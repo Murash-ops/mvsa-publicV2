@@ -119,7 +119,7 @@ export default function ProgramsPage() {
                 >
                   <div className={`relative ${i === 0 ? 'lg:w-3/5 min-h-[450px]' : 'aspect-[16/10]'} overflow-hidden`}>
                     <Image 
-                      src={program.image_url || '/images/academy.png'} 
+                      src={program.image_url || '/images/academy.jpeg'} 
                       alt={program.name} 
                       fill 
                       className="object-cover group-hover:scale-110 transition-transform duration-[2000ms] ease-out" 

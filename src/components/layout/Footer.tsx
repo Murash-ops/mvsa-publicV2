@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import Link from 'next/link';
 import { Instagram, Facebook, Phone, MapPin, Mail } from 'lucide-react';
 
@@ -18,8 +19,10 @@ export default function Footer() {
           {/* Brand Info */}
           <div className="space-y-6">
             <Link href="/" className="flex items-center gap-3 group">
-              <div className="w-10 h-10 bg-gold rounded-xl flex items-center justify-center transition-all duration-300 group-hover:rotate-12 spring-bounce">
-                <span className="text-pitch font-bold text-xl font-brand">M</span>
+              <div className="relative w-14 h-14 bg-white rounded-xl p-1 shadow-sm transition-all duration-300 group-hover:scale-105 spring-bounce flex items-center justify-center">
+                <div className="relative w-full h-full">
+                  <Image src="/images/logo.png" alt="MVSA Logo" fill className="object-contain" unoptimized />
+                </div>
               </div>
               <div>
                 <h2 className="font-brand font-bold text-xl tracking-tighter leading-none text-white">MVSA</h2>
@@ -83,7 +86,7 @@ export default function Footer() {
               </li>
               <li className="flex items-center gap-3">
                 <Phone className="w-5 h-5 text-gold shrink-0" />
-                <span className="text-white/40 text-sm">0783 209 442</span>
+                <span className="text-white/40 text-sm">0798 258 950 / 0783 209 442</span>
               </li>
               <li className="flex items-center gap-3">
                 <Mail className="w-5 h-5 text-gold shrink-0" />
@@ -100,7 +103,6 @@ export default function Footer() {
           <div className="flex gap-8">
             <Link href="/privacy" className="text-white/25 hover:text-gold text-[10px] font-bold uppercase tracking-widest transition-colors duration-300">Privacy</Link>
             <Link href="/terms" className="text-white/25 hover:text-gold text-[10px] font-bold uppercase tracking-widest transition-colors duration-300">Terms</Link>
-            <Link href="/admin" className="text-white/25 hover:text-gold text-[10px] font-bold uppercase tracking-widest transition-colors duration-300">Staff Login</Link>
           </div>
         </div>
       </div>

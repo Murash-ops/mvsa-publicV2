@@ -14,14 +14,14 @@ export default function ContactPage() {
   const contacts = [
     { 
       name: "Arena Bookings", 
-      phone: "0783 209 442", 
+      phone: "0798 258 950", 
       icon: Phone, 
       color: "text-forest", 
       bg: "bg-forest/5" 
     },
     { 
-      name: "Academy Inquiries", 
-      phone: "0116 619 476", 
+      name: "Secondary Line", 
+      phone: "0783 209 442", 
       icon: Shield, 
       color: "text-gold", 
       bg: "bg-gold/10" 

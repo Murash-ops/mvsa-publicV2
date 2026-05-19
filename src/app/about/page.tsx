@@ -7,15 +7,16 @@ import {
   Droplets, 
   Lock, 
   Coffee,
-  CheckCircle2
+  CheckCircle2,
+  Users
 } from 'lucide-react';
 
 export default function AboutPage() {
   const amenities = [
     { icon: Wifi, title: "High-Speed WiFi", desc: "Free access for all players and visitors." },
-    { icon: Droplets, title: "Hydration Station", desc: "Complementary water to keep you at your peak." },
+    { icon: Droplets, title: "Clean Washrooms", desc: "Well-maintained toilets and changing rooms." },
     { icon: Lock, title: "Secure Lockers", desc: "Private storage for your peace of mind." },
-    { icon: Coffee, title: "Member Lounge", desc: "A premium space to relax before or after games." },
+    { icon: Users, title: "Meeting Hall", desc: "A versatile space for team meetings and events." },
   ];
 
   return (
@@ -36,7 +37,7 @@ export default function AboutPage() {
         {/* Story Section - Asymmetric Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center mb-32">
           <div className="lg:col-span-7 relative h-[400px] lg:h-[600px] rounded-[3rem] overflow-hidden shadow-2xl">
-            <Image src="/images/hero_turf.png" alt="MVSA Arena" fill className="object-cover" />
+            <Image src="/images/hero_turf.jpeg" alt="MVSA Arena" fill className="object-cover" />
             <div className="absolute inset-0 bg-gradient-to-r from-forest/40 to-transparent" />
           </div>
           <div className="lg:col-span-5 space-y-8">
@@ -91,20 +92,20 @@ export default function AboutPage() {
           
           <div className="grid grid-cols-1 md:grid-cols-12 gap-6 h-[800px] md:h-[600px]">
             <div className="md:col-span-8 relative rounded-[2.5rem] overflow-hidden shadow-lg group">
-              <Image src="/images/lounge.png" alt="Lounge Area" fill className="object-cover transition-transform duration-700 group-hover:scale-105" />
+              <Image src="/images/meeting_hall.jpeg" alt="Meeting Hall" fill className="object-cover transition-transform duration-700 group-hover:scale-105" />
               <div className="absolute inset-0 bg-forest/20 opacity-0 group-hover:opacity-100 transition-opacity" />
               <div className="absolute bottom-8 left-8 text-white translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all">
-                <p className="font-display font-bold text-2xl italic tracking-tight">The Lounge</p>
-                <p className="text-xs font-bold uppercase tracking-widest text-white/80">Relax & Refuel</p>
+                <p className="font-display font-bold text-2xl italic tracking-tight">The Meeting Hall</p>
+                <p className="text-xs font-bold uppercase tracking-widest text-white/80">Team Events & Strategy</p>
               </div>
             </div>
             <div className="md:col-span-4 grid grid-rows-2 gap-6">
               <div className="relative rounded-[2.5rem] overflow-hidden shadow-lg group">
-                <Image src="/images/hero_turf.png" alt="Turf" fill className="object-cover transition-transform duration-700 group-hover:scale-105" />
+                <Image src="/images/hero_turf.jpeg" alt="Turf" fill className="object-cover transition-transform duration-700 group-hover:scale-105" />
                 <div className="absolute inset-0 bg-forest/20" />
               </div>
               <div className="relative rounded-[2.5rem] overflow-hidden shadow-lg group">
-                <Image src="/images/academy.png" alt="Academy" fill className="object-cover transition-transform duration-700 group-hover:scale-105" />
+                <Image src="/images/academy.jpeg" alt="Academy" fill className="object-cover transition-transform duration-700 group-hover:scale-105" />
                 <div className="absolute inset-0 bg-forest/20" />
               </div>
             </div>

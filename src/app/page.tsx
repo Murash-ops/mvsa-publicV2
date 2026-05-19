@@ -38,8 +38,8 @@ export default function Home() {
             </div>
             
             <h1 className="text-5xl md:text-7xl lg:text-8xl font-display font-extrabold text-white tracking-tighter leading-[0.9] animate-slide-up stagger-1">
-              WHERE <span className="text-gold">WARRIORS</span> <br/>
-              COME TO PLAY.
+              HOME OF <span className="text-gold">FOOTBALL</span> <br/>
+              AND FITNESS.
             </h1>
             
             <p className="text-white/50 text-lg md:text-xl max-w-xl leading-relaxed font-medium animate-slide-up stagger-2">
@@ -69,7 +69,7 @@ export default function Home() {
             <div className="absolute -inset-4 border border-gold/15 rounded-[2.5rem] rotate-3 hidden lg:block" />
             <div className="relative h-full w-full rounded-[2.5rem] overflow-hidden shadow-2xl shadow-pitch/80 border border-white/5 rotate-1 hover:rotate-0 transition-transform duration-700 spring-bounce">
               <Image 
-                src="/images/hero_turf.png" 
+                src="/images/hero_turf.jpeg" 
                 alt="MVSA Premium Football Turf" 
                 fill 
                 className="object-cover"
@@ -147,7 +147,7 @@ export default function Home() {
                 <div className="space-y-4 pt-12">
                   <div className="aspect-[4/5] relative rounded-3xl overflow-hidden shadow-xl group">
                     <div className="absolute inset-0 bg-forest/10 group-hover:bg-forest/5 transition-colors duration-500 z-10" />
-                    <Image src="/images/hero_turf.png" alt="Professional football turf close-up" fill className="object-cover group-hover:scale-105 transition-transform duration-700" />
+                    <Image src="/images/hero_turf.jpeg" alt="Professional football turf close-up" fill className="object-cover group-hover:scale-105 transition-transform duration-700" />
                   </div>
                   <div className="bg-pitch p-6 rounded-3xl text-white relative overflow-hidden">
                     <div className="turf-pattern absolute inset-0" />
@@ -170,7 +170,7 @@ export default function Home() {
                   </div>
                   <div className="aspect-[4/5] relative rounded-3xl overflow-hidden shadow-xl group">
                     <div className="absolute inset-0 bg-forest/10 group-hover:bg-forest/5 transition-colors duration-500 z-10" />
-                    <Image src="/images/lounge.png" alt="MVSA lounge area" fill className="object-cover group-hover:scale-105 transition-transform duration-700" />
+                    <Image src="/images/meeting_hall.jpeg" alt="MVSA meeting hall" fill className="object-cover group-hover:scale-105 transition-transform duration-700" />
                   </div>
                 </div>
               </div>
