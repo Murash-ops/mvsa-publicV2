@@ -1,0 +1,40 @@
+import { defineConfig, devices } from '@playwright/test';
+
+/**
+ * See https://playwright.dev/docs/test-configuration.
+ */
+export default defineConfig({
+  testDir: './tests',
+  /* Run tests in files sequentially to prevent concurrent Next.js dev compiler thrashing */
+  fullyParallel: false,
+  /* Fail the build on CI if you accidentally left test.only in the source code. */
+  forbidOnly: !!process.env.CI,
+  /* Retry on failure */
+  retries: 2,
+  /* Limit workers to 1 for dev server stability */
+  workers: 1,
+  /* Reporter to use. See https://playwright.dev/docs/test-reporters */
+  reporter: 'html',
+  /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
+  timeout: 60 * 1000,
+  expect: {
+    timeout: 10 * 1000,
+  },
+  use: {
+    /* Base URL to use in actions like `await page.goto('/')`. */
+    baseURL: 'http://localhost:3000',
+
+    /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
+    trace: 'on-first-retry',
+    video: 'on-first-retry',
+    screenshot: 'only-on-failure',
+  },
+
+  /* Configure projects for major browsers */
+  projects: [
+    {
+      name: 'chromium',
+      use: { ...devices['Desktop Chrome'] },
+    },
+  ],
+});

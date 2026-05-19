@@ -1,0 +1,232 @@
+@import "tailwindcss";
+
+@theme {
+  /* === CORE PALETTE === */
+  --color-forest: #2D5016;
+  --color-forest-dark: #1A3A0A;
+  --color-forest-light: #3D6B20;
+  
+  --color-gold: #C5A55A;
+  --color-gold-muted: #D4BA7A;
+  --color-gold-deep: #A68B3C;
+  
+  --color-charcoal: #2B2B2B;
+  --color-charcoal-light: #4A4A4A;
+  --color-muted: #71717A;
+  --color-surface: #F9FAFB;
+  --color-card: #FFFFFF;
+  --color-border-color: rgba(45,80,22,0.12);
+  
+  /* === PITCH (DARK THEME) PALETTE === */
+  --color-pitch: #0D1B0E;
+  --color-pitch-light: #162A17;
+  --color-pitch-mid: #1E3620;
+  --color-pitch-surface: rgba(255,255,255,0.04);
+  --color-pitch-border: rgba(255,255,255,0.08);
+  --color-glow: rgba(197,165,90,0.15);
+  
+  /* === STATUS === */
+  --color-success: #22C55E;
+  --color-warning: #F59E0B;
+  --color-error: #DC3545;
+  --color-turf: #4CAF50;
+
+  /* === TYPOGRAPHY === */
+  --font-sans: var(--font-dm-sans), Arial, Helvetica, sans-serif;
+  --font-display: var(--font-outfit), sans-serif;
+  --font-brand: var(--font-cinzel), serif;
+  --font-mono: var(--font-jetbrains-mono), monospace;
+}
+
+@layer base {
+  body {
+    @apply bg-surface text-charcoal font-sans;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display text-forest tracking-tight;
+  }
+}
+
+/* ========================================
+   GLASSMORPHISM UTILITIES
+   ======================================== */
+
+.glass {
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.glass-gold {
+  background: rgba(197, 165, 90, 0.08);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(197, 165, 90, 0.15);
+}
+
+.glass-light {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* ========================================
+   PREMIUM SHADOWS
+   ======================================== */
+
+.shadow-gold-sm {
+  box-shadow: 0 2px 8px rgba(197, 165, 90, 0.12);
+}
+
+.shadow-gold-md {
+  box-shadow: 0 4px 16px rgba(197, 165, 90, 0.15),
+              0 1px 4px rgba(197, 165, 90, 0.1);
+}
+
+.shadow-gold-lg {
+  box-shadow: 0 8px 32px rgba(197, 165, 90, 0.2),
+              0 2px 8px rgba(197, 165, 90, 0.1);
+}
+
+.shadow-pitch {
+  box-shadow: 0 8px 32px rgba(13, 27, 14, 0.5),
+              0 2px 8px rgba(13, 27, 14, 0.3);
+}
+
+/* ========================================
+   ANIMATIONS
+   ======================================== */
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes pulse-gold {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(197, 165, 90, 0.3); }
+  50% { box-shadow: 0 0 0 6px rgba(197, 165, 90, 0); }
+}
+
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes count-glow {
+  0%, 100% { text-shadow: 0 0 8px rgba(220, 53, 69, 0); }
+  50% { text-shadow: 0 0 16px rgba(220, 53, 69, 0.5); }
+}
+
+@keyframes badge-shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+@keyframes entrance-scale {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.animate-shimmer { animation: shimmer 2s infinite; }
+.animate-float { animation: float 3s ease-in-out infinite; }
+.animate-pulse-gold { animation: pulse-gold 2s ease-in-out infinite; }
+.animate-slide-up { animation: slide-up 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+.animate-count-glow { animation: count-glow 1.5s ease-in-out infinite; }
+.animate-entrance { animation: entrance-scale 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+
+/* Stagger delays for list items */
+.stagger-1 { animation-delay: 30ms; }
+.stagger-2 { animation-delay: 60ms; }
+.stagger-3 { animation-delay: 90ms; }
+.stagger-4 { animation-delay: 120ms; }
+.stagger-5 { animation-delay: 150ms; }
+.stagger-6 { animation-delay: 180ms; }
+.stagger-7 { animation-delay: 210ms; }
+.stagger-8 { animation-delay: 240ms; }
+
+/* ========================================
+   TURF PATTERN (replaces external texture)
+   ======================================== */
+
+.turf-pattern {
+  background-image: 
+    repeating-linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.02) 0px,
+      rgba(255, 255, 255, 0.02) 1px,
+      transparent 1px,
+      transparent 40px
+    ),
+    repeating-linear-gradient(
+      0deg,
+      rgba(255, 255, 255, 0.015) 0px,
+      rgba(255, 255, 255, 0.015) 1px,
+      transparent 1px,
+      transparent 40px
+    );
+}
+
+/* ========================================
+   SCROLLBAR UTILITIES
+   ======================================== */
+
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* ========================================
+   SPRING TRANSITION
+   ======================================== */
+
+.spring-bounce {
+  transition-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ========================================
+   SKELETON LOADER
+   ======================================== */
+
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+}
+
+.skeleton::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.08),
+    transparent
+  );
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+/* ========================================
+   TICKET SEPARATOR
+   ======================================== */
+
+.ticket-divider {
+  background-image: repeating-linear-gradient(
+    to right,
+    currentColor 0,
+    currentColor 6px,
+    transparent 6px,
+    transparent 12px
+  );
+  background-size: 12px 1px;
+  background-repeat: repeat-x;
+  background-position: center;
+  height: 1px;
+}
