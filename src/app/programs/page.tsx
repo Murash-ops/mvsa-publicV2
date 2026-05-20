@@ -22,8 +22,10 @@ import EnrollmentFlow from '@/components/programs/EnrollmentFlow';
 
 export default function ProgramsPage() {
   const supabase = createClient();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [programs, setPrograms] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [selectedProgram, setSelectedProgram] = useState<any | null>(null);
   const whatsappNumber = "254798258950";
   

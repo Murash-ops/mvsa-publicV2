@@ -2,7 +2,7 @@ export type Venue = {
   id: number;
   name: string;
   type: 'turf' | 'meeting_room';
-  hourly_rates: any;
+  hourly_rates: Record<string, unknown>;
 };
 
 export type TimeSlot = {

@@ -54,7 +54,7 @@ export default function ContactPage() {
             <span className="text-gold">CONNECT?</span>
           </h1>
           <p className="text-charcoal-light text-lg max-w-2xl leading-relaxed font-medium">
-            Whether you have a question about booking, want to enroll in an academy, or just want to say hi, we're here to help.
+            Whether you have a question about booking, want to enroll in an academy, or just want to say hi, we&apos;re here to help.
           </p>
         </header>
 

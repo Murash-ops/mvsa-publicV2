@@ -67,7 +67,7 @@ export default function AboutPage() {
         <div className="mb-32">
           <div className="text-center max-w-2xl mx-auto mb-16 space-y-4">
             <h2 className="text-4xl font-display font-bold text-forest italic">The Premium Experience</h2>
-            <p className="text-charcoal-light font-medium">We've thought of every detail so you can focus on the game.</p>
+            <p className="text-charcoal-light font-medium">We&apos;ve thought of every detail so you can focus on the game.</p>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">

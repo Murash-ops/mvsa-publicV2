@@ -40,6 +40,7 @@ export default function EnrollmentFlow({ program, onClose }: { program: Program,
     plan: 'session'
   });
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const deposit = (program.pricing_json as any)[formData.plan] * 0.5;
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -104,9 +105,10 @@ export default function EnrollmentFlow({ program, onClose }: { program: Program,
 
       setCheckoutId(mpesaData.CheckoutRequestID);
       setPaymentStatus('polling');
-    } catch (err: any) {
+    } catch (err: unknown) {
       setPaymentStatus('idle');
-      setErrorMessage(err.message || 'Enrollment failed.');
+      console.error(err);
+      alert((err as Error).message || 'Failed to submit enrollment.');
     } finally {
       setIsLoading(false);
     }

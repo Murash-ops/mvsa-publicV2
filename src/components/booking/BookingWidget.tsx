@@ -21,6 +21,7 @@ export default function BookingWidget({ initialVenues }: { initialVenues: Venue[
   const [countdown, setCountdown] = useState(900); // 15 minutes in seconds
   const [errorMessage, setErrorMessage] = useState('');
   const [paymentMethod, setPaymentMethod] = useState<'stk' | 'manual'>('stk');
+  const [randomRef] = useState(() => Math.floor(Math.random() * 1000).toString());
 
   // Generate 7 days for the calendar
   const next7Days = Array.from({ length: 7 }).map((_, i) => addDays(new Date(), i));
@@ -151,9 +152,9 @@ export default function BookingWidget({ initialVenues }: { initialVenues: Venue[
       setCheckoutId(data.toString());
       setManualHoldStatus('held');
       setCountdown(900); // 15 mins
-    } catch (err: any) {
+    } catch (err: unknown) {
       setManualHoldStatus('idle');
-      setErrorMessage(err.message || 'Failed to hold slots. Please try again.');
+      setErrorMessage((err as Error).message || 'Failed to hold slots. Please try again.');
     }
   };
 
@@ -189,9 +190,9 @@ export default function BookingWidget({ initialVenues }: { initialVenues: Venue[
       setCheckoutId(data.CheckoutRequestID);
       setPaymentStatus('polling');
       setCountdown(900); // 15 mins
-    } catch (err: any) {
+    } catch (err: unknown) {
       setPaymentStatus('idle');
-      setErrorMessage(err.message || 'Payment initiation failed.');
+      setErrorMessage((err as Error).message || 'Payment initiation failed.');
     }
   };
 
@@ -517,7 +518,7 @@ export default function BookingWidget({ initialVenues }: { initialVenues: Venue[
                           <div className="bg-pitch/40 p-3 rounded-xl border border-pitch-border">
                             <p className="text-[10px] text-white/30 uppercase font-bold mb-1">Payment Reference</p>
                             <p className="text-xs font-mono font-bold bg-pitch-surface p-2 rounded uppercase text-center text-white/70">
-                              {clientName ? clientName.substring(0, 3).toUpperCase() : 'MVSA'}-{format(new Date(), 'ddMM')}-{Math.floor(Math.random() * 1000)}
+                              {clientName ? clientName.substring(0, 3).toUpperCase() : 'MVSA'}-{format(new Date(), 'ddMM')}-{randomRef || '000'}
                             </p>
                           </div>
                           <p className="text-[10px] text-white/30 leading-relaxed">
