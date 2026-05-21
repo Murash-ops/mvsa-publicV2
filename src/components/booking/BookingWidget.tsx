@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { format, addDays, isSameDay } from 'date-fns';
 import { createClient } from '@/utils/supabase/client';
 import type { Venue, TimeSlot } from '@/types/database';
-import { Calendar, Clock, MapPin, CheckCircle2, Flame, Zap, CreditCard, Smartphone } from 'lucide-react';
+import { Calendar, Clock, MapPin, CheckCircle2, Flame, Zap, CreditCard, Smartphone, Sunrise } from 'lucide-react';
 
 export default function BookingWidget({ initialVenues }: { initialVenues: Venue[] }) {
   const supabase = createClient();
@@ -284,7 +284,13 @@ export default function BookingWidget({ initialVenues }: { initialVenues: Venue[
               {slots.map((slot, i) => {
                 const isSelected = selectedSlots.includes(slot.id);
                 const isAvailable = slot.status === 'available';
+                const isMorning = slot.price_tier === 'morning';
                 const isPeak = slot.price_tier === 'peak';
+                const tierConfig = isMorning
+                  ? { label: 'MORNING', className: 'bg-sky-500/15 text-sky-400', icon: <Sunrise className="w-3 h-3" /> }
+                  : isPeak
+                  ? { label: 'PEAK', className: 'bg-orange-500/15 text-orange-400', icon: <Flame className="w-3 h-3" /> }
+                  : { label: 'OFF-PEAK', className: 'bg-emerald-500/15 text-emerald-400', icon: null };
                 return (
                   <button
                     key={slot.id}
@@ -304,13 +310,9 @@ export default function BookingWidget({ initialVenues }: { initialVenues: Venue[
                     <span className={`block font-mono font-bold text-lg ${isSelected ? 'text-gold' : 'text-white'}`}>
                       {slot.start_time.substring(0, 5)}
                     </span>
-                    <span className={`text-[10px] font-bold mt-1.5 inline-flex items-center gap-1 px-2 py-0.5 rounded-full ${
-                      isPeak 
-                        ? 'bg-orange-500/15 text-orange-400' 
-                        : 'bg-emerald-500/15 text-emerald-400'
-                    }`}>
-                      {isPeak && <Flame className="w-3 h-3" />}
-                      {isPeak ? 'PEAK' : 'OFF-PEAK'}
+                    <span className={`text-[10px] font-bold mt-1.5 inline-flex items-center gap-1 px-2 py-0.5 rounded-full ${tierConfig.className}`}>
+                      {tierConfig.icon}
+                      {tierConfig.label}
                     </span>
                     {!isAvailable && (
                       <span className="absolute top-2 right-2 px-1.5 py-0.5 rounded text-[8px] font-black uppercase bg-error/80 text-white">

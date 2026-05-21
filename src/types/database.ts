@@ -12,5 +12,5 @@ export type TimeSlot = {
   start_time: string;
   end_time: string;
   status: 'available' | 'booked' | 'held';
-  price_tier: 'peak' | 'off_peak' | 'weekend';
+  price_tier: 'peak' | 'off_peak' | 'weekend' | 'morning';
 };
