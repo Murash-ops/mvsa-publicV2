@@ -22,9 +22,45 @@ export default function BookingWidget({ initialVenues }: { initialVenues: Venue[
   const [errorMessage, setErrorMessage] = useState('');
   const [paymentMethod, setPaymentMethod] = useState<'stk' | 'manual'>('stk');
   const [randomRef] = useState(() => Math.floor(Math.random() * 1000).toString());
+  const [mpesaCode, setMpesaCode] = useState('');
+  const [isSubmittingCode, setIsSubmittingCode] = useState(false);
 
-  // Generate 7 days for the calendar
-  const next7Days = Array.from({ length: 7 }).map((_, i) => addDays(new Date(), i));
+  const handleSubmitMpesaCode = async () => {
+    if (!mpesaCode.trim()) {
+      setErrorMessage('Please enter your M-Pesa Transaction Code.');
+      return;
+    }
+    const cleanCode = mpesaCode.trim().toUpperCase();
+    if (!/^[A-Z0-9]{10}$/.test(cleanCode)) {
+      setErrorMessage('Invalid M-Pesa Code. Must be exactly 10 alphanumeric characters.');
+      return;
+    }
+    
+    setIsSubmittingCode(true);
+    setErrorMessage('');
+    
+    try {
+      const { error } = await supabase
+        .from('bookings')
+        .update({
+          checkout_request_id: cleanCode,
+          status: 'pending'
+        })
+        .eq('id', Number(checkoutId));
+
+      if (error) throw error;
+      
+      setPaymentStatus('success');
+      setMpesaCode('');
+    } catch (err: unknown) {
+      setErrorMessage((err as Error).message || 'Failed to submit M-Pesa code. Please try again.');
+    } finally {
+      setIsSubmittingCode(false);
+    }
+  };
+
+  // Generate 14 days for the calendar
+  const next14Days = Array.from({ length: 14 }).map((_, i) => addDays(new Date(), i));
 
   // Fetch slots when venue or date changes
   useEffect(() => {
@@ -242,7 +278,7 @@ export default function BookingWidget({ initialVenues }: { initialVenues: Venue[
             <Calendar className="w-5 h-5 text-gold" /> Select Date
           </h2>
           <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
-            {next7Days.map((date) => {
+            {next14Days.map((date) => {
               const isSelected = isSameDay(date, selectedDate);
               return (
                 <button
@@ -516,7 +552,7 @@ export default function BookingWidget({ initialVenues }: { initialVenues: Venue[
                           </div>
                           <div>
                             <p className="text-[10px] text-white/30 uppercase font-bold">Buy Goods Till Number</p>
-                            <p className="text-2xl font-mono font-bold text-white tracking-wider">5942654</p>
+                            <p className="text-2xl font-mono font-bold text-white tracking-wider">967413</p>
                           </div>
                           <div>
                             <p className="text-[10px] text-white/30 uppercase font-bold">Amount to Pay</p>
@@ -528,14 +564,42 @@ export default function BookingWidget({ initialVenues }: { initialVenues: Venue[
                               {clientName ? clientName.substring(0, 3).toUpperCase() : 'MVSA'}-{format(new Date(), 'ddMM')}-{randomRef || '000'}
                             </p>
                           </div>
-                          <p className="text-[10px] text-white/30 leading-relaxed">
-                            Once you pay, share the M-Pesa message with the receptionist to confirm your booking before the timer runs out.
+
+                          {/* Mpesa Transaction Code Confirmation */}
+                          <div className="pt-2 border-t border-white/5 space-y-2">
+                            <label className="block text-[10px] text-gold uppercase font-bold text-left">Enter M-Pesa Transaction Code</label>
+                            <input 
+                              type="text"
+                              value={mpesaCode}
+                              onChange={(e) => setMpesaCode(e.target.value)}
+                              placeholder="e.g. QET789XYZ"
+                              className="w-full px-3 py-2 bg-pitch/60 border border-pitch-border rounded-xl text-center text-white font-mono uppercase tracking-widest placeholder-white/20 focus:outline-none focus:ring-1 focus:ring-gold/50"
+                            />
+                            {errorMessage && (
+                              <p className="text-error text-[10px] font-medium text-center">{errorMessage}</p>
+                            )}
+                            <button
+                              onClick={handleSubmitMpesaCode}
+                              disabled={isSubmittingCode || !mpesaCode}
+                              className="w-full bg-gold hover:bg-gold-muted disabled:opacity-50 disabled:bg-gold/30 disabled:text-pitch/50 text-pitch py-3 rounded-xl font-bold uppercase tracking-wider text-xs transition-all flex items-center justify-center gap-2"
+                            >
+                              {isSubmittingCode ? 'Verifying...' : 'Submit Payment & Complete Booking'}
+                            </button>
+                          </div>
+
+                          <p className="text-[10px] text-white/30 leading-relaxed text-center pt-2">
+                            Once you pay and submit the code, the administrator will verify the receipt and finalize your booking.
                           </p>
+
+                          <div className="text-center my-1.5">
+                            <span className="text-[10px] text-white/25">or</span>
+                          </div>
+
                           <button 
                             onClick={() => window.open(`https://wa.me/254798258950?text=Hi MVSA! I've just paid KES ${deposit} for my booking (Ref: ${checkoutId}). Please confirm.`, '_blank')}
-                            className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-3.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-colors active:scale-[0.98]"
+                            className="w-full bg-emerald-600/20 border border-emerald-500/30 hover:bg-emerald-600/30 text-emerald-400 py-3 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-colors active:scale-[0.98]"
                           >
-                            Confirm on WhatsApp
+                            Send Receipt via WhatsApp
                           </button>
                         </div>
                       )}
