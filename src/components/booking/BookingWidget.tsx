@@ -107,11 +107,16 @@ export default function BookingWidget({ initialVenues }: { initialVenues: Venue[
     );
   };
 
+  const getSlotPrice = (slot: { price_tier: string }) => {
+    const rates = selectedVenue?.hourly_rates as Record<string, number> | undefined;
+    return rates?.[slot.price_tier] ?? 0;
+  };
+
   const calculateTotal = () => {
     return selectedSlots.reduce((total, id) => {
       const slot = slots.find(s => s.id === id);
       if (!slot) return total;
-      return total + (slot.price_tier === 'peak' ? 2000 : 1500);
+      return total + getSlotPrice(slot);
     }, 0);
   };
 
