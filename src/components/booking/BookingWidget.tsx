@@ -20,7 +20,7 @@ export default function BookingWidget({ initialVenues }: { initialVenues: Venue[
   const [checkoutId, setCheckoutId] = useState<string | null>(null);
   const [countdown, setCountdown] = useState(900); // 15 minutes in seconds
   const [errorMessage, setErrorMessage] = useState('');
-  const [paymentMethod, setPaymentMethod] = useState<'stk' | 'manual'>('stk');
+  const [paymentMethod, setPaymentMethod] = useState<'stk' | 'manual'>('manual');
   const [randomRef] = useState(() => Math.floor(Math.random() * 1000).toString());
   const [mpesaCode, setMpesaCode] = useState('');
   const [isSubmittingCode, setIsSubmittingCode] = useState(false);
@@ -481,33 +481,7 @@ export default function BookingWidget({ initialVenues }: { initialVenues: Venue[
                     <p className="text-error text-xs mt-2 font-medium">{errorMessage}</p>
                   )}
 
-                  {/* Payment Method Tabs */}
-                  {manualHoldStatus !== 'held' && (
-                    <div className="flex glass rounded-xl p-1 mb-2">
-                      <button 
-                        onClick={() => setPaymentMethod('stk')}
-                        className={`flex-1 py-2.5 text-xs font-bold uppercase tracking-wider rounded-lg transition-all duration-300 flex items-center justify-center gap-2 ${
-                          paymentMethod === 'stk' 
-                            ? 'bg-gold text-pitch shadow-gold-sm' 
-                            : 'text-white/40 hover:text-white/60'
-                        }`}
-                      >
-                        <Smartphone className="w-3.5 h-3.5" />
-                        STK Push
-                      </button>
-                      <button 
-                        onClick={() => setPaymentMethod('manual')}
-                        className={`flex-1 py-2.5 text-xs font-bold uppercase tracking-wider rounded-lg transition-all duration-300 flex items-center justify-center gap-2 ${
-                          paymentMethod === 'manual' 
-                            ? 'bg-gold text-pitch shadow-gold-sm' 
-                            : 'text-white/40 hover:text-white/60'
-                        }`}
-                      >
-                        <CreditCard className="w-3.5 h-3.5" />
-                        Manual Pay
-                      </button>
-                    </div>
-                  )}
+
 
                   {paymentMethod === 'stk' ? (
                     <>
