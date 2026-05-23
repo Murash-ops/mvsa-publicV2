@@ -7,5 +7,5 @@ test('booking page should show venues', async ({ page }) => {
   await expect(page.locator('text=NO VENUES AVAILABLE')).not.toBeVisible({ timeout: 10000 });
   
   // Check for the seeded venue
-  await expect(page.locator('text=Main Arena Turf')).toBeVisible();
+  await expect(page.locator('text=Main Arena Turf').first()).toBeVisible();
 });

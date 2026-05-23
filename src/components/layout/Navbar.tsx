@@ -45,9 +45,7 @@ export default function Navbar() {
             </div>
           </div>
           <div>
-            <h1 className={`font-brand font-bold text-xl lg:text-2xl transition-colors duration-500 tracking-tighter leading-none ${
-              isScrolled || isDarkPage ? 'text-white' : 'text-forest'
-            }`}>MVSA</h1>
+            <h1 className="font-brand font-bold text-xl lg:text-2xl transition-colors duration-500 tracking-tighter leading-none text-white">MVSA</h1>
             <p className="text-[10px] text-gold font-bold uppercase tracking-widest leading-none mt-1">Arena & Academy</p>
           </div>
         </Link>
@@ -59,10 +57,10 @@ export default function Navbar() {
               key={link.href} 
               href={link.href}
               className={`
-                relative text-sm font-bold tracking-widest uppercase transition-colors duration-500 py-2
+                group relative text-sm font-bold tracking-widest uppercase transition-colors duration-500 py-2
                 ${pathname === link.href 
                   ? 'text-gold' 
-                  : (isScrolled || isDarkPage ? 'text-white/60 hover:text-white' : 'text-forest/60 hover:text-forest')}
+                  : 'text-white/60 hover:text-white'}
               `}
             >
               {link.name}
@@ -88,9 +86,7 @@ export default function Navbar() {
 
         {/* Mobile Toggle */}
         <button 
-          className={`lg:hidden p-2 hover:bg-white/5 rounded-xl transition-colors ${
-            isScrolled || isDarkPage ? 'text-white' : 'text-forest'
-          }`}
+          className="lg:hidden p-2 hover:bg-white/5 rounded-xl transition-colors text-white"
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           aria-label={isMobileMenuOpen ? 'Close menu' : 'Open menu'}
         >

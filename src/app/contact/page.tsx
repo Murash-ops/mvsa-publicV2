@@ -4,7 +4,6 @@ import {
   MapPin, 
   Instagram, 
   Facebook, 
-  MessageSquare,
   Clock,
   Send,
   Shield
@@ -14,24 +13,27 @@ export default function ContactPage() {
   const contacts = [
     { 
       name: "Arena Bookings", 
-      phone: "0798 258 950", 
+      value: "0798 258 950", 
+      href: "tel:0798258950",
       icon: Phone, 
-      color: "text-forest", 
-      bg: "bg-forest/5" 
+      color: "text-gold", 
+      bg: "bg-white/5" 
     },
     { 
       name: "Secondary Line", 
-      phone: "0783 209 442", 
+      value: "0783 209 442", 
+      href: "tel:0783209442",
       icon: Shield, 
       color: "text-gold", 
-      bg: "bg-gold/10" 
+      bg: "bg-white/5" 
     },
     { 
-      name: "WhatsApp Support", 
-      phone: "0798 258 950", 
-      icon: MessageSquare, 
-      color: "text-[#25D366]", 
-      bg: "bg-[#25D366]/10" 
+      name: "Official Email", 
+      value: "mtviewsportsarena@gmail.com", 
+      href: "mailto:mtviewsportsarena@gmail.com",
+      icon: Mail, 
+      color: "text-gold", 
+      bg: "bg-white/5" 
     },
   ];
 
@@ -45,11 +47,11 @@ export default function ContactPage() {
       <div className="max-w-7xl mx-auto px-6 lg:px-10">
         {/* Header */}
         <header className="mb-20 space-y-6">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-forest/5 border border-forest/10 rounded-full">
-            <Send className="w-4 h-4 text-forest" />
-            <span className="text-forest text-[10px] font-bold uppercase tracking-[0.2em]">Get in Touch</span>
+          <div className="inline-flex items-center gap-2 px-4 py-2 glass-gold rounded-full">
+            <Send className="w-4 h-4 text-gold" />
+            <span className="text-gold text-[10px] font-bold uppercase tracking-[0.2em]">Get in Touch</span>
           </div>
-          <h1 className="text-5xl md:text-7xl font-display font-bold text-forest tracking-tighter leading-[0.9] italic">
+          <h1 className="text-5xl md:text-7xl font-display font-bold text-white tracking-tighter leading-[0.9] italic">
             READY TO <br/>
             <span className="text-gold">CONNECT?</span>
           </h1>
@@ -63,19 +65,25 @@ export default function ContactPage() {
           <div className="lg:col-span-5 space-y-6">
             <div className="grid grid-cols-1 gap-6">
               {contacts.map((contact, i) => (
-                <div key={i} className="flex items-center gap-6 p-8 bg-white rounded-3xl border border-border-color shadow-sm hover:shadow-md transition-shadow group">
-                  <div className={`w-14 h-14 ${contact.bg} ${contact.color} rounded-2xl flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform`}>
+                <a 
+                  key={i} 
+                  href={contact.href}
+                  className="flex items-center gap-6 p-8 glass rounded-3xl border border-white/5 hover:border-gold/30 hover:shadow-gold-md transition-all duration-300 group spring-bounce"
+                >
+                  <div className={`w-14 h-14 ${contact.bg} ${contact.color} rounded-2xl flex items-center justify-center shrink-0 group-hover:scale-110 transition-all duration-300`}>
                     <contact.icon className="w-7 h-7" />
                   </div>
-                  <div>
-                    <p className="text-[10px] font-bold text-muted uppercase tracking-widest mb-1">{contact.name}</p>
-                    <p className="text-xl font-display font-bold text-forest italic">{contact.phone}</p>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest mb-1">{contact.name}</p>
+                    <p className={`font-display font-bold text-white italic transition-colors group-hover:text-gold ${contact.name.includes('Email') ? 'text-xs sm:text-sm md:text-base break-all font-sans not-italic' : 'text-xl'}`}>
+                      {contact.value}
+                    </p>
                   </div>
-                </div>
+                </a>
               ))}
             </div>
 
-            <div className="p-8 bg-forest rounded-[2rem] text-white space-y-6 relative overflow-hidden">
+            <div className="p-8 glass-gold rounded-[2rem] text-white space-y-6 relative overflow-hidden border border-gold/12 shadow-gold-sm animate-slide-up">
               <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10" />
               <div className="relative z-10">
                 <div className="flex items-center gap-3 text-gold mb-4">
@@ -84,10 +92,10 @@ export default function ContactPage() {
                 </div>
                 <div className="space-y-3">
                   <div className="flex justify-between items-center border-b border-white/10 pb-2">
-                    <span className="text-sm font-medium text-white/60">Monday — Sunday</span>
-                    <span className="text-sm font-bold">8:00 AM — 12:00 AM</span>
+                    <span className="text-sm font-medium text-white/80">Monday — Sunday</span>
+                    <span className="text-sm font-bold text-gold">8:00 AM — 12:00 AM</span>
                   </div>
-                  <p className="text-xs text-white/40 leading-relaxed">
+                  <p className="text-xs text-white/50 leading-relaxed">
                     Last bookable slot starts at 11:00 PM daily.
                   </p>
                 </div>
@@ -100,14 +108,14 @@ export default function ContactPage() {
                   key={social.name}
                   href={social.href}
                   target="_blank"
-                  className="flex-1 flex items-center gap-3 p-4 bg-white rounded-2xl border border-border-color hover:border-gold transition-colors group"
+                  className="flex-1 flex items-center gap-3 p-4 glass rounded-2xl border border-white/5 hover:border-gold/30 hover:shadow-gold-sm transition-all duration-300 group spring-bounce"
                 >
-                  <div className="w-8 h-8 bg-surface text-forest rounded-lg flex items-center justify-center group-hover:bg-gold group-hover:text-forest transition-colors">
+                  <div className="w-8 h-8 bg-white/5 text-gold rounded-lg flex items-center justify-center group-hover:bg-gold group-hover:text-pitch transition-all duration-300">
                     <social.icon className="w-4 h-4" />
                   </div>
                   <div className="min-w-0">
-                    <p className="text-[9px] font-bold text-muted uppercase tracking-tighter leading-none">{social.name}</p>
-                    <p className="text-xs font-bold text-forest truncate">{social.handle}</p>
+                    <p className="text-[9px] font-bold text-white/40 uppercase tracking-tighter leading-none">{social.name}</p>
+                    <p className="text-xs font-bold text-white truncate">{social.handle}</p>
                   </div>
                 </a>
               ))}
@@ -116,7 +124,7 @@ export default function ContactPage() {
 
           {/* Map & Form Section */}
           <div className="lg:col-span-7 space-y-8">
-            <div className="bg-white p-4 rounded-[2.5rem] border border-border-color shadow-sm h-[400px] lg:h-full min-h-[450px] relative overflow-hidden group">
+            <div className="glass p-4 rounded-[2.5rem] border border-white/5 shadow-pitch h-[400px] lg:h-full min-h-[450px] relative overflow-hidden group">
               {/* Google Maps Embed Iframe */}
               <iframe 
                 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15955.15647573428!2d36.75!3d-1.26!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x182f19f6a6c42171%3A0x6b40e704043f053e!2sMountain%20View%20Mall!5e0!3m2!1sen!2ske!4v1700000000000!5m2!1sen!2ske" 
@@ -126,10 +134,10 @@ export default function ContactPage() {
                 referrerPolicy="no-referrer-when-downgrade"
               />
               
-              <div className="absolute bottom-10 left-10 right-10 p-6 bg-white/90 backdrop-blur-md border border-border-color rounded-2xl flex items-start gap-4 shadow-xl translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500">
-                <MapPin className="w-6 h-6 text-forest shrink-0 mt-1" />
+              <div className="absolute bottom-10 left-10 right-10 p-6 glass backdrop-blur-md border border-white/10 rounded-2xl flex items-start gap-4 shadow-pitch translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500">
+                <MapPin className="w-6 h-6 text-gold shrink-0 mt-1" />
                 <div>
-                  <p className="font-display font-bold text-forest text-lg italic">Find Us Here</p>
+                  <p className="font-display font-bold text-white text-lg italic animate-entrance">Find Us Here</p>
                   <p className="text-sm text-charcoal-light leading-relaxed">
                     Waiyaki Way, Behind Mountain View Mall, <br/>
                     Kangemi, Nairobi.

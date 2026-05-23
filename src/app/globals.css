@@ -1,35 +1,36 @@
 @import "tailwindcss";
 
 @theme {
-  /* === CORE PALETTE === */
-  --color-forest: #2D5016;
-  --color-forest-dark: #1A3A0A;
-  --color-forest-light: #3D6B20;
+  /* === CORE REDESIGN PALETTE === */
+  --color-forest: #0d2818;
+  --color-forest-dark: #061a10;
+  --color-forest-light: #1b4332;
   
-  --color-gold: #C5A55A;
-  --color-gold-muted: #D4BA7A;
-  --color-gold-deep: #A68B3C;
+  --color-gold: hsl(38, 42%, 63%); /* #c5a880 */
+  --color-gold-muted: hsl(38, 48%, 54%); /* #b59363 */
+  --color-gold-deep: #8f744e;
   
-  --color-charcoal: #2B2B2B;
-  --color-charcoal-light: #4A4A4A;
-  --color-muted: #71717A;
-  --color-surface: #F9FAFB;
-  --color-card: #FFFFFF;
-  --color-border-color: rgba(45,80,22,0.12);
+  --color-charcoal: #061a10;
+  --color-charcoal-light: #bfcfc6;
+  --color-muted: #718a7a;
+  
+  --color-surface: #061a10;
+  --color-card: rgba(255, 255, 255, 0.03);
+  --color-border-color: rgba(255, 255, 255, 0.07);
   
   /* === PITCH (DARK THEME) PALETTE === */
-  --color-pitch: #0D1B0E;
-  --color-pitch-light: #162A17;
-  --color-pitch-mid: #1E3620;
-  --color-pitch-surface: rgba(255,255,255,0.04);
-  --color-pitch-border: rgba(255,255,255,0.08);
-  --color-glow: rgba(197,165,90,0.15);
+  --color-pitch: #061a10;
+  --color-pitch-light: #0a2416;
+  --color-pitch-mid: #103320;
+  --color-pitch-surface: rgba(255, 255, 255, 0.03);
+  --color-pitch-border: rgba(255, 255, 255, 0.07);
+  --color-glow: rgba(197, 168, 128, 0.15);
   
   /* === STATUS === */
   --color-success: #22C55E;
   --color-warning: #F59E0B;
   --color-error: #DC3545;
-  --color-turf: #4CAF50;
+  --color-turf: #2d6a4f;
 
   /* === TYPOGRAPHY === */
   --font-sans: var(--font-dm-sans), Arial, Helvetica, sans-serif;
@@ -40,64 +41,97 @@
 
 @layer base {
   body {
-    @apply bg-surface text-charcoal font-sans;
+    background-image: 
+      linear-gradient(
+        rgba(6, 26, 16, 0.82),
+        rgba(6, 26, 16, 0.94)
+      ),
+      url('/images/hero_turf.jpeg');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+    @apply text-charcoal-light font-sans min-h-screen antialiased;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    @apply font-display text-forest tracking-tight;
+    @apply font-display text-white tracking-tighter;
+    font-weight: 700;
+  }
+  
+  h1 {
+    letter-spacing: -0.03em;
   }
 }
 
 /* ========================================
-   GLASSMORPHISM UTILITIES
+   GLASSMORPHISM UTILITIES (PRO MAX)
    ======================================== */
 
 .glass {
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(255, 255, 255, 0.03);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.07);
 }
 
 .glass-gold {
-  background: rgba(197, 165, 90, 0.08);
+  background: rgba(197, 168, 128, 0.05);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(197, 165, 90, 0.15);
+  border: 1px solid rgba(197, 168, 128, 0.12);
 }
 
 .glass-light {
-  background: rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.05);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 /* ========================================
-   PREMIUM SHADOWS
+   PREMIUM GLOWS AND SHADOWS
    ======================================== */
 
 .shadow-gold-sm {
-  box-shadow: 0 2px 8px rgba(197, 165, 90, 0.12);
+  box-shadow: 0 2px 8px rgba(197, 168, 128, 0.12);
 }
 
 .shadow-gold-md {
-  box-shadow: 0 4px 16px rgba(197, 165, 90, 0.15),
-              0 1px 4px rgba(197, 165, 90, 0.1);
+  box-shadow: 0 4px 16px rgba(197, 168, 128, 0.15),
+              0 1px 4px rgba(197, 168, 128, 0.1);
 }
 
 .shadow-gold-lg {
-  box-shadow: 0 8px 32px rgba(197, 165, 90, 0.2),
-              0 2px 8px rgba(197, 165, 90, 0.1);
+  box-shadow: 0 0 20px rgba(197, 168, 128, 0.15);
 }
 
 .shadow-pitch {
-  box-shadow: 0 8px 32px rgba(13, 27, 14, 0.5),
-              0 2px 8px rgba(13, 27, 14, 0.3);
+  box-shadow: 0 8px 32px rgba(6, 26, 16, 0.6),
+              0 2px 8px rgba(6, 26, 16, 0.4);
 }
 
 /* ========================================
-   ANIMATIONS
+   CALIBRATED TIERS BADGES
+   ======================================== */
+
+.tier-morning {
+  background-color: hsl(200, 85%, 96%);
+  color: hsl(198, 80%, 45%);
+}
+
+.tier-peak {
+  background-color: hsl(24, 95%, 96%);
+  color: hsl(20, 85%, 55%);
+}
+
+.tier-offpeak {
+  background-color: hsl(142, 70%, 95%);
+  color: hsl(142, 60%, 40%);
+}
+
+/* ========================================
+   ANIMATIONS & HOVERS
    ======================================== */
 
 @keyframes shimmer {
@@ -111,8 +145,8 @@
 }
 
 @keyframes pulse-gold {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(197, 165, 90, 0.3); }
-  50% { box-shadow: 0 0 0 6px rgba(197, 165, 90, 0); }
+  0%, 100% { box-shadow: 0 0 0 0 rgba(197, 168, 128, 0.3); }
+  50% { box-shadow: 0 0 0 6px rgba(197, 168, 128, 0); }
 }
 
 @keyframes slide-up {
@@ -125,11 +159,6 @@
   50% { text-shadow: 0 0 16px rgba(220, 53, 69, 0.5); }
 }
 
-@keyframes badge-shimmer {
-  0% { background-position: -200% center; }
-  100% { background-position: 200% center; }
-}
-
 @keyframes entrance-scale {
   from { opacity: 0; transform: scale(0.95); }
   to { opacity: 1; transform: scale(1); }
@@ -138,9 +167,18 @@
 .animate-shimmer { animation: shimmer 2s infinite; }
 .animate-float { animation: float 3s ease-in-out infinite; }
 .animate-pulse-gold { animation: pulse-gold 2s ease-in-out infinite; }
-.animate-slide-up { animation: slide-up 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+.animate-slide-up { animation: slide-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) both; }
 .animate-count-glow { animation: count-glow 1.5s ease-in-out infinite; }
-.animate-entrance { animation: entrance-scale 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+.animate-entrance { animation: entrance-scale 0.4s cubic-bezier(0.16, 1, 0.3, 1) both; }
+
+/* Micro-transitions */
+.btn-premium {
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn-premium:active {
+  transform: scale(0.98);
+}
 
 /* Stagger delays for list items */
 .stagger-1 { animation-delay: 30ms; }
@@ -151,28 +189,6 @@
 .stagger-6 { animation-delay: 180ms; }
 .stagger-7 { animation-delay: 210ms; }
 .stagger-8 { animation-delay: 240ms; }
-
-/* ========================================
-   TURF PATTERN (replaces external texture)
-   ======================================== */
-
-.turf-pattern {
-  background-image: 
-    repeating-linear-gradient(
-      90deg,
-      rgba(255, 255, 255, 0.02) 0px,
-      rgba(255, 255, 255, 0.02) 1px,
-      transparent 1px,
-      transparent 40px
-    ),
-    repeating-linear-gradient(
-      0deg,
-      rgba(255, 255, 255, 0.015) 0px,
-      rgba(255, 255, 255, 0.015) 1px,
-      transparent 1px,
-      transparent 40px
-    );
-}
 
 /* ========================================
    SCROLLBAR UTILITIES
@@ -186,7 +202,7 @@
    ======================================== */
 
 .spring-bounce {
-  transition-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 /* ========================================
@@ -230,3 +246,54 @@
   background-position: center;
   height: 1px;
 }
+
+/* ========================================
+   PREMIUM CUSTOM BACKGROUND PATTERNS
+   ======================================== */
+
+.turf-pattern {
+  background-image: 
+    linear-gradient(rgba(34, 197, 94, 0.015) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(34, 197, 94, 0.015) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+.checkerboard-pattern {
+  background-image: repeating-conic-gradient(rgba(255, 255, 255, 0.008) 0 25%, transparent 0 50%);
+  background-size: 80px 80px;
+}
+
+.scanline-pattern {
+  background-image: linear-gradient(rgba(249, 115, 22, 0.008) 1px, transparent 1px);
+  background-size: 100% 24px;
+}
+
+/* Inline typographic capsule sizing and alignment */
+.capsule-inline {
+  display: inline-block;
+  vertical-align: middle;
+  height: clamp(24px, 5vw, 48px);
+  width: clamp(48px, 10vw, 96px);
+  position: relative;
+  overflow: hidden;
+  border-radius: 9999px;
+  transform: translateY(-0.08em);
+}
+
+/* Bento tile class */
+.bento-tile {
+  background: rgba(255, 255, 255, 0.02);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 8px 32px rgba(6, 26, 16, 0.3);
+  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.bento-tile:hover {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(197, 168, 128, 0.25);
+  box-shadow: 0 12px 40px rgba(197, 168, 128, 0.1);
+  transform: translateY(-4px);
+}
+

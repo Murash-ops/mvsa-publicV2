@@ -40,7 +40,9 @@ export default function Footer() {
                 <Facebook className="w-5 h-5 text-white/60 group-hover:text-pitch group-hover:scale-110 transition-all duration-300" />
               </a>
               <a href="https://tiktok.com/@mtviewsportsarena" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-white/5 hover:bg-gold rounded-xl flex items-center justify-center transition-all duration-300 group hover:shadow-gold-sm spring-bounce" aria-label="TikTok">
-                <span className="text-xs font-black tracking-tighter text-white/60 group-hover:text-pitch transition-colors">Tik.</span>
+                <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 text-white/60 group-hover:text-pitch group-hover:scale-110 transition-all duration-300">
+                  <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.17-2.89-.6-4.09-1.5-.7-.52-1.27-1.2-1.68-1.97-.22-.37-.36-.77-.47-1.19-.02 1.53-.01 3.05-.01 4.58-.02 3.2-.82 6.45-3.11 8.68-2.29 2.29-5.73 3.09-8.83 2.37-3.1-.72-5.7-3.08-6.65-6.08-.95-3-1.07-6.52.46-9.42C2.28 5.4 4.88 3.5 7.9 3.08c1.3-.18 2.63-.07 3.89.33v4.29c-.84-.26-1.77-.35-2.61-.17-1.42.3-2.66 1.34-3.18 2.69-.52 1.35-.46 2.92.16 4.21.62 1.29 1.94 2.19 3.36 2.34 1.42.15 2.9-.38 3.69-1.57.79-1.19.86-2.73.85-4.11V.02z" />
+                </svg>
               </a>
             </div>
           </div>
@@ -90,7 +92,9 @@ export default function Footer() {
               </li>
               <li className="flex items-center gap-3">
                 <Mail className="w-5 h-5 text-gold shrink-0" />
-                <span className="text-white/40 text-sm">hello@mvsa.co.ke</span>
+                <a href="mailto:mtviewsportsarena@gmail.com" className="text-white/40 hover:text-gold transition-colors text-sm">
+                  mtviewsportsarena@gmail.com
+                </a>
               </li>
             </ul>
           </div>

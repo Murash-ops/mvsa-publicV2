@@ -142,12 +142,12 @@ export default function EnrollmentFlow({ program, onClose }: { program: Program,
 
   return (
     <div className="fixed inset-0 bg-pitch/80 backdrop-blur-xl z-[100] flex items-center justify-center p-4 animate-entrance">
-      <div className="bg-white/95 backdrop-blur-md rounded-[2.5rem] w-full max-w-xl overflow-hidden shadow-[0_0_100px_rgba(0,0,0,0.5)] animate-slide-up relative">
+      <div className="glass rounded-[2.5rem] w-full max-w-xl overflow-hidden shadow-pitch animate-slide-up relative">
         <div className="absolute top-0 right-0 w-32 h-32 bg-gold/5 rounded-bl-[4rem] -z-10" />
         
-        {/* Header with deep forest gradient */}
-        <div className="p-10 flex justify-between items-center bg-gradient-to-br from-forest-dark via-forest to-forest-dark text-white relative overflow-hidden">
-          <div className="absolute inset-0 turf-pattern opacity-20 mix-blend-overlay" />
+        {/* Header with glass borders */}
+        <div className="p-10 flex justify-between items-center bg-white/3 border-b border-white/5 text-white relative overflow-hidden">
+          <div className="absolute inset-0 turf-pattern opacity-10 mix-blend-overlay" />
           <div className="absolute -right-10 -top-10 w-32 h-32 bg-gold/20 rounded-full blur-3xl" />
           
           <div className="relative z-10 space-y-1">
@@ -167,15 +167,15 @@ export default function EnrollmentFlow({ program, onClose }: { program: Program,
         </div>
 
         {/* Step Indicator */}
-        <div className="px-10 py-6 flex items-center gap-4 bg-surface/50 border-b border-forest/5">
+        <div className="px-10 py-6 flex items-center gap-4 bg-white/1 border-b border-white/5">
           <div className="flex items-center gap-2">
-            <span className={`w-6 h-6 rounded-lg flex items-center justify-center text-[10px] font-black transition-all ${step >= 1 ? 'bg-forest text-gold' : 'bg-forest/5 text-forest/40'}`}>1</span>
-            <span className="text-[10px] font-black uppercase tracking-widest text-forest/40">Details</span>
+            <span className={`w-6 h-6 rounded-lg flex items-center justify-center text-[10px] font-black transition-all ${step >= 1 ? 'bg-gold text-pitch' : 'bg-white/5 text-white/40'}`}>1</span>
+            <span className="text-[10px] font-black uppercase tracking-widest text-white/40">Details</span>
           </div>
-          <div className="h-px flex-1 bg-forest/10" />
+          <div className="h-px flex-1 bg-white/10" />
           <div className="flex items-center gap-2">
-            <span className={`w-6 h-6 rounded-lg flex items-center justify-center text-[10px] font-black transition-all ${step >= 2 ? 'bg-forest text-gold' : 'bg-forest/5 text-forest/40'}`}>2</span>
-            <span className="text-[10px] font-black uppercase tracking-widest text-forest/40">Payment</span>
+            <span className={`w-6 h-6 rounded-lg flex items-center justify-center text-[10px] font-black transition-all ${step >= 2 ? 'bg-gold text-pitch' : 'bg-white/5 text-white/40'}`}>2</span>
+            <span className="text-[10px] font-black uppercase tracking-widest text-white/40">Payment</span>
           </div>
         </div>
 
@@ -184,13 +184,13 @@ export default function EnrollmentFlow({ program, onClose }: { program: Program,
             <div className="w-24 h-24 bg-gold/10 text-gold rounded-[2rem] flex items-center justify-center mx-auto mb-8 shadow-inner">
               <CheckCircle2 className="w-12 h-12" />
             </div>
-            <h3 className="text-4xl font-display font-black text-forest mb-4 tracking-tighter uppercase leading-tight">Welcome to <br/>the Arena!</h3>
-            <p className="text-charcoal-light mb-10 text-lg leading-relaxed font-medium">
+            <h3 className="text-4xl font-display font-black text-white mb-4 tracking-tighter uppercase leading-tight">Welcome to <br/>the Arena!</h3>
+            <p className="text-charcoal-light/80 mb-10 text-lg leading-relaxed font-medium">
               Your enrollment for <strong>{program.name}</strong> is confirmed. Prepare for greatness, <strong>{formData.participantName}</strong>.
             </p>
             <button 
               onClick={onClose}
-              className="w-full bg-forest hover:bg-forest-dark text-white py-5 rounded-[1.5rem] font-black tracking-[0.2em] uppercase shadow-2xl shadow-forest/20 transition-all hover:-translate-y-1 active:scale-95"
+              className="w-full bg-gradient-to-r from-gold to-gold-muted hover:from-white hover:to-white text-pitch py-5 rounded-[1.5rem] font-black tracking-[0.2em] uppercase shadow-gold-sm hover:shadow-gold-md transition-all duration-300 hover:-translate-y-0.5 active:scale-95 spring-bounce"
             >
               Enter Dashboard
             </button>
@@ -198,19 +198,19 @@ export default function EnrollmentFlow({ program, onClose }: { program: Program,
         ) : paymentStatus === 'polling' ? (
           <div className="p-14 text-center animate-entrance">
             <div className="relative w-20 h-20 mx-auto mb-10">
-              <div className="absolute inset-0 border-4 border-forest/5 rounded-full" />
+              <div className="absolute inset-0 border-4 border-white/5 rounded-full" />
               <div className="absolute inset-0 border-4 border-gold border-t-transparent rounded-full animate-spin" />
               <div className="absolute inset-0 flex items-center justify-center">
-                <Phone className="w-8 h-8 text-forest" />
+                <Phone className="w-8 h-8 text-gold animate-pulse" />
               </div>
             </div>
-            <h3 className="text-3xl font-display font-black text-forest mb-4 uppercase tracking-tighter">Awaiting PIN</h3>
-            <p className="text-charcoal-light mb-8 text-lg font-medium opacity-80">
-              Complete the <strong className="text-forest">KES {deposit.toLocaleString()}</strong> STK push on your device to finalize.
+            <h3 className="text-3xl font-display font-black text-white mb-4 uppercase tracking-tighter">Awaiting PIN</h3>
+            <p className="text-charcoal-light/80 mb-8 text-lg font-medium">
+              Complete the <strong className="text-gold">KES {deposit.toLocaleString()}</strong> STK push on your device to finalize.
             </p>
-            <div className="bg-forest/5 p-6 rounded-[2rem] border border-forest/10 inline-flex items-center gap-3">
+            <div className="glass-gold p-6 rounded-[2rem] border border-gold/15 inline-flex items-center gap-3">
               <div className="w-2 h-2 bg-gold rounded-full animate-pulse" />
-              <p className="text-[10px] font-black text-forest uppercase tracking-[0.2em]">Secure Cloud Polling Active</p>
+              <p className="text-[10px] font-black text-gold uppercase tracking-[0.2em]">Secure Cloud Polling Active</p>
             </div>
           </div>
         ) : (
@@ -218,7 +218,7 @@ export default function EnrollmentFlow({ program, onClose }: { program: Program,
             {step === 1 ? (
               <div className="space-y-6">
                 <div className="space-y-3">
-                  <label className="text-[10px] font-black uppercase tracking-[0.2em] text-forest/40 flex items-center gap-2">
+                  <label className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40 flex items-center gap-2">
                     <User className="w-3 h-3 text-gold" /> Participant Full Name
                   </label>
                   <input 
@@ -227,12 +227,12 @@ export default function EnrollmentFlow({ program, onClose }: { program: Program,
                     placeholder="Enter athlete's name"
                     value={formData.participantName}
                     onChange={(e) => setFormData({...formData, participantName: e.target.value})}
-                    className="w-full px-6 py-5 rounded-2xl border border-forest/10 bg-surface/50 focus:outline-none focus:ring-2 focus:ring-gold/30 focus:border-gold/40 font-bold text-forest transition-all placeholder:text-forest/20 shadow-inner"
+                    className="w-full px-6 py-5 rounded-2xl border border-white/10 bg-white/3 focus:outline-none focus:ring-2 focus:ring-gold/40 focus:border-gold/30 font-bold text-white transition-all placeholder:text-white/20 shadow-inner"
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-6">
                   <div className="space-y-3">
-                    <label className="text-[10px] font-black uppercase tracking-[0.2em] text-forest/40 flex items-center gap-2">
+                    <label className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40 flex items-center gap-2">
                       <Calendar className="w-3 h-3 text-gold" /> Athlete Age
                     </label>
                     <input 
@@ -241,11 +241,11 @@ export default function EnrollmentFlow({ program, onClose }: { program: Program,
                       placeholder="e.g. 12"
                       value={formData.participantAge}
                       onChange={(e) => setFormData({...formData, participantAge: e.target.value})}
-                      className="w-full px-6 py-5 rounded-2xl border border-forest/10 bg-surface/50 focus:outline-none focus:ring-2 focus:ring-gold/30 focus:border-gold/40 font-bold text-forest transition-all placeholder:text-forest/20 shadow-inner"
+                      className="w-full px-6 py-5 rounded-2xl border border-white/10 bg-white/3 focus:outline-none focus:ring-2 focus:ring-gold/40 focus:border-gold/30 font-bold text-white transition-all placeholder:text-white/20 shadow-inner"
                     />
                   </div>
                   <div className="space-y-3">
-                    <label className="text-[10px] font-black uppercase tracking-[0.2em] text-forest/40 flex items-center gap-2">
+                    <label className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40 flex items-center gap-2">
                       <Phone className="w-3 h-3 text-gold" /> Parent Phone
                     </label>
                     <input 
@@ -254,7 +254,7 @@ export default function EnrollmentFlow({ program, onClose }: { program: Program,
                       placeholder="07XX..."
                       value={formData.clientPhone}
                       onChange={(e) => setFormData({...formData, clientPhone: e.target.value})}
-                      className="w-full px-6 py-5 rounded-2xl border border-forest/10 bg-surface/50 focus:outline-none focus:ring-2 focus:ring-gold/30 focus:border-gold/40 font-bold text-forest transition-all placeholder:text-forest/20 shadow-inner"
+                      className="w-full px-6 py-5 rounded-2xl border border-white/10 bg-white/3 focus:outline-none focus:ring-2 focus:ring-gold/40 focus:border-gold/30 font-bold text-white transition-all placeholder:text-white/20 shadow-inner"
                     />
                   </div>
                 </div>
@@ -262,7 +262,7 @@ export default function EnrollmentFlow({ program, onClose }: { program: Program,
             ) : (
               <div className="space-y-8">
                 <div className="space-y-4">
-                  <label className="text-[10px] font-black uppercase tracking-[0.2em] text-forest/40">Choose Your Pathway</label>
+                  <label className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40">Choose Your Pathway</label>
                   <div className="grid grid-cols-1 gap-4">
                     {Object.entries(program.pricing_json).map(([key, value]) => {
                       if (!value) return null;
@@ -275,20 +275,20 @@ export default function EnrollmentFlow({ program, onClose }: { program: Program,
                           className={`
                             flex justify-between items-center p-6 rounded-[2rem] border-2 transition-all duration-500
                             ${isActive 
-                              ? 'border-gold bg-gold/5 shadow-[0_0_30px_rgba(197,165,90,0.1)]' 
-                              : 'border-forest/5 hover:border-forest/20 bg-surface'}
+                              ? 'border-gold bg-gold/10 shadow-gold-sm' 
+                              : 'border-white/5 hover:border-white/20 bg-white/3'}
                           `}
                         >
                           <div className="text-left flex items-center gap-4">
-                            <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${isActive ? 'border-gold' : 'border-forest/20'}`}>
+                            <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${isActive ? 'border-gold' : 'border-white/20'}`}>
                               {isActive && <div className="w-2 h-2 bg-gold rounded-full" />}
                             </div>
                             <div>
-                              <p className={`text-sm font-black uppercase tracking-widest ${isActive ? 'text-forest' : 'text-forest/60'}`}>{key}</p>
-                              <p className="text-[10px] text-muted font-bold uppercase tracking-widest">Full Access</p>
+                              <p className={`text-sm font-black uppercase tracking-widest ${isActive ? 'text-white' : 'text-white/60'}`}>{key}</p>
+                              <p className="text-[10px] text-white/40 font-bold uppercase tracking-widest">Full Access</p>
                             </div>
                           </div>
-                          <p className={`text-2xl font-display font-black ${isActive ? 'text-gold' : 'text-forest'}`}>
+                          <p className={`text-2xl font-display font-black ${isActive ? 'text-gold' : 'text-white'}`}>
                             KES {value.toLocaleString()}
                           </p>
                         </button>
@@ -298,7 +298,7 @@ export default function EnrollmentFlow({ program, onClose }: { program: Program,
                 </div>
 
                 {/* Glass Summary */}
-                <div className="bg-forest-dark p-8 rounded-[2rem] relative overflow-hidden text-white shadow-2xl">
+                <div className="glass-gold p-8 rounded-[2rem] relative overflow-hidden text-white shadow-gold-sm border border-gold/15 animate-slide-up">
                   <div className="absolute inset-0 turf-pattern opacity-10" />
                   <div className="relative z-10 flex justify-between items-end">
                     <div className="space-y-1">
@@ -317,21 +317,21 @@ export default function EnrollmentFlow({ program, onClose }: { program: Program,
             {errorMessage && (
               <div className="bg-red-500/10 border border-red-500/20 p-4 rounded-2xl flex items-center gap-3">
                 <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
-                <p className="text-red-700 text-xs font-black uppercase tracking-widest">{errorMessage}</p>
+                <p className="text-red-500 text-xs font-black uppercase tracking-widest">{errorMessage}</p>
               </div>
             )}
 
             <button 
               type="submit"
               disabled={isLoading}
-              className="w-full flex items-center justify-center gap-4 bg-forest hover:bg-forest-dark text-white px-8 py-6 rounded-[1.5rem] font-black text-xs tracking-[0.3em] uppercase transition-all duration-500 shadow-2xl shadow-forest/20 hover:-translate-y-1 active:scale-95 disabled:opacity-50"
+              className="w-full flex items-center justify-center gap-4 bg-gradient-to-r from-gold to-gold-muted hover:from-white hover:to-white text-pitch px-8 py-6 rounded-[1.5rem] font-black text-xs tracking-[0.3em] uppercase transition-all duration-300 shadow-gold-sm hover:shadow-gold-md hover:-translate-y-0.5 active:scale-95 disabled:opacity-50 spring-bounce"
             >
               {isLoading ? (
-                <Loader2 className="w-6 h-6 animate-spin text-gold" />
+                <Loader2 className="w-6 h-6 animate-spin text-pitch" />
               ) : step === 1 ? (
-                <>Next: Choose Plan <ChevronRight className="w-5 h-5 text-gold" /></>
+                <>Next: Choose Plan <ChevronRight className="w-5 h-5 text-pitch" /></>
               ) : (
-                <>Pay via M-Pesa <ChevronRight className="w-5 h-5 text-gold" /></>
+                <>Pay via M-Pesa <ChevronRight className="w-5 h-5 text-pitch" /></>
               )}
             </button>
           </form>
@@ -340,3 +340,4 @@ export default function EnrollmentFlow({ program, onClose }: { program: Program,
     </div>
   );
 }
+

@@ -24,11 +24,11 @@ export default function AboutPage() {
       <div className="max-w-7xl mx-auto px-6 lg:px-10">
         {/* Header */}
         <header className="mb-20 space-y-6">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-forest/5 border border-forest/10 rounded-full">
-            <Heart className="w-4 h-4 text-forest" />
-            <span className="text-forest text-[10px] font-bold uppercase tracking-[0.2em]">Our Story & Mission</span>
+          <div className="inline-flex items-center gap-2 px-4 py-2 glass-gold rounded-full">
+            <Heart className="w-4 h-4 text-gold" />
+            <span className="text-gold text-[10px] font-bold uppercase tracking-[0.2em]">Our Story & Mission</span>
           </div>
-          <h1 className="text-5xl md:text-7xl font-display font-bold text-forest tracking-tighter leading-[0.9] italic">
+          <h1 className="text-5xl md:text-7xl font-display font-bold text-white tracking-tighter leading-[0.9] italic">
             THE HEART OF <br/>
             <span className="text-gold">NAIROBI SPORTS.</span>
           </h1>
@@ -42,7 +42,7 @@ export default function AboutPage() {
           </div>
           <div className="lg:col-span-5 space-y-8">
             <div className="space-y-4">
-              <h2 className="text-3xl font-display font-bold text-forest italic">Our Mission</h2>
+              <h2 className="text-3xl font-display font-bold text-white italic">Our Mission</h2>
               <p className="text-charcoal-light text-lg leading-relaxed font-medium">
                 Mountain View Sports Arena (MVSA) was born from a simple vision: to create a world-class sports destination in the heart of our community.
               </p>
@@ -51,12 +51,12 @@ export default function AboutPage() {
               We believe that sports have the power to transform lives—building character in youth, health in adults, and unity in communities. MVSA provides more than just a pitch; we provide an ecosystem where athletes of all levels can thrive.
             </p>
             <div className="grid grid-cols-2 gap-4 pt-4">
-              <div className="p-6 bg-surface rounded-2xl border border-border-color">
-                <p className="text-2xl font-display font-bold text-forest italic mb-1">100%</p>
+              <div className="p-6 glass rounded-2xl border border-white/5">
+                <p className="text-2xl font-display font-bold text-gold italic mb-1">100%</p>
                 <p className="text-[10px] font-bold uppercase tracking-widest text-muted">Premium Turf</p>
               </div>
-              <div className="p-6 bg-surface rounded-2xl border border-border-color">
-                <p className="text-2xl font-display font-bold text-forest italic mb-1">24/7</p>
+              <div className="p-6 glass rounded-2xl border border-white/5">
+                <p className="text-2xl font-display font-bold text-gold italic mb-1">24/7</p>
                 <p className="text-[10px] font-bold uppercase tracking-widest text-muted">Secure Facility</p>
               </div>
             </div>
@@ -66,18 +66,18 @@ export default function AboutPage() {
         {/* Amenities Section */}
         <div className="mb-32">
           <div className="text-center max-w-2xl mx-auto mb-16 space-y-4">
-            <h2 className="text-4xl font-display font-bold text-forest italic">The Premium Experience</h2>
+            <h2 className="text-4xl font-display font-bold text-white italic">The Premium Experience</h2>
             <p className="text-charcoal-light font-medium">We&apos;ve thought of every detail so you can focus on the game.</p>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {amenities.map((item, i) => (
-              <div key={i} className="group p-8 bg-white rounded-3xl border border-border-color shadow-sm hover:shadow-xl transition-all hover:-translate-y-2 text-center">
-                <div className="w-16 h-16 bg-forest/5 text-forest rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:bg-gold group-hover:text-forest transition-colors">
+              <div key={i} className="group p-8 glass rounded-3xl border border-white/5 hover:border-gold/30 hover:shadow-gold-md transition-all duration-300 hover:-translate-y-2 text-center spring-bounce">
+                <div className="w-16 h-16 bg-white/5 text-gold rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:bg-gold group-hover:text-pitch transition-colors duration-300">
                   <item.icon className="w-8 h-8" />
                 </div>
-                <h3 className="text-xl font-display font-bold text-forest italic mb-3">{item.title}</h3>
-                <p className="text-charcoal-light text-sm leading-relaxed">{item.desc}</p>
+                <h3 className="text-xl font-display font-bold text-white italic mb-3">{item.title}</h3>
+                <p className="text-charcoal-light/70 text-sm leading-relaxed">{item.desc}</p>
               </div>
             ))}
           </div>
@@ -86,8 +86,8 @@ export default function AboutPage() {
         {/* Gallery Section - Masonry-like Layout */}
         <div className="space-y-12">
           <div className="flex items-center gap-4">
-            <h2 className="text-2xl font-display font-bold text-forest italic">Facility Tour</h2>
-            <div className="flex-1 h-px bg-border-color" />
+            <h2 className="text-2xl font-display font-bold text-white italic">Facility Tour</h2>
+            <div className="flex-1 h-px bg-white/10" />
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-12 gap-6 h-[800px] md:h-[600px]">

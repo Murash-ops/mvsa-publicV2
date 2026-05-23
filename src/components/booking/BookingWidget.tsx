@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { format, addDays, isSameDay } from 'date-fns';
 import { createClient } from '@/utils/supabase/client';
 import type { Venue, TimeSlot } from '@/types/database';
+import Image from 'next/image';
 import { Calendar, Clock, MapPin, CheckCircle2, Flame, Zap, CreditCard, Smartphone, Sunrise } from 'lucide-react';
 
 export default function BookingWidget({ initialVenues }: { initialVenues: Venue[] }) {
@@ -246,35 +247,74 @@ export default function BookingWidget({ initialVenues }: { initialVenues: Venue[
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-      {/* LEFT COLUMN: Selection (Venues, Calendar, Slots) */}
-      <div className="lg:col-span-2 space-y-8">
+    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+      {/* ========================================================
+          LEFT COLUMN: SELECTION GRID (VENUE, CALENDAR, SLOTS)
+          ======================================================== */}
+      <div className="lg:col-span-8 space-y-6">
         
-        {/* Venue Selection */}
-        <section className="animate-slide-up">
-          <h2 className="text-lg font-bold font-display mb-4 flex items-center gap-2 text-white/80">
+        {/* CARD A: Venue Selector */}
+        <section className="glass rounded-3xl p-6 border border-white/5 animate-slide-up relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-gold/5 rounded-full blur-2xl pointer-events-none" />
+          <h2 className="text-lg font-bold font-display mb-6 flex items-center gap-2 text-white/95">
             <MapPin className="w-5 h-5 text-gold" /> Select Venue
           </h2>
-          <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
-            {initialVenues.map(v => (
-              <button
-                key={v.id}
-                onClick={() => setSelectedVenue(v)}
-                className={`px-6 py-3.5 rounded-2xl font-medium border transition-all duration-300 whitespace-nowrap spring-bounce ${
-                  selectedVenue?.id === v.id 
-                    ? 'border-gold bg-gold/10 text-gold shadow-gold-sm' 
-                    : 'border-pitch-border bg-pitch-surface text-white/60 hover:border-white/15 hover:text-white/80'
-                }`}
-              >
-                {v.name}
-              </button>
-            ))}
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            {initialVenues.map(v => {
+              const isSelected = selectedVenue?.id === v.id;
+              
+              // Map images based on venue names
+              const imgMap: Record<string, string> = {
+                'Main Turf': '/images/hero_turf.jpeg',
+                'Main Arena Turf': '/images/hero_turf.jpeg',
+                'Academy Pitch': '/images/academy.jpeg',
+                'Meeting Hall': '/images/meeting_hall.jpeg',
+                'Executive Lounge': '/images/meeting_hall.jpeg'
+              };
+              const bgImg = imgMap[v.name] || '/images/hero_turf.jpeg';
+              
+              return (
+                <button
+                  key={v.id}
+                  onClick={() => setSelectedVenue(v)}
+                  className={`relative overflow-hidden h-36 rounded-2xl border text-left p-5 transition-all duration-300 spring-bounce group flex flex-col justify-end ${
+                    isSelected 
+                      ? 'border-gold shadow-gold-md ring-1 ring-gold/40 scale-[1.02]' 
+                      : 'border-white/5 hover:border-white/20'
+                  }`}
+                  aria-label={`Select venue ${v.name}`}
+                  id={`venue-btn-${v.id}`}
+                >
+                  <Image 
+                    src={bgImg} 
+                    alt={v.name} 
+                    fill 
+                    className="object-cover absolute inset-0 opacity-20 group-hover:opacity-40 group-hover:scale-105 transition-all duration-500 z-0" 
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-forest-dark via-forest-dark/30 to-transparent z-[1]" />
+                  <div className="relative z-10 w-full flex items-center justify-between">
+                    <div>
+                      <p className={`font-bold font-display text-base transition-colors ${isSelected ? 'text-gold animate-entrance' : 'text-white'}`}>
+                        {v.name}
+                      </p>
+                      <p className="text-[9px] text-white/40 font-bold uppercase tracking-wider">
+                        {v.type === 'turf' ? '5-Aside Pitch' : 'Sanctuary Lounge'}
+                      </p>
+                    </div>
+                    {isSelected && (
+                      <div className="w-2.5 h-2.5 bg-success rounded-full animate-pulse shadow-[0_0_10px_#22c55e]" />
+                    )}
+                  </div>
+                </button>
+              );
+            })}
           </div>
         </section>
 
-        {/* Date Selection */}
-        <section className="animate-slide-up stagger-1">
-          <h2 className="text-lg font-bold font-display mb-4 flex items-center gap-2 text-white/80">
+        {/* CARD B: Calendar Date Picker */}
+        <section className="glass rounded-3xl p-6 border border-white/5 animate-slide-up stagger-1 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-forest-light/5 rounded-full blur-2xl pointer-events-none" />
+          <h2 className="text-lg font-bold font-display mb-6 flex items-center gap-2 text-white/95">
             <Calendar className="w-5 h-5 text-gold" /> Select Date
           </h2>
           <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
@@ -284,61 +324,75 @@ export default function BookingWidget({ initialVenues }: { initialVenues: Venue[
                 <button
                   key={date.toISOString()}
                   onClick={() => setSelectedDate(date)}
-                  className={`flex flex-col items-center justify-center min-w-[72px] p-3 rounded-2xl border transition-all duration-300 spring-bounce ${
+                  className={`flex flex-col items-center justify-center min-w-[72px] p-4 rounded-2xl border transition-all duration-300 spring-bounce ${
                     isSelected 
-                      ? 'border-gold bg-gold text-pitch shadow-gold-md' 
-                      : 'border-pitch-border bg-pitch-surface text-white/60 hover:border-white/15 hover:text-white/80'
+                      ? 'border-gold bg-gold text-forest shadow-gold-md scale-105 font-bold' 
+                      : 'border-white/5 bg-white/3 text-white/60 hover:border-gold/30 hover:text-white'
                   }`}
+                  aria-label={`Select date ${format(date, 'EEEE, MMMM d')}`}
+                  id={`date-btn-${format(date, 'yyyy-MM-dd')}`}
                 >
-                  <span className={`text-xs uppercase font-bold ${isSelected ? 'text-pitch/60' : 'opacity-60'}`}>{format(date, 'EEE')}</span>
+                  <span className={`text-[10px] uppercase font-bold tracking-wider ${isSelected ? 'text-forest-dark/80 font-black' : 'opacity-50'}`}>
+                    {format(date, 'EEE')}
+                  </span>
                   <span className="text-xl font-bold font-mono my-1">{format(date, 'd')}</span>
-                  <span className={`text-xs font-medium ${isSelected ? 'text-pitch/60' : 'opacity-60'}`}>{format(date, 'MMM')}</span>
+                  <span className={`text-[10px] font-bold ${isSelected ? 'text-forest-dark/80 font-black' : 'opacity-50'}`}>
+                    {format(date, 'MMM')}
+                  </span>
                 </button>
               );
             })}
           </div>
         </section>
 
-        {/* Time Slots */}
-        <section className="animate-slide-up stagger-2">
-          <h2 className="text-lg font-bold font-display mb-4 flex items-center gap-2 text-white/80">
-            <Clock className="w-5 h-5 text-gold" /> Available Slots
+        {/* CARD C: Time-Slot Grid */}
+        <section className="glass rounded-3xl p-6 border border-white/5 animate-slide-up stagger-2 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-gold/5 rounded-full blur-2xl pointer-events-none" />
+          <h2 className="text-lg font-bold font-display mb-6 flex items-center gap-2 text-white/95">
+            <Clock className="w-5 h-5 text-gold" /> Available Slots (1-Hour Sessions)
           </h2>
           {isLoading ? (
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
               {[1,2,3,4,5,6,7,8].map(i => (
                 <div key={i} className="skeleton h-20 rounded-2xl" />
               ))}
             </div>
           ) : slots.length === 0 ? (
-            <div className="glass rounded-2xl p-10 text-center">
-              <Calendar className="w-12 h-12 mx-auto mb-3 text-white/15" />
+            <div className="glass rounded-2xl p-10 text-center border border-white/5">
+              <Calendar className="w-12 h-12 mx-auto mb-3 text-white/10" />
               <p className="text-white/40 font-medium">No slots scheduled for this date yet.</p>
             </div>
           ) : (
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
               {slots.map((slot, i) => {
                 const isSelected = selectedSlots.includes(slot.id);
                 const isAvailable = slot.status === 'available';
                 const isMorning = slot.price_tier === 'morning';
                 const isPeak = slot.price_tier === 'peak';
+                const isWeekend = slot.price_tier === 'weekend';
+                
                 const tierConfig = isMorning
-                  ? { label: 'MORNING', className: 'bg-sky-500/15 text-sky-400', icon: <Sunrise className="w-3 h-3" /> }
+                  ? { label: 'MORNING', className: 'tier-morning', icon: <Sunrise className="w-3 h-3" /> }
                   : isPeak
-                  ? { label: 'PEAK', className: 'bg-orange-500/15 text-orange-400', icon: <Flame className="w-3 h-3" /> }
-                  : { label: 'OFF-PEAK', className: 'bg-emerald-500/15 text-emerald-400', icon: null };
+                  ? { label: 'PEAK', className: 'tier-peak', icon: <Flame className="w-3 h-3" /> }
+                  : isWeekend
+                  ? { label: 'WEEKEND', className: 'tier-peak', icon: <Flame className="w-3 h-3" /> }
+                  : { label: 'OFF-PEAK', className: 'tier-offpeak', icon: null };
+                  
                 return (
                   <button
                     key={slot.id}
                     disabled={!isAvailable}
                     onClick={() => toggleSlot(slot.id)}
-                    className={`relative p-4 rounded-2xl border text-center transition-all duration-300 spring-bounce animate-slide-up stagger-${Math.min(i + 1, 8)} ${
+                    className={`relative p-4 rounded-2xl border text-center transition-all duration-300 spring-bounce hover:scale-[1.03] animate-slide-up stagger-${Math.min(i + 1, 8)} ${
                       !isAvailable 
-                        ? 'bg-pitch-surface border-pitch-border opacity-40 cursor-not-allowed'
+                        ? 'bg-white/1 border-white/5 opacity-40 cursor-not-allowed'
                         : isSelected 
-                          ? 'border-gold bg-gold/15 shadow-gold-sm scale-[1.02]'
-                          : 'bg-pitch-surface border-pitch-border hover:border-gold/30 hover:bg-gold/5'
+                          ? 'border-gold bg-gold/10 shadow-gold-lg ring-1 ring-gold/30'
+                          : 'bg-white/3 border-white/5 hover:border-gold/30 hover:bg-gold/5'
                     }`}
+                    aria-label={`Select hour slot starting ${slot.start_time.substring(0, 5)}`}
+                    id={`slot-btn-${slot.id}`}
                   >
                     {isSelected && (
                       <CheckCircle2 className="w-4 h-4 text-gold absolute top-2.5 right-2.5 animate-entrance" />
@@ -346,7 +400,7 @@ export default function BookingWidget({ initialVenues }: { initialVenues: Venue[
                     <span className={`block font-mono font-bold text-lg ${isSelected ? 'text-gold' : 'text-white'}`}>
                       {slot.start_time.substring(0, 5)}
                     </span>
-                    <span className={`text-[10px] font-bold mt-1.5 inline-flex items-center gap-1 px-2 py-0.5 rounded-full ${tierConfig.className}`}>
+                    <span className={`text-[9px] font-extrabold mt-1.5 inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full ${tierConfig.className}`}>
                       {tierConfig.icon}
                       {tierConfig.label}
                     </span>
@@ -363,23 +417,31 @@ export default function BookingWidget({ initialVenues }: { initialVenues: Venue[
         </section>
       </div>
 
-      {/* RIGHT COLUMN: Summary & Payment */}
-      <div className="animate-slide-up stagger-3">
-        <div className="glass rounded-3xl p-6 sticky top-28">
-          <h3 className="font-display font-bold text-2xl mb-6 text-white">Booking Summary</h3>
+      {/* ========================================================
+          CARD D: SUMMARY COLUMN (STICKY TICKET LAYOUT)
+          ======================================================== */}
+      <div className="lg:col-span-4 animate-slide-up stagger-3 lg:sticky lg:top-28">
+        <div className="glass rounded-3xl p-6 relative overflow-hidden border border-white/5 shadow-pitch">
+          {/* Subtle gold line on top to suggest ticket header */}
+          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-gold/50 via-gold/10 to-gold/50" />
+          
+          <h3 className="font-display font-bold text-2xl mb-6 text-white flex items-center gap-2">
+            <CreditCard className="w-5 h-5 text-gold" /> Booking Details
+          </h3>
           
           {paymentStatus === 'success' ? (
             <div className="text-center py-8 animate-entrance">
               <div className="w-20 h-20 bg-emerald-500/20 text-emerald-400 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg shadow-emerald-500/10">
                 <CheckCircle2 className="w-12 h-12" />
               </div>
-              <h4 className="text-2xl font-bold font-display mb-2 text-white">Booking Confirmed!</h4>
-              <p className="text-white/50 mb-8">
-                Your slots have been reserved. You will receive an SMS confirmation shortly.
+              <h4 className="text-2xl font-bold font-display mb-2 text-white">Reserved Successfully!</h4>
+              <p className="text-charcoal-light/80 text-sm mb-8">
+                Your slots have been held. The administrator will review and send SMS confirmation.
               </p>
               <button 
                 onClick={resetBooking}
-                className="w-full bg-white/10 hover:bg-white/15 text-white py-4 rounded-xl font-medium transition-colors"
+                className="w-full bg-white/10 hover:bg-white/15 text-white py-4 rounded-xl font-medium transition-colors btn-premium"
+                id="btn-book-another"
               >
                 Make Another Booking
               </button>
@@ -387,9 +449,9 @@ export default function BookingWidget({ initialVenues }: { initialVenues: Venue[
           ) : paymentStatus === 'polling' ? (
             <div className="text-center py-8 animate-entrance">
               <div className="w-16 h-16 border-4 border-gold border-t-transparent rounded-full animate-spin mx-auto mb-6" />
-              <h4 className="text-xl font-bold font-display mb-2 text-white">Waiting for M-Pesa PIN</h4>
-              <p className="text-white/40 mb-4">
-                We&apos;ve sent an STK push to <strong className="text-white/70">{phoneNumber}</strong>. Please enter your PIN on your phone to confirm.
+              <h4 className="text-xl font-bold font-display mb-2 text-white">M-Pesa Verification</h4>
+              <p className="text-charcoal-light/75 text-sm mb-4">
+                Pushing STK payload to <strong className="text-white">{phoneNumber}</strong>. Type PIN on your phone to finalize.
               </p>
               <div className="glass-gold p-4 rounded-2xl mb-6">
                 <p className="text-xs uppercase font-bold text-gold/60 mb-1">Time remaining to pay</p>
@@ -399,7 +461,8 @@ export default function BookingWidget({ initialVenues }: { initialVenues: Venue[
               </div>
               <button 
                 onClick={() => setPaymentStatus('idle')}
-                className="text-white/40 hover:text-white/60 text-sm underline underline-offset-4 transition-colors"
+                className="text-white/40 hover:text-white/60 text-xs underline underline-offset-4 transition-colors"
+                id="btn-polling-cancel"
               >
                 Cancel and try again
               </button>
@@ -409,11 +472,12 @@ export default function BookingWidget({ initialVenues }: { initialVenues: Venue[
               <div className="w-20 h-20 bg-error/15 text-error rounded-full flex items-center justify-center mx-auto mb-6 text-3xl font-bold">
                 ✕
               </div>
-              <h4 className="text-xl font-bold font-display mb-2 text-white">Payment Failed</h4>
+              <h4 className="text-xl font-bold font-display mb-2 text-white">Session Expired</h4>
               <p className="text-white/40 mb-8">{errorMessage}</p>
               <button 
                 onClick={() => setPaymentStatus('idle')}
-                className="w-full bg-white/10 hover:bg-white/15 text-white py-4 rounded-xl font-medium transition-colors"
+                className="w-full bg-white/10 hover:bg-white/15 text-white py-4 rounded-xl font-medium transition-colors btn-premium"
+                id="btn-payment-retry"
               >
                 Try Again
               </button>
@@ -424,29 +488,29 @@ export default function BookingWidget({ initialVenues }: { initialVenues: Venue[
               <div className="space-y-4 mb-6">
                 <div className="flex justify-between text-sm">
                   <span className="text-white/40">Venue</span>
-                  <span className="font-medium text-white/80">{selectedVenue?.name || '-'}</span>
+                  <span className="font-bold text-white/90">{selectedVenue?.name || '-'}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-white/40">Date</span>
-                  <span className="font-medium text-white/80">{format(selectedDate, 'MMM do, yyyy')}</span>
+                  <span className="font-bold text-white/90">{format(selectedDate, 'MMM do, yyyy')}</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-white/40">Slots Selected</span>
-                  <span className="font-medium text-white/80">{selectedSlots.length}</span>
+                  <span className="text-white/40">Hours Picked</span>
+                  <span className="font-bold text-white/90">{selectedSlots.length} hrs</span>
                 </div>
               </div>
 
               {/* Ticket Divider */}
-              <div className="ticket-divider text-white/10 my-6" />
+              <div className="ticket-divider text-white/20 my-6" />
 
               {/* Pricing */}
               <div className="space-y-2 mb-8">
                 <div className="flex justify-between">
-                  <span className="text-white/40 text-sm">Total Amount</span>
+                  <span className="text-white/40 text-sm">Total Fee</span>
                   <span className="font-mono font-bold text-white/80">KES {total.toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gold text-sm font-medium">Required Deposit (50%)</span>
+                  <span className="text-gold text-sm font-bold">50% Deposit Req.</span>
                   <span className="font-mono font-bold text-xl text-gold">KES {deposit.toLocaleString()}</span>
                 </div>
               </div>
@@ -456,23 +520,25 @@ export default function BookingWidget({ initialVenues }: { initialVenues: Venue[
                   {/* Name and Phone Inputs */}
                   <div className="space-y-3">
                     <div>
-                      <label className="block text-xs font-bold text-white/40 mb-1.5 uppercase tracking-wider">Your Name</label>
+                      <label className="block text-[10px] font-bold text-gold uppercase tracking-wider mb-1">Your Name</label>
                       <input 
                         type="text" 
                         value={clientName}
                         onChange={(e) => setClientName(e.target.value)}
-                        className="w-full px-4 py-3 rounded-xl border border-pitch-border bg-pitch-surface text-white placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-gold/40 focus:border-gold/30 transition-all" 
+                        className="w-full px-4 py-3 rounded-xl border border-white/10 bg-white/3 text-white placeholder-white/25 focus:outline-none focus:ring-2 focus:ring-gold/40 focus:border-gold/30 transition-all duration-300" 
                         placeholder="Full name" 
+                        id="input-client-name"
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-bold text-white/40 mb-1.5 uppercase tracking-wider">M-Pesa Number</label>
+                      <label className="block text-[10px] font-bold text-gold uppercase tracking-wider mb-1">M-Pesa Number</label>
                       <input 
                         type="tel" 
                         value={phoneNumber}
                         onChange={(e) => setPhoneNumber(e.target.value)}
-                        className="w-full px-4 py-3 rounded-xl border border-pitch-border bg-pitch-surface text-white placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-gold/40 focus:border-gold/30 transition-all" 
+                        className="w-full px-4 py-3 rounded-xl border border-white/10 bg-white/3 text-white placeholder-white/25 focus:outline-none focus:ring-2 focus:ring-gold/40 focus:border-gold/30 transition-all duration-300" 
                         placeholder="07XX XXX XXX" 
+                        id="input-phone-number"
                       />
                     </div>
                   </div>
@@ -481,108 +547,101 @@ export default function BookingWidget({ initialVenues }: { initialVenues: Venue[
                     <p className="text-error text-xs mt-2 font-medium">{errorMessage}</p>
                   )}
 
-
-
-                  {paymentMethod === 'stk' ? (
-                    <>
-                      <button 
-                        onClick={handlePayment}
-                        disabled={paymentStatus === 'processing' || !phoneNumber || !clientName}
-                        className="w-full bg-gold hover:bg-gold-muted disabled:bg-gold/30 disabled:text-pitch/50 text-pitch py-4 rounded-xl font-bold uppercase tracking-widest text-sm transition-all duration-300 active:scale-[0.98] spring-bounce shadow-gold-md mt-2"
-                      >
-                        {paymentStatus === 'processing' ? 'Processing...' : 'Pay Deposit via M-Pesa'}
-                      </button>
-                      <p className="text-[10px] text-center text-white/25 mt-3 leading-relaxed">
-                        By clicking, an STK push will be sent to your phone. Securely processed via Safaricom Daraja.
-                      </p>
-                    </>
-                  ) : (
-                    <div className="glass-gold p-5 rounded-2xl">
-                      <p className="text-xs font-bold text-gold uppercase tracking-wider mb-3">Pay manually to Till</p>
-                      
-                      {manualHoldStatus === 'idle' || manualHoldStatus === 'holding' || manualHoldStatus === 'failed' ? (
-                        <div className="space-y-4">
-                          <p className="text-xs text-white/40">
-                            To prevent double-booking, we will hold these slots for 15 minutes while you make the payment.
+                  <div className="glass-gold p-5 rounded-2xl border border-gold/10">
+                    <p className="text-xs font-bold text-gold uppercase tracking-wider mb-3 flex items-center gap-1.5">
+                      <Zap className="w-4 h-4" /> Pay Manually to Till
+                    </p>
+                    
+                    {manualHoldStatus === 'idle' || manualHoldStatus === 'holding' || manualHoldStatus === 'failed' ? (
+                      <div className="space-y-4">
+                        <p className="text-[11px] text-charcoal-light/70 leading-relaxed">
+                          To protect your slots from double-booking, we will lock them for 15 minutes while you submit your Till payment.
+                        </p>
+                        {errorMessage && manualHoldStatus === 'failed' && (
+                          <p className="text-error text-xs mt-2 font-medium">{errorMessage}</p>
+                        )}
+                        <button 
+                          onClick={handleManualHold}
+                          disabled={manualHoldStatus === 'holding' || !phoneNumber || !clientName}
+                          className="w-full bg-gold hover:bg-gold-muted disabled:opacity-50 text-forest py-4 rounded-xl font-bold uppercase tracking-widest text-xs transition-all duration-300 active:scale-[0.98] spring-bounce shadow-gold-md btn-premium"
+                          id="btn-manual-hold"
+                        >
+                          {manualHoldStatus === 'holding' ? 'Locking Slots...' : 'Hold Slots & Get Till'}
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="space-y-4 animate-slide-up">
+                        <div className="bg-forest-dark/40 p-4 rounded-xl text-center border border-gold/15">
+                          <p className="text-[9px] font-bold text-gold/60 uppercase mb-1">Slots Locked For</p>
+                          <p className={`text-3xl font-mono font-bold text-gold ${countdown < 120 ? 'animate-count-glow' : ''}`}>
+                            {`${Math.floor(countdown / 60)}:${(countdown % 60).toString().padStart(2, '0')}`}
                           </p>
-                          {errorMessage && manualHoldStatus === 'failed' && (
-                            <p className="text-error text-xs mt-2 font-medium">{errorMessage}</p>
-                          )}
-                          <button 
-                            onClick={handleManualHold}
-                            disabled={manualHoldStatus === 'holding' || !phoneNumber || !clientName}
-                            className="w-full bg-gold hover:bg-gold-muted disabled:opacity-50 text-pitch py-4 rounded-xl font-bold uppercase tracking-widest text-xs transition-all duration-300 active:scale-[0.98] spring-bounce"
-                          >
-                            {manualHoldStatus === 'holding' ? 'Holding Slots...' : 'Hold Slots & Show Till'}
-                          </button>
                         </div>
-                      ) : (
-                        <div className="space-y-4 animate-slide-up">
-                          <div className="bg-pitch/40 p-4 rounded-xl text-center border border-gold/10">
-                            <p className="text-xs font-bold text-gold/60 uppercase mb-1">Slots Held For</p>
-                            <p className={`text-3xl font-mono font-bold text-gold ${countdown < 120 ? 'animate-count-glow' : ''}`}>
-                              {Math.floor(countdown / 60)}:{(countdown % 60).toString().padStart(2, '0')}
-                            </p>
+                        
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <p className="text-[9px] text-white/30 uppercase font-black tracking-wider">Buy Goods Till</p>
+                            <p className="text-xl font-mono font-bold text-white tracking-widest">967413</p>
                           </div>
                           <div>
-                            <p className="text-[10px] text-white/30 uppercase font-bold">Buy Goods Till Number</p>
-                            <p className="text-2xl font-mono font-bold text-white tracking-wider">967413</p>
-                          </div>
-                          <div>
-                            <p className="text-[10px] text-white/30 uppercase font-bold">Amount to Pay</p>
+                            <p className="text-[9px] text-white/30 uppercase font-black tracking-wider">Deposit Fee</p>
                             <p className="text-xl font-mono font-bold text-gold">KES {deposit.toLocaleString()}</p>
                           </div>
-                          <div className="bg-pitch/40 p-3 rounded-xl border border-pitch-border">
-                            <p className="text-[10px] text-white/30 uppercase font-bold mb-1">Payment Reference</p>
-                            <p className="text-xs font-mono font-bold bg-pitch-surface p-2 rounded uppercase text-center text-white/70">
-                              {clientName ? clientName.substring(0, 3).toUpperCase() : 'MVSA'}-{format(new Date(), 'ddMM')}-{randomRef || '000'}
-                            </p>
-                          </div>
-
-                          {/* Mpesa Transaction Code Confirmation */}
-                          <div className="pt-2 border-t border-white/5 space-y-2">
-                            <label className="block text-[10px] text-gold uppercase font-bold text-left">Enter M-Pesa Transaction Code</label>
-                            <input 
-                              type="text"
-                              value={mpesaCode}
-                              onChange={(e) => setMpesaCode(e.target.value)}
-                              placeholder="e.g. QET789XYZ"
-                              className="w-full px-3 py-2 bg-pitch/60 border border-pitch-border rounded-xl text-center text-white font-mono uppercase tracking-widest placeholder-white/20 focus:outline-none focus:ring-1 focus:ring-gold/50"
-                            />
-                            {errorMessage && (
-                              <p className="text-error text-[10px] font-medium text-center">{errorMessage}</p>
-                            )}
-                            <button
-                              onClick={handleSubmitMpesaCode}
-                              disabled={isSubmittingCode || !mpesaCode}
-                              className="w-full bg-gold hover:bg-gold-muted disabled:opacity-50 disabled:bg-gold/30 disabled:text-pitch/50 text-pitch py-3 rounded-xl font-bold uppercase tracking-wider text-xs transition-all flex items-center justify-center gap-2"
-                            >
-                              {isSubmittingCode ? 'Verifying...' : 'Submit Payment & Complete Booking'}
-                            </button>
-                          </div>
-
-                          <p className="text-[10px] text-white/30 leading-relaxed text-center pt-2">
-                            Once you pay and submit the code, the administrator will verify the receipt and finalize your booking.
+                        </div>
+                        
+                        <div className="bg-forest-dark/40 p-3 rounded-xl border border-white/5">
+                          <p className="text-[9px] text-white/30 uppercase font-bold mb-1">M-Pesa Reference</p>
+                          <p className="text-xs font-mono font-bold p-2 bg-white/3 rounded uppercase text-center text-white/70">
+                            {clientName ? clientName.substring(0, 3).toUpperCase() : 'MVSA'}-{format(new Date(), 'ddMM')}-{randomRef || '000'}
                           </p>
+                        </div>
 
-                          <div className="text-center my-1.5">
-                            <span className="text-[10px] text-white/25">or</span>
-                          </div>
-
-                          <button 
-                            onClick={() => window.open(`https://wa.me/254798258950?text=Hi MVSA! I've just paid KES ${deposit} for my booking (Ref: ${checkoutId}). Please confirm.`, '_blank')}
-                            className="w-full bg-emerald-600/20 border border-emerald-500/30 hover:bg-emerald-600/30 text-emerald-400 py-3 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-colors active:scale-[0.98]"
+                        {/* Mpesa Transaction Code Confirmation */}
+                        <div className="pt-2 border-t border-white/10 space-y-2">
+                          <label className="block text-[9px] text-gold uppercase font-bold text-left tracking-wider">Enter M-Pesa Code (10 Chars)</label>
+                          <input 
+                            type="text"
+                            value={mpesaCode}
+                            onChange={(e) => setMpesaCode(e.target.value)}
+                            placeholder="e.g. RG89SH3FKL"
+                            className="w-full px-3 py-2 bg-forest-dark/60 border border-white/10 rounded-xl text-center text-white font-mono uppercase tracking-widest placeholder-white/20 focus:outline-none focus:ring-1 focus:ring-gold/50"
+                            id="input-mpesa-code"
+                          />
+                          {errorMessage && (
+                            <p className="text-error text-[10px] font-medium text-center">{errorMessage}</p>
+                          )}
+                          <button
+                            onClick={handleSubmitMpesaCode}
+                            disabled={isSubmittingCode || !mpesaCode}
+                            className="w-full bg-gold hover:bg-gold-muted disabled:opacity-50 disabled:bg-gold/30 disabled:text-forest/50 text-forest py-3 rounded-xl font-bold uppercase tracking-wider text-xs transition-all flex items-center justify-center gap-2 btn-premium"
+                            id="btn-submit-code"
                           >
-                            Send Receipt via WhatsApp
+                            {isSubmittingCode ? 'Verifying...' : 'Complete Booking'}
                           </button>
                         </div>
-                      )}
-                    </div>
-                  )}
+
+                        <p className="text-[9px] text-white/35 leading-relaxed text-center pt-2">
+                          Once confirmed, the system verifies M-Pesa receipts against Kenya Safaricom databases and secures your slots permanently.
+                        </p>
+
+                        <div className="text-center my-1.5">
+                          <span className="text-[9px] text-white/25 font-bold">or</span>
+                        </div>
+
+                        <button 
+                          onClick={() => window.open(`https://wa.me/254798258950?text=Hi MVSA! I've just paid KES ${deposit} for my booking (Ref: ${checkoutId}). Please confirm.`, '_blank')}
+                          className="w-full bg-emerald-600/10 border border-emerald-500/20 hover:bg-emerald-600/25 text-emerald-400 py-3 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all duration-300"
+                          id="btn-whatsapp-receipt"
+                        >
+                          Send Receipt via WhatsApp
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 </div>
               ) : (
-                <div className="glass text-white/30 text-sm p-5 rounded-xl text-center border border-dashed border-white/10">
-                  Select at least one available slot to continue booking.
+                <div className="glass text-white/30 text-xs p-5 rounded-xl text-center border border-dashed border-white/10">
+                  Select an hour session slot above to continue.
                 </div>
               )}
             </>
