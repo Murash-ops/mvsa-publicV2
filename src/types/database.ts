@@ -3,6 +3,9 @@ export type Venue = {
   name: string;
   type: 'turf' | 'meeting_room';
   hourly_rates: Record<string, unknown>;
+  description?: string;
+  image_url?: string;
+  is_active?: boolean;
 };
 
 export type TimeSlot = {

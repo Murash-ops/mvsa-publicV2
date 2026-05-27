@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { DM_Sans, Cinzel, JetBrains_Mono, Outfit } from "next/font/google";
+import { DM_Sans, Cinzel, JetBrains_Mono, Outfit, Chakra_Petch, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
@@ -29,6 +29,19 @@ const jetbrainsMono = JetBrains_Mono({
   weight: ["400"],
 });
 
+const chakraPetch = Chakra_Petch({
+  variable: "--font-chakra-petch",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  style: ["normal", "italic"],
+});
+
+const spaceGrotesk = Space_Grotesk({
+  variable: "--font-space-grotesk",
+  subsets: ["latin"],
+  weight: ["400", "500", "700"],
+});
+
 export const metadata: Metadata = {
   title: "Mountain View Sports Arena | Play • Compete • Connect",
   description: "Nairobi's premium 5-aside football turf and recreational facility. Book your pitch today.",
@@ -41,7 +54,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${dmSans.variable} ${outfit.variable} ${cinzel.variable} ${jetbrainsMono.variable} font-sans antialiased bg-surface text-charcoal min-h-screen flex flex-col`}>
+      <body className={`${dmSans.variable} ${outfit.variable} ${cinzel.variable} ${jetbrainsMono.variable} ${chakraPetch.variable} ${spaceGrotesk.variable} font-sans antialiased bg-surface text-charcoal min-h-screen flex flex-col`}>
         <Navbar />
         <div className="flex-1">
           {children}
@@ -52,3 +65,4 @@ export default function RootLayout({
     </html>
   );
 }
+
