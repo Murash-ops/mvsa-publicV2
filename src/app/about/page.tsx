@@ -181,6 +181,52 @@ export default async function AboutPage() {
             </div>
           </div>
         </div>
+
+        {/* SPONSORS & PARTNERSHIPS SECTION */}
+        <div className="mt-24 border-t border-white/5 pt-16 text-center max-w-4xl mx-auto px-6">
+          <span className="text-[10px] font-mono font-bold uppercase tracking-[0.3em] text-gold">Cooperation Registry</span>
+          <h2 className="text-3xl md:text-4xl font-display font-black text-white italic uppercase tracking-tight mt-2 mb-4">
+            Partnerships & Sponsorships
+          </h2>
+          <p className="text-charcoal-light text-sm md:text-base leading-relaxed font-medium mb-12 max-w-2xl mx-auto">
+            Align your brand with elite athletic development, youth empowerment, and community sports advocacy in the heart of Nairobi. Join our network of corporate partners.
+          </p>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-left mb-12">
+            <div className="p-6 bg-white/[0.01] border border-white/5 rounded-none hover:border-gold/30 transition-all duration-300">
+              <span className="text-gold text-xs font-mono font-bold block uppercase mb-2">01 / Visibility</span>
+              <h3 className="text-white font-display font-bold text-sm uppercase tracking-wider mb-2">Elite Pitchside Brand Exposure</h3>
+              <p className="text-charcoal-light/70 text-xs font-medium leading-relaxed">
+                Feature premium brand signage on our main turf sidelines, indoor arenas, or digital streaming broadcasts during tournaments.
+              </p>
+            </div>
+            
+            <div className="p-6 bg-white/[0.01] border border-white/5 rounded-none hover:border-gold/30 transition-all duration-300">
+              <span className="text-gold text-xs font-mono font-bold block uppercase mb-2">02 / Academy</span>
+              <h3 className="text-white font-display font-bold text-sm uppercase tracking-wider mb-2">Youth Academy Sponsorships</h3>
+              <p className="text-charcoal-light/70 text-xs font-medium leading-relaxed">
+                Fund underprivileged youth cohorts, supply official branded jerseys, or support academy training gear to drive local talent.
+              </p>
+            </div>
+
+            <div className="p-6 bg-white/[0.01] border border-white/5 rounded-none hover:border-gold/30 transition-all duration-300">
+              <span className="text-gold text-xs font-mono font-bold block uppercase mb-2">03 / Corporate</span>
+              <h3 className="text-white font-display font-bold text-sm uppercase tracking-wider mb-2">Corporate Naming Rights</h3>
+              <p className="text-charcoal-light/70 text-xs font-medium leading-relaxed">
+                Secure naming rights for key facilities, tournaments, or VIP strategist lounges with exclusive executive board access.
+              </p>
+            </div>
+          </div>
+
+          <a 
+            href="https://wa.me/254798258950?text=Hello%2C%20I%20am%20interested%20in%20discussing%20a%20corporate%20partnership%20with%20MVSA%20Sports%20Arena."
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-block px-8 py-4 bg-gradient-to-r from-gold to-gold-deep hover:from-white hover:to-white text-forest font-black uppercase text-xs tracking-[0.2em] transition-all duration-300 shadow-gold-sm hover:scale-[1.02]"
+          >
+            Become a Partner
+          </a>
+        </div>
       </div>
     </main>
   );
