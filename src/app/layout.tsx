@@ -51,6 +51,15 @@ const spaceGrotesk = Space_Grotesk({
 export const metadata: Metadata = {
   title: "Mountain View Sports Arena | Play • Compete • Connect",
   description: "Nairobi's premium 5-aside football turf and recreational facility. Book your pitch today.",
+  icons: {
+    icon: [
+      { url: '/favicon.ico', sizes: 'any' },
+      { url: '/favicon-192x192.png', sizes: '192x192', type: 'image/png' }
+    ],
+    apple: [
+      { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' }
+    ]
+  }
 };
 
 export default function RootLayout({
