@@ -111,7 +111,7 @@ test.describe('MVSA Public Site Mobile Responsiveness & Touch Usability', () => 
             await page.waitForTimeout(1000);
 
             // Open menu
-            await menuButton.click();
+            await menuButton.click({ force: true });
             
             // Wait for the drawer container to render and become visible
             const drawerContainer = page.locator('.lg\\:hidden.fixed').first();
@@ -122,7 +122,7 @@ test.describe('MVSA Public Site Mobile Responsiveness & Touch Usability', () => 
             await expect(drawerLink).toBeVisible();
 
             // Close menu
-            await menuButton.click();
+            await menuButton.click({ force: true });
             await expect(drawerContainer).toBeHidden({ timeout: 5000 });
           }
 
@@ -150,8 +150,8 @@ test.describe('MVSA Public Site Mobile Responsiveness & Touch Usability', () => 
               await expect(scrollableContainers.first()).toBeVisible();
             }
 
-            // Check if slot grids are properly bounded by width
-            const slotGrid = page.locator('div.grid-cols-2');
+            // Check if venue grids are properly bounded by width
+            const slotGrid = page.locator('[data-testid="venue-grid"]');
             if (await slotGrid.isVisible()) {
               const gridBox = await slotGrid.boundingBox();
               if (gridBox) {

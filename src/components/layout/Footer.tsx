@@ -15,14 +15,14 @@ export default function Footer() {
           {/* Brand Info */}
           <div className="space-y-6">
             <Link href="/" className="flex items-center gap-3 group">
-              <div className="relative w-14 h-14 bg-white rounded-none p-1 shadow-sm transition-all duration-300 group-hover:scale-105 spring-bounce flex items-center justify-center border border-white/10">
+              <div className="relative w-12 h-12 bg-white rounded-none p-1 border border-white/20 transition-all duration-300 group-hover:scale-105 spring-bounce flex items-center justify-center shrink-0 shadow-sm">
                 <div className="relative w-full h-full">
                   <Image src="/images/logo.png" alt="MVSA Logo" fill className="object-contain" unoptimized />
                 </div>
               </div>
               <div>
                 <h2 className="font-brand font-bold text-xl tracking-tighter leading-none text-white">MVSA</h2>
-                <p className="text-[9px] text-gold font-bold uppercase tracking-widest leading-none mt-1">Arena & Academy</p>
+                <p className="text-[10px] text-gold font-bold uppercase tracking-widest leading-none mt-1">Arena & Academy</p>
               </div>
             </Link>
             <p className="text-white/50 text-xs sm:text-sm leading-relaxed max-w-xs font-medium">

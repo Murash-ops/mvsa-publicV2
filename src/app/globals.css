@@ -1,22 +1,22 @@
 @import "tailwindcss";
 
 @theme {
-  /* === CORE REDESIGN PALETTE (LUXURY LIGHT THEME) === */
-  --color-forest: #2D5016;         /* Primary Brand Color — Forest Green */
-  --color-forest-dark: #1A3A0A;    /* Primary Hover & Press States */
-  --color-forest-light: #3D6B20;   /* Secondary CTA & Fill */
+  /* === CORE REDESIGN PALETTE === */
+  --color-forest: #0d2818;
+  --color-forest-dark: #061a10;
+  --color-forest-light: #1b4332;
   
   --color-gold: #C5A55A;           /* Luxury Gold Accent */
   --color-gold-muted: #D4BA7A;     /* Subdued gold */
   --color-gold-deep: #9A7B39;
   
-  --color-charcoal: #2B2B2B;       /* Primary Typography - Off-black */
-  --color-charcoal-light: #4A4A4A; /* Secondary labels & body copy */
-  --color-muted: #71717A;          /* Timestamps, disabled borders */
+  --color-charcoal: #F9FAFB;       /* Primary Typography - High-emphasis light */
+  --color-charcoal-light: #bfcfc6; /* Secondary labels & body copy */
+  --color-muted: #718a7a;          /* Timestamps, disabled borders */
   
-  --color-surface: #F9FAFB;        /* Canvas Background */
-  --color-card: #FFFFFF;           /* Card containers & forms surface */
-  --color-border-color: rgba(45,80,22,0.12); /* Subtle green-tinted border line */
+  --color-surface: #061a10;        /* Canvas Background */
+  --color-card: rgba(13, 30, 14, 0.85); /* Premium Translucent container surface */
+  --color-border-color: rgba(255, 255, 255, 0.08); /* Subtle white-tinted border line */
   
   /* === STATUS === */
   --color-success: #22C55E;
@@ -33,54 +33,68 @@
 
 @layer base {
   body {
-    @apply bg-surface text-charcoal font-sans min-h-screen antialiased;
+    background-image: 
+      linear-gradient(
+        rgba(6, 26, 16, 0.40),
+        rgba(6, 26, 16, 0.70)
+      ),
+      url('/images/hero_turf.jpeg');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+    @apply text-charcoal-light font-sans min-h-screen antialiased bg-surface;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    @apply font-display text-forest tracking-normal;
+    @apply font-display text-white tracking-normal;
     font-weight: 700;
   }
 }
 
 /* ========================================
-   PREMIUM WHISPER SHADOWS (BORDER RADIUS: 0PX)
+   GLASSMORPHISM & PREMIUM GLOWS
    ======================================== */
 
 .glass {
-  background: #FFFFFF;
-  border: 1px solid rgba(45, 80, 22, 0.12);
-  box-shadow: 0 4px 20px -2px rgba(45, 80, 22, 0.05);
+  background: rgba(13, 30, 14, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 0px !important;
 }
 
 .glass-gold {
   background: rgba(197, 165, 90, 0.04);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   border: 1px solid rgba(197, 165, 90, 0.2);
   border-radius: 0px !important;
 }
 
 .glass-light {
-  background: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(45, 80, 22, 0.08);
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 0px !important;
 }
 
 .shadow-gold-sm {
-  box-shadow: 0 2px 8px rgba(197, 165, 90, 0.08);
+  box-shadow: 0 2px 8px rgba(197, 165, 90, 0.12);
 }
 
 .shadow-gold-md {
-  box-shadow: 0 4px 16px rgba(197, 165, 90, 0.12);
+  box-shadow: 0 4px 16px rgba(197, 165, 90, 0.15);
 }
 
 .shadow-gold-lg {
-  box-shadow: 0 8px 32px rgba(197, 165, 90, 0.15);
+  box-shadow: 0 8px 32px rgba(197, 165, 90, 0.2);
 }
 
 .shadow-pitch {
-  box-shadow: 0 4px 20px -2px rgba(45, 80, 22, 0.05);
+  box-shadow: 0 8px 32px rgba(6, 26, 16, 0.6),
+              0 2px 8px rgba(6, 26, 16, 0.4);
 }
 
 /* ========================================
