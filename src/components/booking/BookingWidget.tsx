@@ -36,6 +36,8 @@ export default function BookingWidget({ initialVenues }: { initialVenues: Venue[
   
   const [errorMessage, setErrorMessage] = useState('');
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [slotHoldWarning, setSlotHoldWarning] = useState('');
+  const [isHolding, setIsHolding] = useState(false);
 
   // Generate exactly 14 days ahead starting from today
   const next14Days = Array.from({ length: 14 }).map((_, i) => addDays(new Date(), i));
@@ -140,9 +142,10 @@ export default function BookingWidget({ initialVenues }: { initialVenues: Venue[
     return `https://wa.me/254798258950?text=${encodeURIComponent(message)}`;
   };
 
-  const handleWhatsAppRedirect = (e?: React.FormEvent) => {
+  const handleWhatsAppRedirect = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     setErrorMessage('');
+    setSlotHoldWarning('');
     
     if (!selectedVenue) {
       setErrorMessage('Please select a venue.');
@@ -161,10 +164,35 @@ export default function BookingWidget({ initialVenues }: { initialVenues: Venue[
       setErrorMessage('Please enter a valid Kenyan phone number (e.g. 07xxxxxxxx or 01xxxxxxxx).');
       return;
     }
+
+    setIsHolding(true);
     
-    // Open WhatsApp
-    window.open(buildWhatsAppUrl(), '_blank');
-    setIsSubmitted(true);
+    try {
+      // Call the stored database function to reserve slot and create a pending booking row
+      const { data, error } = await supabase.rpc('create_booking_with_hold', {
+        p_venue_id: selectedVenue.id,
+        p_client_name: clientName.trim(),
+        p_client_phone: cleanPhone,
+        p_slot_ids: selectedSlots,
+        p_total_amount: total,
+        p_deposit_amount: 0,
+        p_balance: total,
+        p_source: 'whatsapp'
+      });
+      
+      if (error) {
+        console.error('Database slot hold error:', error);
+        setSlotHoldWarning('Warning: We could not hold your time slot in our database. Please proceed to WhatsApp to manually confirm availability with our staff.');
+      }
+    } catch (err) {
+      console.error('Database connection error:', err);
+      setSlotHoldWarning('Warning: We could not hold your time slot in our database. Please proceed to WhatsApp to manually confirm availability with our staff.');
+    } finally {
+      setIsHolding(false);
+      // Open WhatsApp regardless of DB outcome
+      window.open(buildWhatsAppUrl(), '_blank');
+      setIsSubmitted(true);
+    }
   };
 
   if (isSubmitted) {
@@ -178,9 +206,15 @@ export default function BookingWidget({ initialVenues }: { initialVenues: Venue[
           <h2 className="text-4xl text-white tracking-tighter uppercase leading-none font-display font-bold">
             Your request has been sent!
           </h2>
-          <p className="text-charcoal-light text-base max-w-md mx-auto leading-relaxed font-medium">
-            We&apos;ll confirm your booking on WhatsApp within a few minutes. See you on the pitch 🏟️
-          </p>
+          {slotHoldWarning ? (
+            <p className="text-amber-400 font-semibold bg-amber-500/10 border border-amber-500/20 p-4 text-sm max-w-md mx-auto leading-relaxed">
+              {slotHoldWarning}
+            </p>
+          ) : (
+            <p className="text-charcoal-light text-base max-w-md mx-auto leading-relaxed font-medium">
+              We&apos;ll confirm your booking on WhatsApp within a few minutes. See you on the pitch 🏟️
+            </p>
+          )}
         </div>
 
         <div className="pt-4 flex justify-center">
@@ -463,9 +497,10 @@ export default function BookingWidget({ initialVenues }: { initialVenues: Venue[
 
             <button
               onClick={handleWhatsAppRedirect}
-              className="w-full py-5 bg-gold hover:bg-gold-muted text-forest-dark border border-gold font-display text-xs font-extrabold uppercase tracking-widest transition-all rounded-none flex items-center justify-center gap-2.5 shadow-gold-sm cursor-pointer hover:scale-[1.02] active:scale-[0.98] spring-bounce animate-pulse-gold"
+              disabled={isHolding}
+              className="w-full py-5 bg-gold hover:bg-gold-muted text-forest-dark border border-gold font-display text-xs font-extrabold uppercase tracking-widest transition-all rounded-none flex items-center justify-center gap-2.5 shadow-gold-sm cursor-pointer hover:scale-[1.02] active:scale-[0.98] spring-bounce animate-pulse-gold disabled:opacity-50"
             >
-              Reserve via WhatsApp
+              {isHolding ? 'Reserving Slot...' : 'Reserve via WhatsApp'}
             </button>
             
             <p className="text-[10px] text-white/40 italic font-medium pt-2 text-center leading-relaxed">

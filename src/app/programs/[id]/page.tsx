@@ -7,15 +7,12 @@ import {
   Trophy, 
   Users, 
   Clock, 
-  CheckCircle2, 
   ArrowLeft,
   Loader2,
   Calendar,
-  Phone,
   User,
   ShieldAlert,
   Compass,
-  Zap,
   Lock,
   ChevronRight
 } from 'lucide-react';
@@ -30,19 +27,6 @@ export default function ProgramDetailsPage() {
   // State
   const [program, setProgram] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [registrationSuccess, setRegistrationSuccess] = useState(false);
-
-  // Form State
-  const [participantName, setParticipantName] = useState('');
-  const [participantAge, setParticipantAge] = useState('');
-  const [parentPhone, setParentPhone] = useState('');
-  const [parentName, setParentName] = useState('');
-  const [pricingPlan, setPricingPlan] = useState('session');
-  
-  // Custom dynamic schema answers
-  const [dynamicAnswers, setDynamicAnswers] = useState<Record<string, string>>({});
-  const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
     if (programId) {
@@ -64,12 +48,6 @@ export default function ProgramDetailsPage() {
 
       if (!error && data) {
         setProgram(data);
-        if (data.pricing_json) {
-          const availablePlans = Object.keys(data.pricing_json).filter(key => data.pricing_json[key] > 0);
-          if (availablePlans.length > 0) {
-            setPricingPlan(availablePlans[0]);
-          }
-        }
       } else {
         router.push('/programs');
       }
@@ -86,90 +64,6 @@ export default function ProgramDetailsPage() {
       return program?.schedule?.includes('Ages') ? program?.schedule : 'Ages 6 - 16';
     }
     return 'Ages 16+ / Adults';
-  };
-
-  const getPriceLabel = (planKey: string) => {
-    if (!program?.pricing_json) return 'KES 0';
-    const val = program?.pricing_json[planKey];
-    return `KES ${val?.toLocaleString() || 0}`;
-  };
-
-  const submitEnrollment = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setErrorMessage('');
-    
-    // Core Validations
-    if (!participantName.trim()) {
-      setErrorMessage('Participant name is required.');
-      return;
-    }
-    if (program?.type === 'academy') {
-      const age = parseInt(participantAge);
-      if (isNaN(age) || age < 4 || age > 18) {
-        setErrorMessage('Participant age must be between 4 and 18 for academies.');
-        return;
-      }
-    }
-    const cleanPhone = parentPhone.replace(/\s/g, '');
-    if (!/^(07|01|254)\d{8,10}$/.test(cleanPhone)) {
-      setErrorMessage('Please enter a valid Kenyan phone number (e.g. 07xxxxxxxx).');
-      return;
-    }
-
-    setIsSubmitting(true);
-
-    try {
-      // Compile dynamic responses as custom answers metadata
-      const hasSchema = program?.registration_schema && Array.isArray(program?.registration_schema) && program?.registration_schema?.length > 0;
-      
-      let genderVal = 'Other';
-      let experienceVal = 'Beginner';
-      let schoolClubVal = '';
-      let medicalVal = '';
-
-      if (hasSchema) {
-        Object.entries(dynamicAnswers).forEach(([fieldKey, value]) => {
-          const keyLower = fieldKey.toLowerCase();
-          if (keyLower.includes('gender')) {
-            genderVal = value;
-          } else if (keyLower.includes('experience')) {
-            experienceVal = value;
-          } else if (keyLower.includes('school') || keyLower.includes('club')) {
-            schoolClubVal = value;
-          } else if (keyLower.includes('medical') || keyLower.includes('allergy') || keyLower.includes('history')) {
-            medicalVal = value;
-          } else {
-            medicalVal += (medicalVal ? '\n' : '') + `${fieldKey}: ${value}`;
-          }
-        });
-      }
-
-      // Insert enrollment in pending status (No auto SMS sent)
-      const { error: enrollError } = await supabase
-        .from('enrollments')
-        .insert([{
-          program_id: program?.id,
-          participant_name: participantName.trim(),
-          participant_age: parseInt(participantAge) || null,
-          client_phone: cleanPhone,
-          status: 'pending', // Set strictly as pending for Admin review
-          payment_status: 'unpaid',
-          gender: genderVal,
-          communication_pref: 'whatsapp',
-          prior_experience: experienceVal,
-          school_club: schoolClubVal || null,
-          medical_conditions: medicalVal || null,
-          pricing_plan: pricingPlan
-        }]);
-
-      if (enrollError) throw enrollError;
-
-      setRegistrationSuccess(true);
-    } catch (err: any) {
-      setErrorMessage(err.message || 'Error processing your registration');
-    } finally {
-      setIsSubmitting(false);
-    }
   };
 
   if (isLoading) {
@@ -205,7 +99,10 @@ export default function ProgramDetailsPage() {
     );
   }
 
-  const hasCustomSchema = program?.registration_schema && Array.isArray(program?.registration_schema) && program?.registration_schema?.length > 0;
+  // Build conversational WhatsApp link using program name
+  const whatsAppUrl = `https://wa.me/254798258950?text=${encodeURIComponent(
+    `Hi MVSA 👋 I'm interested in enrolling in ${program?.name || 'this program'}. My name is [Name]. Could you share more details on enrollment?`
+  )}`;
 
   return (
     <main className="min-h-screen bg-transparent text-charcoal text-left pb-32">
@@ -286,210 +183,36 @@ export default function ProgramDetailsPage() {
             </div>
           </div>
 
-          {/* Right Column: Registration Card */}
+          {/* Right Column: Enrollment Card (WhatsApp Redirect) */}
           <div className="lg:col-span-5 lg:sticky lg:top-28">
-            <div className="bg-card border border-white/10 rounded-none shadow-sm overflow-hidden">
-              
-              {/* Header */}
-              <div className="p-6 border-b border-white/10 bg-white/5 text-white flex justify-between items-center">
+            <div className="bg-card border border-white/10 rounded-none shadow-sm overflow-hidden p-8 space-y-6">
+              <div className="flex justify-between items-center border-b border-white/10 pb-4">
                 <div>
-                  <h3 className="text-lg font-display font-bold uppercase tracking-tight">PROGRAM REGISTRATION</h3>
-                  <p className="text-[9px] font-black uppercase tracking-widest mt-0.5 text-gold">Submit Details for Intake</p>
+                  <span className="text-[9px] font-black uppercase tracking-widest text-gold">Intake open</span>
+                  <h3 className="text-2xl font-display font-bold uppercase tracking-tight text-white mt-0.5">Join Program</h3>
                 </div>
                 <div className="flex items-center gap-1 bg-white/5 px-3 py-1.5 rounded-none border border-white/10 text-[9px] font-mono font-bold text-white">
                   <Lock className="w-3.5 h-3.5 text-gold" /> SECURE
                 </div>
               </div>
 
-              {/* Dynamic Registration Form (Single Unified View) */}
-              {registrationSuccess ? (
-                <div className="p-8 text-center animate-entrance space-y-6">
-                  <div className="w-16 h-16 bg-emerald-500/10 text-emerald-600 rounded-none border border-emerald-500/20 flex items-center justify-center mx-auto">
-                    <CheckCircle2 className="w-8 h-8" />
-                  </div>
-                  <h4 className="text-2xl text-white font-display font-bold uppercase tracking-tight">
-                    Registration received!
-                  </h4>
-                  <p className="text-charcoal-light text-sm leading-relaxed font-medium">
-                    We&apos;ll be in touch to confirm your spot.
-                  </p>
-                  <button 
-                    onClick={() => router.push('/programs')}
-                    className="w-full py-4 bg-forest hover:bg-forest-light text-white rounded-none font-display text-xs font-bold uppercase tracking-widest transition-colors border border-forest cursor-pointer"
-                  >
-                    Return to Programs
-                  </button>
-                </div>
-              ) : (
-                <form onSubmit={submitEnrollment} className="p-8 space-y-5">
-                  
-                  {/* Standard Field: Participant Name */}
-                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold uppercase tracking-wider text-white/80 block">Athlete Full Name</label>
-                    <div className="relative">
-                      <User className="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-white/50" />
-                      <input 
-                        required
-                        type="text" 
-                        placeholder="e.g. Brandon Kalomba"
-                        value={participantName}
-                        onChange={(e) => setParticipantName(e.target.value)}
-                        className="w-full pl-11 pr-4 py-3 border border-white/10 bg-white/5 text-white placeholder-white/30 focus:outline-none focus:border-gold transition-all text-sm font-medium rounded-none"
-                      />
-                    </div>
-                  </div>
+              <p className="text-xs text-charcoal-light leading-relaxed font-medium">
+                Enrollment for this program is managed directly through WhatsApp. Tap below to chat with our academy administrators to discuss details, parent requirements, and starting schedules.
+              </p>
 
-                  {/* Standard Field: Athlete Age */}
-                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold uppercase tracking-wider text-white/80 block">Athlete Age</label>
-                    <div className="relative">
-                      <Calendar className="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-white/50" />
-                      <input 
-                        required
-                        type="number" 
-                        placeholder="e.g. 11"
-                        value={participantAge}
-                        onChange={(e) => setParticipantAge(e.target.value)}
-                        className="w-full pl-11 pr-4 py-3 border border-white/10 bg-white/5 text-white placeholder-white/30 focus:outline-none focus:border-gold transition-all text-sm font-medium rounded-none"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Standard Field: Parent/Contact Phone */}
-                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold uppercase tracking-wider text-white/80 block">Parent / Guardian Phone</label>
-                    <div className="relative">
-                      <Phone className="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-white/50" />
-                      <input 
-                        required
-                        type="tel" 
-                        placeholder="e.g. 0798258950"
-                        value={parentPhone}
-                        onChange={(e) => setParentPhone(e.target.value)}
-                        className="w-full pl-11 pr-4 py-3 border border-white/10 bg-white/5 text-white placeholder-white/30 font-mono focus:outline-none focus:border-gold transition-all text-sm rounded-none"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Dynamic Fields from registration_schema */}
-                  {hasCustomSchema ? (
-                    program?.registration_schema?.map((field: any) => {
-                      const inputKey = field.field_name;
-                      return (
-                        <div key={inputKey} className="space-y-1.5 pt-2 border-t border-white/5">
-                          <label className="text-[10px] font-bold uppercase tracking-wider text-white/80 block">
-                            {field.field_name} {field.required && <span className="text-error">*</span>}
-                          </label>
-                          {field.type === 'textarea' ? (
-                            <textarea
-                              required={field.required}
-                              rows={3}
-                              placeholder="Enter details..."
-                              value={dynamicAnswers[inputKey] || ''}
-                              onChange={(e) => setDynamicAnswers({ ...dynamicAnswers, [inputKey]: e.target.value })}
-                              className="w-full px-4 py-3 border border-white/10 bg-white/5 text-white placeholder-white/30 focus:outline-none focus:border-gold transition-all text-sm font-medium rounded-none"
-                            />
-                          ) : field.type === 'select' ? (
-                            <select
-                              required={field.required}
-                              value={dynamicAnswers[inputKey] || ''}
-                              onChange={(e) => setDynamicAnswers({ ...dynamicAnswers, [inputKey]: e.target.value })}
-                              className="w-full px-4 py-3 border border-white/10 bg-white/5 text-white focus:outline-none focus:border-gold transition-all text-sm font-medium rounded-none"
-                            >
-                              <option value="">Select option...</option>
-                              {field.options?.map((opt: string) => (
-                                <option key={opt} value={opt}>{opt}</option>
-                              ))}
-                            </select>
-                          ) : field.type === 'checkbox' ? (
-                            <label className="flex items-center gap-3 py-2 cursor-pointer select-none">
-                              <input
-                                type="checkbox"
-                                required={field.required}
-                                checked={dynamicAnswers[inputKey] === 'true'}
-                                onChange={(e) => setDynamicAnswers({ ...dynamicAnswers, [inputKey]: e.target.checked ? 'true' : 'false' })}
-                                className="w-4 h-4 text-gold border-white/10 rounded-none focus:ring-0 focus:outline-none accent-gold cursor-pointer"
-                              />
-                              <span className="text-xs text-charcoal-light font-bold">Yes, I confirm</span>
-                            </label>
-                          ) : (
-                            <input
-                              required={field.required}
-                              type={field.type === 'number' ? 'number' : 'text'}
-                              placeholder="Enter details..."
-                              value={dynamicAnswers[inputKey] || ''}
-                              onChange={(e) => setDynamicAnswers({ ...dynamicAnswers, [inputKey]: e.target.value })}
-                              className="w-full px-4 py-3 border border-white/10 bg-white/5 text-white placeholder-white/30 focus:outline-none focus:border-gold transition-all text-sm font-medium rounded-none"
-                            />
-                          )}
-                        </div>
-                      );
-                    })
-                  ) : null}
-
-                  {/* Standard Field: Pricing Plan Selection */}
-                  {program?.pricing_json && (
-                    <div className="space-y-2 pt-4 border-t border-white/10">
-                      <label className="text-[10px] font-bold uppercase tracking-wider text-white/80 block">Choose Pricing Option</label>
-                      <div className="grid grid-cols-1 gap-2.5">
-                        {Object.entries(program?.pricing_json || {}).map(([key, value]) => {
-                          if (!value || (value as number) === 0) return null;
-                          const isActive = pricingPlan === key;
-                          return (
-                            <button
-                              key={key}
-                              type="button"
-                              onClick={() => setPricingPlan(key)}
-                              className={`w-full flex items-center justify-between p-4 border text-left transition-all duration-300 rounded-none cursor-pointer ${
-                                isActive 
-                                  ? 'border-gold bg-gold/10 text-gold font-bold scale-[1.01]' 
-                                  : 'border-white/10 bg-white/5 text-white hover:border-gold/30 hover:bg-gold/10'
-                              }`}
-                            >
-                              <div className="flex items-center gap-3">
-                                <div className={`w-3.5 h-3.5 rounded-full border flex items-center justify-center shrink-0 ${isActive ? 'border-gold' : 'border-white/10'}`}>
-                                  {isActive && <div className="w-1.5 h-1.5 bg-gold rounded-full" />}
-                                </div>
-                                <span className="text-xs font-bold uppercase tracking-wider">{key}</span>
-                              </div>
-                              <span className="text-sm font-mono font-bold text-white">
-                                KES {value.toLocaleString()}
-                              </span>
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Billing Details Block */}
-                  {program?.pricing_json && (
-                    <div className="p-4 border border-white/10 bg-white/5 rounded-none flex justify-between items-center text-xs">
-                      <span className="font-bold text-charcoal-light">Total Fees Due:</span>
-                      <span className="font-mono font-black text-lg text-gold">{getPriceLabel(pricingPlan)}</span>
-                    </div>
-                  )}
-
-                  {errorMessage && (
-                    <p className="text-error text-xs font-semibold">{errorMessage}</p>
-                  )}
-
-                  {/* Submit Button */}
-                  <button 
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="w-full flex items-center justify-center gap-2.5 bg-gold hover:bg-gold-muted disabled:opacity-50 text-forest-dark py-4.5 rounded-none font-display text-xs font-extrabold uppercase tracking-widest transition-all duration-300 active:scale-[0.98] cursor-pointer"
-                  >
-                    {isSubmitting ? (
-                      <Loader2 className="w-5 h-5 animate-spin text-forest-dark" />
-                    ) : (
-                      'Register Now'
-                    )}
-                  </button>
-
-                </form>
-              )}
-
+              <a
+                href={whatsAppUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full py-5 bg-gold hover:bg-gold-muted text-forest-dark border border-gold font-display text-xs font-extrabold uppercase tracking-widest transition-all rounded-none flex items-center justify-center gap-2.5 shadow-gold-sm hover:scale-[1.02] active:scale-[0.98] spring-bounce text-center"
+              >
+                Enroll via WhatsApp
+                <ChevronRight className="w-4 h-4 stroke-[2.5px]" />
+              </a>
+              
+              <p className="text-[10px] text-white/40 italic font-medium text-center leading-relaxed">
+                *Clicking redirects to WhatsApp chat at +254798258950
+              </p>
             </div>
           </div>
 

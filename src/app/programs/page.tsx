@@ -127,9 +127,6 @@ export default function ProgramsPage() {
                         <CalendarDays className="w-4 h-4 text-gold stroke-[2px]" />
                         {getAgeLevel(program)}
                       </p>
-                      <p className="text-sm font-mono text-gold font-extrabold tracking-wider pt-0.5">
-                        {getPriceLabel(program.pricing_json)}
-                      </p>
                     </div>
                   </div>
 
@@ -199,9 +196,6 @@ export default function ProgramsPage() {
                       <p className="text-xs font-sans text-charcoal-light font-semibold tracking-wide flex items-center gap-1.5 pt-1">
                         <CalendarDays className="w-4 h-4 text-gold stroke-[2px]" />
                         {getAgeLevel(program)}
-                      </p>
-                      <p className="text-sm font-mono text-gold font-extrabold tracking-wider pt-0.5">
-                        {getPriceLabel(program.pricing_json)}
                       </p>
                     </div>
                   </div>

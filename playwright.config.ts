@@ -30,6 +30,14 @@ export default defineConfig({
     screenshot: 'only-on-failure',
   },
 
+  /* Use webServer to let Playwright manage/reuse the dev server */
+  webServer: {
+    command: 'npm run dev',
+    url: 'http://localhost:3000',
+    reuseExistingServer: true,
+    timeout: 120_000,
+  },
+
   /* Configure projects for major browsers */
   projects: [
     {

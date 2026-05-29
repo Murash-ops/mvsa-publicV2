@@ -6,7 +6,10 @@ import {
   Lock, 
   Wifi, 
   Clock, 
-  ChevronRight 
+  ChevronRight,
+  Shield,
+  HelpCircle,
+  Activity
 } from 'lucide-react';
 
 export const revalidate = 0; // Ensure live database changes propagate instantly
@@ -15,13 +18,39 @@ export default async function Home() {
   const supabase = await createClient();
   
   // Parallel fetch to eliminate waterfalls
-  const [programsRes, venuesRes] = await Promise.all([
+  const [programsRes, venuesRes, siteContentRes] = await Promise.all([
     supabase.from('programs').select('*').eq('is_active', true).limit(4),
-    supabase.from('venues').select('*').order('id', { ascending: true })
+    supabase.from('venues').select('*').order('id', { ascending: true }),
+    supabase.from('site_content').select('*')
   ]);
 
   const dbVenues = venuesRes?.data || [];
   const dbPrograms = programsRes?.data || [];
+  const siteContent = siteContentRes?.data || [];
+
+  // 1. Parse dynamic content keys with hardcoded fallbacks
+  const homepageRow = siteContent.find((r: any) => r.key === 'homepage_content');
+  const homepageData = homepageRow?.value || {};
+
+  const heroHeadline = homepageData.hero_headline || "Home of Football \n& Fitness";
+  const heroSubheading = homepageData.hero_subheading || "Premium synthetic turf. Floodlit nights. Behind Mountain View Mall, Waiyaki Way.";
+  const heroTextAboveCta = homepageData.hero_text_above_cta || "Want to see the arena in action? Follow us on Instagram and TikTok @mtviewsportsarena";
+  const closingCtaHeadline = homepageData.closing_cta_headline || "Book Your Slot Today";
+  
+  const instagramHandle = homepageData.instagram || "mtviewsportsarena";
+  const tiktokHandle = homepageData.tiktok || "mtviewsportsarena";
+
+  const trustCard1Title = homepageData.trust_card_1_title || "Changing Rooms & Lockers";
+  const trustCard1Desc = homepageData.trust_card_1_desc || "Private premium changing stalls and secure smart lockers for your gear.";
+  const trustCard2Title = homepageData.trust_card_2_title || "Free WiFi & Water";
+  const trustCard2Desc = homepageData.trust_card_2_desc || "High-speed clubhouse connection and unlimited filtered hydration station.";
+  const trustCard3Title = homepageData.trust_card_3_title || "Floodlit Until 11PM";
+  const trustCard3Desc = homepageData.trust_card_3_desc || "FIFA-standard shadow-free matches under our high-intensity lighting systems.";
+
+  const appearanceRow = siteContent.find((r: any) => r.key === 'appearance_settings');
+  const appearanceData = appearanceRow?.value || {};
+  
+  const heroImgUrl = homepageData.hero_image_url || appearanceData.hero_image_url || "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?q=80&w=1920";
 
   // Determine Turf rates from database
   const turfVenue = dbVenues.find((v: any) => v.type === 'turf' || v.name.includes('Turf'));
@@ -32,25 +61,36 @@ export default async function Home() {
   const meetingVenue = dbVenues.find((v: any) => v.type === 'meeting_room' || v.name.includes('Meeting'));
   const meetingMinRate = meetingVenue?.hourly_rates?.off_peak || 1000;
 
+  const renderHeadline = (text: string) => {
+    return text.split('\n').map((line, index) => (
+      <span key={index}>
+        {line}
+        {index < text.split('\n').length - 1 && <br className="hidden sm:inline" />}
+      </span>
+    ));
+  };
+
   return (
     <main className="min-h-screen text-charcoal selection:bg-gold selection:text-forest-dark overflow-x-hidden">
       {/* ============================================
           1. HERO SECTION (FULL BLEED OVERLAY)
           ============================================ */}
-      <section className="relative h-screen flex items-center justify-center pt-20 z-10 overflow-hidden">
+      <section 
+        className="relative h-screen flex items-center justify-center pt-20 z-10 overflow-hidden bg-cover bg-center bg-no-repeat"
+        style={{ backgroundImage: `url('${heroImgUrl}')` }}
+      >
         {/* Lighter atmospheric overlay letting background show through */}
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#061a10]/20 to-[#061a10]/60 z-0" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#061a10]/40 via-[#061a10]/20 to-[#061a10]/80 z-0" />
 
         <div className="max-w-7xl mx-auto px-6 lg:px-10 w-full relative z-20 pt-10 text-center space-y-8 animate-slide-up">
           {/* Headline - Cinzel, large, white, sharp */}
           <h1 className="font-display text-5xl sm:text-7xl md:text-8xl font-black uppercase tracking-tight text-white leading-[0.95] drop-shadow-lg">
-            Home of Football <br className="hidden sm:inline" />
-            <span className="text-white">& Fitness</span>
+            {renderHeadline(heroHeadline)}
           </h1>
           
           {/* Subheading - DM Sans, muted white, one line */}
-          <p className="font-sans text-sm sm:text-base md:text-lg text-white/70 max-w-3xl mx-auto font-medium tracking-wide">
-            Premium synthetic turf. Floodlit nights. Behind Mountain View Mall, Waiyaki Way.
+          <p className="font-sans text-sm sm:text-base md:text-lg text-white/80 max-w-3xl mx-auto font-medium tracking-wide">
+            {heroSubheading}
           </p>
           
           {/* Double CTAs - Stacked on Mobile, Side-by-Side on Desktop */}
@@ -83,9 +123,9 @@ export default async function Home() {
                 <Lock className="w-5 h-5" />
               </div>
               <div className="space-y-1">
-                <h4 className="font-display font-bold text-sm text-white uppercase tracking-wider">Changing Rooms & Lockers</h4>
+                <h4 className="font-display font-bold text-sm text-white uppercase tracking-wider">{trustCard1Title}</h4>
                 <p className="font-sans text-xs text-white/50 leading-relaxed font-medium">
-                  Private premium changing stalls and secure smart lockers for your gear.
+                  {trustCard1Desc}
                 </p>
               </div>
             </div>
@@ -96,9 +136,9 @@ export default async function Home() {
                 <Wifi className="w-5 h-5" />
               </div>
               <div className="space-y-1">
-                <h4 className="font-display font-bold text-sm text-white uppercase tracking-wider">Free WiFi & Water</h4>
+                <h4 className="font-display font-bold text-sm text-white uppercase tracking-wider">{trustCard2Title}</h4>
                 <p className="font-sans text-xs text-white/50 leading-relaxed font-medium">
-                  High-speed clubhouse connection and unlimited filtered hydration station.
+                  {trustCard2Desc}
                 </p>
               </div>
             </div>
@@ -109,9 +149,9 @@ export default async function Home() {
                 <Clock className="w-5 h-5" />
               </div>
               <div className="space-y-1">
-                <h4 className="font-display font-bold text-sm text-white uppercase tracking-wider">Floodlit Until 11PM</h4>
+                <h4 className="font-display font-bold text-sm text-white uppercase tracking-wider">{trustCard3Title}</h4>
                 <p className="font-sans text-xs text-white/50 leading-relaxed font-medium">
-                  FIFA-standard shadow-free matches under our high-intensity lighting systems.
+                  {trustCard3Desc}
                 </p>
               </div>
             </div>
@@ -193,37 +233,25 @@ export default async function Home() {
       <section className="py-24 bg-[#061a10]/50 border-t border-white/5 relative z-20 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto px-6 lg:px-10 space-y-12">
           
-          <div className="flex items-center gap-6">
-            <h2 className="text-2xl font-display font-bold text-white uppercase tracking-tight shrink-0">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-8">
+            <h2 className="text-xl sm:text-2xl font-display font-bold text-white uppercase tracking-tight">
               Programs & Training Pathways
             </h2>
-            <div className="flex-1 h-px bg-white/10" />
+            <div className="hidden sm:block flex-1 h-px bg-white/10" />
           </div>
 
           {/* Grid Layout (Desktop) / Horizontal Scroll (Mobile) */}
           <div className="flex md:grid md:grid-cols-2 lg:grid-cols-4 gap-6 overflow-x-auto md:overflow-x-visible pb-4 md:pb-0 scrollbar-hide shrink-0">
             {(dbPrograms.length > 0 ? dbPrograms : [
-              { name: "Football Academy", schedule: "Ages 6-16", pricing_json: { term: 15000 } },
-              { name: "Chess Club", schedule: "Ages 4-18", pricing_json: { term: 8000 } },
-              { name: "Dance & Rhythm", schedule: "Ages 6-16", pricing_json: { term: 10000 } },
-              { name: "Arena Fitness", schedule: "Ages 16+", pricing_json: { session: 1000 } }
+              { name: "Football Academy", schedule: "Ages 6-16" },
+              { name: "Chess Club", schedule: "Ages 4-18" },
+              { name: "Dance & Rhythm", schedule: "Ages 6-16" },
+              { name: "Arena Fitness", schedule: "Ages 16+" }
             ]).map((program: any, index: number) => {
-              // Determine dynamic price text
-              let priceText = 'KES 1,000 / Session';
-              if (program.pricing_json) {
-                const termPrice = program.pricing_json.term;
-                const monthlyPrice = program.pricing_json.monthly;
-                const sessionPrice = program.pricing_json.session;
-                
-                if (termPrice) priceText = `KES ${termPrice.toLocaleString()} / Term`;
-                else if (monthlyPrice) priceText = `KES ${monthlyPrice.toLocaleString()} / Month`;
-                else if (sessionPrice) priceText = `KES ${sessionPrice.toLocaleString()} / Session`;
-              }
-
               return (
                 <div 
                   key={index} 
-                  className="bg-card border border-white/10 p-6 rounded-none flex flex-col justify-between min-w-[280px] md:min-w-0 h-[190px] shadow-sm hover:border-gold hover:-translate-y-1 transition-all duration-300"
+                  className="bg-card border border-white/10 p-6 rounded-none flex flex-col justify-between min-w-[280px] md:min-w-0 h-[150px] shadow-sm hover:border-gold hover:-translate-y-1 transition-all duration-300"
                 >
                   <div className="space-y-4 text-left">
                     <div className="flex justify-between items-center">
@@ -234,8 +262,8 @@ export default async function Home() {
                     </div>
                     <div>
                       <h4 className="text-white font-bold text-base uppercase tracking-wide font-display">{program.name}</h4>
-                      <p className="text-[10px] text-gold font-bold uppercase tracking-widest mt-1.5 font-mono">
-                        {priceText}
+                      <p className="text-[10px] text-gold/60 font-medium uppercase tracking-widest mt-1.5 font-mono">
+                        {program.age_group || 'All levels welcome'}
                       </p>
                     </div>
                   </div>
@@ -266,7 +294,7 @@ export default async function Home() {
         
         <div className="max-w-4xl mx-auto px-6 space-y-10 relative z-10">
           <h2 className="font-display text-4xl sm:text-5xl md:text-6xl font-black uppercase tracking-tight text-white leading-none">
-            Book Your Slot Today
+            {closingCtaHeadline}
           </h2>
           
           {/* Dominant Gold CTA */}
@@ -282,14 +310,14 @@ export default async function Home() {
           {/* Social details in single block */}
           <div className="pt-8 space-y-6">
             <p className="text-white/60 font-sans text-xs sm:text-sm font-semibold tracking-wide max-w-xl mx-auto leading-relaxed">
-              Want to see the arena in action? Follow us on Instagram and TikTok <strong className="text-white">@mtviewsportsarena</strong>
+              {heroTextAboveCta}
             </p>
             
             {/* Social Icons - Instagram and TikTok only */}
             <div className="flex justify-center items-center gap-5">
               {/* Instagram SVG */}
               <a 
-                href="https://instagram.com/mtviewsportsarena" 
+                href={`https://instagram.com/${instagramHandle}`} 
                 target="_blank" 
                 rel="noopener noreferrer" 
                 className="w-10 h-10 rounded-none bg-white/5 hover:bg-gold/15 border border-white/10 hover:border-gold flex items-center justify-center text-white hover:text-gold transition-all"
@@ -304,7 +332,7 @@ export default async function Home() {
 
               {/* TikTok SVG */}
               <a 
-                href="https://tiktok.com/@mtviewsportsarena" 
+                href={`https://tiktok.com/@${tiktokHandle}`} 
                 target="_blank" 
                 rel="noopener noreferrer" 
                 className="w-10 h-10 rounded-none bg-white/5 hover:bg-gold/15 border border-white/10 hover:border-gold flex items-center justify-center text-white hover:text-gold transition-all"

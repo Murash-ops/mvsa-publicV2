@@ -71,9 +71,15 @@ test.describe('MVSA Public Site Mobile Responsiveness & Touch Usability', () => 
           });
           expect(hasHorizontalScrollbar).toBe(false);
 
-          // 3. Verify Text Readability (No major text horizontal overflow)
           const overflowingTextElements = await page.evaluate(() => {
-            const elements = Array.from(document.querySelectorAll('h1, h2, h3, p'));
+            const elements = Array.from(document.querySelectorAll('h1, h2, h3, p')).filter(el => {
+              // Exclude elements inside scrollable horizontal lists
+              const scrollParent = el.closest('.overflow-x-auto, .overflow-x-scroll');
+              if (scrollParent) return false;
+              // Exclude mobile navigation drawers or absolute overlays
+              if (el.closest('.lg\\:hidden.fixed') || el.closest('aside')) return false;
+              return true;
+            });
             return elements
               .map(el => {
                 const rect = el.getBoundingClientRect();
