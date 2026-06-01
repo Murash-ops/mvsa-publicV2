@@ -6,14 +6,31 @@ import {
   Phone, 
   Mail, 
   MapPin, 
-  Instagram, 
-  Facebook, 
   Clock,
   Send,
   Loader2,
   CheckCircle2,
   MessageSquare
 } from 'lucide-react';
+
+// Brand icons removed from lucide-react v0.470+; inline SVG wrappers
+const Instagram = ({ className }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <rect width="20" height="20" x="2" y="2" rx="5" ry="5" /><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" /><line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
+  </svg>
+);
+
+const Facebook = ({ className }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
+  </svg>
+);
+
+const TikTok = ({ className }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5" />
+  </svg>
+);
 
 export default function ContactPage() {
   const supabase = createClient();
@@ -60,7 +77,7 @@ export default function ContactPage() {
   const socialLinks = [
     { name: "Instagram", handle: "@mtviewsportsarena", icon: Instagram, href: "https://instagram.com/mtviewsportsarena" },
     { name: "Facebook", handle: "MtView Sports Arena", icon: Facebook, href: "https://facebook.com/mtviewsportsarena" },
-    { name: "TikTok", handle: "@mountainviewsportsarena", icon: Instagram, href: "https://www.tiktok.com/@mountainviewsportsarena" },
+    { name: "TikTok", handle: "@mountainviewsportsarena", icon: TikTok, href: "https://www.tiktok.com/@mountainviewsportsarena" },
   ];
 
   const handleSubmit = async (e: React.FormEvent) => {
