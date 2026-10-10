@@ -1,226 +1,421 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+/**
+ * Booking widget — live availability from the MVSA backend, then the approved
+ * hold-then-confirm flow.
+ *
+ * It talks only to this site's own route handlers (/api/availability,
+ * /api/booking/hold, /api/booking/confirm) because the backend bearer token
+ * must never reach the browser.
+ *
+ * Three honesty rules are load-bearing here:
+ *  - If the backend cannot be reached we say exactly that and offer the phone
+ *    and WhatsApp route. We never render an empty slot list, which would read
+ *    as "fully booked".
+ *  - A 409 means the interval went while the customer was deciding, or their
+ *    15-minute hold lapsed. We say so and re-fetch availability.
+ *  - When booking writes are switched off, the WhatsApp handover says in plain
+ *    words that nothing has been reserved yet.
+ *
+ * Start times and prices are never derived here. Both come from the backend
+ * per slot, so a change to the venue's start increments or to how a rate is
+ * worked out needs no change in this component.
+ */
+
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { format, addDays, isSameDay } from 'date-fns';
-import { createClient } from '@/utils/supabase/client';
-import type { Venue, TimeSlot } from '@/types/database';
 import Image from 'next/image';
-import { 
-  Calendar, 
-  Clock, 
-  MapPin, 
-  User, 
-  Phone, 
-  CheckCircle2, 
-  MessageSquare,
-  ArrowRight
-} from 'lucide-react';
 import Link from 'next/link';
+import {
+  Calendar,
+  Clock,
+  MapPin,
+  User,
+  Phone,
+  Users,
+  CheckCircle2,
+  AlertTriangle,
+  MessageSquare,
+} from 'lucide-react';
+import type { VenuePresentation } from '@/content/venues';
+import type {
+  AvailabilityResponseBody,
+  AvailabilitySlot,
+  ConfirmResponseBody,
+  HeldSlotBody,
+  HoldResponseBody,
+} from '@/lib/booking/contracts';
+import { isValidKenyanPhone } from '@/lib/booking/phone';
 
-export default function BookingWidget({ initialVenues }: { initialVenues: Venue[] }) {
-  const supabase = createClient();
-  
-  const displayedVenues = initialVenues.filter(v => 
-    v.name === 'Main Arena Turf' || v.name === 'Meeting Room / Conference Hall'
-  );
+type Failure = { message: string; kind: string };
 
-  const [selectedVenue, setSelectedVenue] = useState<Venue | null>(displayedVenues[0] || null);
+/** Offered lengths. The backend is the authority and re-validates every one. */
+const DURATION_OPTIONS = [
+  { minutes: 60, label: '1 hour' },
+  { minutes: 120, label: '2 hours' },
+  { minutes: 180, label: '3 hours' },
+  { minutes: 240, label: '4 hours' },
+  { minutes: 300, label: '5 hours' },
+  { minutes: 600, label: 'Full day (10 hours)' },
+];
+
+interface BookingWidgetProps {
+  venues: VenuePresentation[];
+  /** False unless MVSA_BOOKING_WRITES_ENABLED=true on the server. */
+  bookingWritesEnabled: boolean;
+  whatsappNumber: string;
+  bookingsPhone: string;
+  bookingsPhoneHref: string;
+}
+
+function localTime(value: string): string {
+  // "2026-10-11T08:20:00+03:00" -> "08:20"
+  return value.slice(11, 16);
+}
+
+async function readFailure(response: Response): Promise<Failure> {
+  try {
+    const body = (await response.json()) as { error?: { message?: string; kind?: string } };
+    return {
+      message: body.error?.message ?? 'We cannot reach the arena booking system right now.',
+      kind: body.error?.kind ?? 'server',
+    };
+  } catch {
+    return {
+      message: 'We cannot reach the arena booking system right now.',
+      kind: 'server',
+    };
+  }
+}
+
+export default function BookingWidget({
+  venues,
+  bookingWritesEnabled,
+  whatsappNumber,
+  bookingsPhone,
+  bookingsPhoneHref,
+}: BookingWidgetProps) {
+  const [venue, setVenue] = useState<VenuePresentation>(venues[0]);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
-  const [slots, setSlots] = useState<TimeSlot[]>([]);
-  const [selectedSlots, setSelectedSlots] = useState<number[]>([]);
-  const [isLoadingSlots, setIsLoadingSlots] = useState(false);
-  
-  // Details Form
+  const [durationMinutes, setDurationMinutes] = useState(60);
+
+  const [slots, setSlots] = useState<AvailabilitySlot[]>([]);
+  const [timezone, setTimezone] = useState<string>('Africa/Nairobi');
+  const [isLoadingSlots, setIsLoadingSlots] = useState(true);
+  const [slotsFailure, setSlotsFailure] = useState<Failure | null>(null);
+  const [selectedSlot, setSelectedSlot] = useState<AvailabilitySlot | null>(null);
+
   const [clientName, setClientName] = useState('');
   const [clientPhone, setClientPhone] = useState('');
-  
-  const [errorMessage, setErrorMessage] = useState('');
-  const [isSubmitted, setIsSubmitted] = useState(false);
-  const [slotHoldWarning, setSlotHoldWarning] = useState('');
+  const [partySize, setPartySize] = useState(venues[0]?.kind === 'turf' ? 10 : 6);
+  const [notes, setNotes] = useState('');
+
+  const [intentKey, setIntentKey] = useState<string | null>(null);
+  const [hold, setHold] = useState<HeldSlotBody | null>(null);
+  const [secondsLeft, setSecondsLeft] = useState(0);
+  const [booking, setBooking] = useState<ConfirmResponseBody | null>(null);
+
   const [isHolding, setIsHolding] = useState(false);
+  const [isConfirming, setIsConfirming] = useState(false);
+  const [formError, setFormError] = useState('');
+  const [actionFailure, setActionFailure] = useState<Failure | null>(null);
+  const [handoverNotice, setHandoverNotice] = useState('');
 
-  // Generate exactly 14 days ahead starting from today
-  const next14Days = Array.from({ length: 14 }).map((_, i) => addDays(new Date(), i));
+  const requestRef = useRef(0);
+  const next14Days = useMemo(
+    () => Array.from({ length: 14 }).map((_, i) => addDays(new Date(), i)),
+    []
+  );
 
-  // Fetch slots when selectedVenue or selectedDate changes
-  useEffect(() => {
-    async function fetchSlots() {
-      if (!selectedVenue) return;
-      
-      setIsLoadingSlots(true);
-      const dateStr = format(selectedDate, 'yyyy-MM-dd');
-      
-      try {
-        const { data, error } = await supabase
-          .from('time_slots')
-          .select('*')
-          .eq('venue_id', selectedVenue.id)
-          .eq('date', dateStr)
-          .order('start_time', { ascending: true });
-          
-        if (!error && data) {
-          // Filter to slots between 6AM and 11PM (06:00 to 23:00)
-          const filteredSlots = data.filter((s: any) => {
-            const hour = parseInt(s.start_time.split(':')[0]);
-            return hour >= 6 && hour <= 23;
-          });
-          setSlots(filteredSlots);
-        }
-      } catch (err) {
-        console.error('Error fetching slots:', err);
-      } finally {
-        setIsLoadingSlots(false);
-        setSelectedSlots([]); // Reset selected slots on date/venue change
-      }
-    }
-    
-    fetchSlots();
-  }, [selectedVenue, selectedDate]);
+  const loadSlots = useCallback(async () => {
+    const requestId = ++requestRef.current;
+    setIsLoadingSlots(true);
+    setSlotsFailure(null);
 
-  const toggleSlot = (id: number) => {
-    setSelectedSlots(prev => 
-      prev.includes(id) ? prev.filter(s => s !== id) : [...prev, id]
-    );
-  };
+    const query = new URLSearchParams({
+      date: format(selectedDate, 'yyyy-MM-dd'),
+      resource_id: venue.resourceId,
+      duration_minutes: String(durationMinutes),
+    });
 
-  const getSlotPrice = (slot: TimeSlot) => {
-    const rates = selectedVenue?.hourly_rates as Record<string, number> | undefined;
-    return rates?.[slot.price_tier] ?? (slot.price_tier === 'peak' ? 2000 : 1500);
-  };
-
-  // Calculate total price based on selected slots
-  const calculateTotal = () => {
-    return selectedSlots.reduce((total, id) => {
-      const slot = slots.find(s => s.id === id);
-      if (!slot) return total;
-      return total + getSlotPrice(slot);
-    }, 0);
-  };
-
-  const total = calculateTotal();
-
-  // Format slot times string for summary and prefilled message
-  const getSelectedSlotsTimeString = () => {
-    if (selectedSlots.length === 0) return 'No slots selected';
-    const sortedSelected = slots
-      .filter(s => selectedSlots.includes(s.id))
-      .sort((a, b) => a.start_time.localeCompare(b.start_time));
-      
-    if (sortedSelected.length === 1) {
-      const s = sortedSelected[0];
-      const start = s.start_time.substring(0, 5);
-      const [h, m] = s.start_time.split(':');
-      const endHour = (parseInt(h) + 1).toString().padStart(2, '0');
-      return `${start} - ${endHour}:${m}`;
-    } else {
-      return sortedSelected.map(s => {
-        const start = s.start_time.substring(0, 5);
-        const [h, m] = s.start_time.split(':');
-        const endHour = (parseInt(h) + 1).toString().padStart(2, '0');
-        return `${start}-${endHour}:${m}`;
-      }).join(', ');
-    }
-  };
-
-  const getPeakStatus = () => {
-    const sortedSelected = slots.filter(s => selectedSlots.includes(s.id));
-    const hasPeak = sortedSelected.some(s => s.price_tier === 'peak');
-    return hasPeak ? 'Peak' : 'Off-Peak';
-  };
-
-  // WhatsApp conversational prefilled message builder
-  const buildWhatsAppUrl = () => {
-    const venueName = selectedVenue?.name || 'Main Arena Turf';
-    const dayDate = format(selectedDate, 'EEEE MMM do');
-    const timeRange = getSelectedSlotsTimeString();
-    const peakStatus = getPeakStatus();
-    const priceVal = total;
-    const nameVal = clientName.trim();
-    const phoneVal = clientPhone.trim();
-
-    const message = `Hi MVSA 👋 I'd like to book the ${venueName} on ${dayDate}, ${timeRange} (${peakStatus} - KES ${priceVal.toLocaleString()}). My name is ${nameVal}, number is ${phoneVal}.`;
-    return `https://wa.me/254798258950?text=${encodeURIComponent(message)}`;
-  };
-
-  const handleWhatsAppRedirect = async (e?: React.FormEvent) => {
-    if (e) e.preventDefault();
-    setErrorMessage('');
-    setSlotHoldWarning('');
-    
-    if (!selectedVenue) {
-      setErrorMessage('Please select a venue.');
-      return;
-    }
-    if (selectedSlots.length === 0) {
-      setErrorMessage('Please select at least one hourly time slot.');
-      return;
-    }
-    if (!clientName.trim()) {
-      setErrorMessage('Please enter your full name.');
-      return;
-    }
-    const cleanPhone = clientPhone.replace(/\s/g, '');
-    if (!/^(07|01|254)\d{8,10}$/.test(cleanPhone)) {
-      setErrorMessage('Please enter a valid Kenyan phone number (e.g. 07xxxxxxxx or 01xxxxxxxx).');
-      return;
-    }
-
-    setIsHolding(true);
-    
     try {
-      // Call the stored database function to reserve slot and create a pending booking row
-      const { data, error } = await supabase.rpc('create_booking_with_hold', {
-        p_venue_id: selectedVenue.id,
-        p_client_name: clientName.trim(),
-        p_client_phone: cleanPhone,
-        p_slot_ids: selectedSlots,
-        p_total_amount: total,
-        p_deposit_amount: 0,
-        p_balance: total,
-        p_source: 'whatsapp'
+      const response = await fetch(`/api/availability?${query.toString()}`, {
+        cache: 'no-store',
       });
-      
-      if (error) {
-        console.error('Database slot hold error:', error);
-        setSlotHoldWarning('Warning: We could not hold your time slot in our database. Please proceed to WhatsApp to manually confirm availability with our staff.');
+      if (requestId !== requestRef.current) return;
+
+      if (!response.ok) {
+        setSlots([]);
+        setSlotsFailure(await readFailure(response));
+        return;
       }
-    } catch (err) {
-      console.error('Database connection error:', err);
-      setSlotHoldWarning('Warning: We could not hold your time slot in our database. Please proceed to WhatsApp to manually confirm availability with our staff.');
+
+      const body = (await response.json()) as AvailabilityResponseBody;
+      setSlots(body.slots);
+      setTimezone(body.timezone);
+    } catch {
+      if (requestId !== requestRef.current) return;
+      setSlots([]);
+      setSlotsFailure({
+        message: 'We cannot reach the arena booking system right now.',
+        kind: 'unreachable',
+      });
+    } finally {
+      if (requestId === requestRef.current) setIsLoadingSlots(false);
+    }
+  }, [durationMinutes, selectedDate, venue.resourceId]);
+
+  useEffect(() => {
+    // Deferred by a microtask: loadSlots sets the loading state as it starts,
+    // and doing that synchronously inside the effect would cascade an extra
+    // render pass. `active` drops the result if the query changed meanwhile.
+    let active = true;
+    void Promise.resolve().then(() => {
+      if (active) void loadSlots();
+    });
+    return () => {
+      active = false;
+    };
+  }, [loadSlots]);
+
+  /** Any change to the query invalidates the chosen slot and any stale notice. */
+  const clearSelection = () => {
+    setSelectedSlot(null);
+    setActionFailure(null);
+    setHandoverNotice('');
+    setFormError('');
+  };
+
+  // Hold countdown. When it runs out the hold is gone in the backend too, so
+  // the customer is told and availability is refreshed.
+  useEffect(() => {
+    if (!hold) return;
+
+    const tick = () => {
+      const remaining = Math.max(0, Math.round((Date.parse(hold.expires_at) - Date.now()) / 1000));
+      setSecondsLeft(remaining);
+      if (remaining === 0) {
+        setHold(null);
+        setIntentKey(null);
+        setActionFailure({
+          kind: 'conflict',
+          message:
+            'Your 15-minute hold has expired, so the slot is free for others again. Pick a time and we will hold it afresh.',
+        });
+        void loadSlots();
+      }
+    };
+
+    tick();
+    const timer = setInterval(tick, 1000);
+    return () => clearInterval(timer);
+  }, [hold, loadSlots]);
+
+  const whatsappUrl = useMemo(() => {
+    const dayLabel = format(selectedDate, 'EEEE d MMM');
+    const timeLabel = selectedSlot
+      ? `${localTime(selectedSlot.local.start_local)}–${localTime(selectedSlot.local.end_local)}`
+      : 'a time that works';
+    const priceLabel = selectedSlot ? ` (${selectedSlot.price.display})` : '';
+    const hours = durationMinutes / 60;
+    const message =
+      `Hi MVSA 👋 I'd like to book the ${venue.displayName} on ${dayLabel}, ${timeLabel}` +
+      `${priceLabel} for ${hours} ${hours === 1 ? 'hour' : 'hours'}, ${partySize} people.` +
+      `${clientName.trim() ? ` My name is ${clientName.trim()}.` : ''}` +
+      `${clientPhone.trim() ? ` My number is ${clientPhone.trim()}.` : ''}`;
+    return `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+  }, [
+    clientName,
+    clientPhone,
+    durationMinutes,
+    partySize,
+    selectedDate,
+    selectedSlot,
+    venue.displayName,
+    whatsappNumber,
+  ]);
+
+  const validateDetails = (): boolean => {
+    if (!selectedSlot) {
+      setFormError('Pick a start time first.');
+      return false;
+    }
+    if (clientName.trim().length < 2) {
+      setFormError('Please enter your full name.');
+      return false;
+    }
+    if (!isValidKenyanPhone(clientPhone)) {
+      setFormError('Please enter a valid Kenyan phone number (e.g. 07xxxxxxxx).');
+      return false;
+    }
+    if (!Number.isInteger(partySize) || partySize < 1 || partySize > 500) {
+      setFormError('Tell us how many people are coming (1 to 500).');
+      return false;
+    }
+    setFormError('');
+    return true;
+  };
+
+  const handleHold = async () => {
+    setActionFailure(null);
+    setHandoverNotice('');
+    if (!validateDetails() || !selectedSlot) return;
+
+    // One key per customer intent, reused by every retry of this attempt.
+    const key = intentKey ?? crypto.randomUUID();
+    setIntentKey(key);
+    setIsHolding(true);
+
+    try {
+      const response = await fetch('/api/booking/hold', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          resource_id: venue.resourceId,
+          start_at: selectedSlot.start_at,
+          duration_minutes: durationMinutes,
+          party_size: partySize,
+          name: clientName.trim(),
+          phone: clientPhone.trim(),
+          intent_key: key,
+        }),
+      });
+
+      if (!response.ok) {
+        const failure = await readFailure(response);
+        setActionFailure(failure);
+        setIntentKey(null);
+        if (response.status === 409) {
+          setSelectedSlot(null);
+          await loadSlots();
+        }
+        return;
+      }
+
+      const body = (await response.json()) as HoldResponseBody;
+      if (body.outcome === 'identity_confirmation_required') {
+        setHandoverNotice(body.message);
+        setIntentKey(null);
+        return;
+      }
+      setHold(body);
+    } catch {
+      setIntentKey(null);
+      setActionFailure({
+        kind: 'unreachable',
+        message: 'We cannot reach the arena booking system right now.',
+      });
     } finally {
       setIsHolding(false);
-      // Open WhatsApp regardless of DB outcome
-      window.open(buildWhatsAppUrl(), '_blank');
-      setIsSubmitted(true);
     }
   };
 
-  if (isSubmitted) {
+  const handleConfirm = async () => {
+    if (!hold || !intentKey) return;
+    setActionFailure(null);
+    setIsConfirming(true);
+
+    try {
+      const response = await fetch('/api/booking/confirm', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          hold_id: hold.hold_id,
+          name: clientName.trim(),
+          phone: clientPhone.trim(),
+          party_size: partySize,
+          notes,
+          intent_key: intentKey,
+        }),
+      });
+
+      if (!response.ok) {
+        const failure = await readFailure(response);
+        setActionFailure(failure);
+        if (response.status === 409 || response.status === 404) {
+          // The interval went, or the hold lapsed: start again from live slots.
+          setHold(null);
+          setIntentKey(null);
+          setSelectedSlot(null);
+          await loadSlots();
+        }
+        return;
+      }
+
+      const body = (await response.json()) as
+        | ConfirmResponseBody
+        | { outcome: 'identity_confirmation_required'; message: string };
+
+      if (body.outcome === 'identity_confirmation_required') {
+        setHandoverNotice(body.message);
+        return;
+      }
+
+      setBooking(body);
+      setHold(null);
+    } catch {
+      setActionFailure({
+        kind: 'unreachable',
+        message: 'We cannot reach the arena booking system right now.',
+      });
+    } finally {
+      setIsConfirming(false);
+    }
+  };
+
+  const contactRoute = (
+    <div className="flex flex-col sm:flex-row gap-3 pt-2">
+      <a
+        href={whatsappUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="flex-1 inline-flex items-center justify-center gap-2 px-6 py-4 bg-gold hover:bg-gold-muted text-forest-dark border border-gold font-display text-xs font-extrabold uppercase tracking-widest transition-all"
+        data-testid="whatsapp-route"
+      >
+        <MessageSquare className="w-4 h-4" /> Message reception on WhatsApp
+      </a>
+      <a
+        href={bookingsPhoneHref}
+        className="flex-1 inline-flex items-center justify-center gap-2 px-6 py-4 bg-transparent hover:bg-white/5 text-white border border-white/20 font-display text-xs font-extrabold uppercase tracking-widest transition-all"
+        data-testid="phone-route"
+      >
+        <Phone className="w-4 h-4" /> Call {bookingsPhone}
+      </a>
+    </div>
+  );
+
+  /* --------------------------- confirmed booking -------------------------- */
+
+  if (booking) {
     return (
-      <div className="max-w-xl mx-auto text-center py-16 animate-entrance space-y-10">
+      <div
+        className="max-w-xl mx-auto text-center py-16 animate-entrance space-y-10"
+        data-testid="booking-confirmed"
+      >
         <div className="w-20 h-20 bg-emerald-500/10 text-emerald-600 rounded-none border border-emerald-500/20 flex items-center justify-center mx-auto">
-          <CheckCircle2 className="w-10 h-10 animate-pulse" />
+          <CheckCircle2 className="w-10 h-10" />
         </div>
-        
+
         <div className="space-y-4">
           <h2 className="text-4xl text-white tracking-tighter uppercase leading-none font-display font-bold">
-            Your request has been sent!
+            Your slot is booked
           </h2>
-          {slotHoldWarning ? (
-            <p className="text-amber-400 font-semibold bg-amber-500/10 border border-amber-500/20 p-4 text-sm max-w-md mx-auto leading-relaxed">
-              {slotHoldWarning}
-            </p>
-          ) : (
-            <p className="text-charcoal-light text-base max-w-md mx-auto leading-relaxed font-medium">
-              We&apos;ll confirm your booking on WhatsApp within a few minutes. See you on the pitch 🏟️
-            </p>
-          )}
+          <p className="text-charcoal-light text-base max-w-md mx-auto leading-relaxed font-medium">
+            {booking.resource_name}, {localTime(booking.start_local)}–
+            {localTime(booking.end_local)} on{' '}
+            {format(new Date(booking.start_local), 'EEEE d MMM yyyy')}.
+          </p>
+          <p className="font-mono text-gold text-lg font-bold">Reference {booking.reference}</p>
+          <p className="text-charcoal-light text-sm max-w-md mx-auto leading-relaxed font-medium">
+            {booking.amount_due_display} is due at reception. Keep the reference — reception can
+            find your booking with it.
+          </p>
         </div>
 
         <div className="pt-4 flex justify-center">
-          <Link 
+          <Link
             href="/"
-            className="px-10 py-5 bg-gold hover:bg-gold-muted text-forest-dark font-display text-xs font-bold uppercase tracking-widest rounded-none shadow-gold-sm transition-all hover:scale-105 active:scale-95 border border-gold"
+            className="px-10 py-5 bg-gold hover:bg-gold-muted text-forest-dark font-display text-xs font-bold uppercase tracking-widest rounded-none shadow-gold-sm transition-all border border-gold"
           >
             Back to Home
           </Link>
@@ -229,15 +424,13 @@ export default function BookingWidget({ initialVenues }: { initialVenues: Venue[
     );
   }
 
+  /* ------------------------------- main form ------------------------------ */
+
   return (
     <div className="w-full">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start pb-24">
-        {/* Left Column: Input Sections (2/3 width on desktop) */}
         <div className="lg:col-span-2 space-y-10">
-          
-          {/* ========================================================
-              SECTION A: SELECT VENUE
-              ======================================================== */}
+          {/* SECTION A: VENUE */}
           <section className="space-y-6 text-left">
             <div className="space-y-2 border-b border-white/5 pb-4">
               <h2 className="text-xl font-bold font-display text-white uppercase tracking-wide flex items-center gap-2">
@@ -249,53 +442,40 @@ export default function BookingWidget({ initialVenues }: { initialVenues: Venue[
             </div>
 
             <div className="grid grid-cols-2 gap-4" data-testid="venue-grid">
-              {displayedVenues.map((v) => {
-                const isSelected = selectedVenue?.id === v.id;
-                
-                const imgMap: Record<string, string> = {
-                  'Main Arena Turf': '/images/hero_turf.jpeg',
-                  '5-Aside Turf': '/images/hero_turf.jpeg',
-                  'Meeting Room': '/images/meeting_hall.jpeg',
-                  'Meeting Hall': '/images/meeting_hall.jpeg',
-                  'Meeting Room / Conference Hall': '/images/meeting_hall.jpeg'
-                };
-                const bgImg = v.image_url || imgMap[v.name] || '/images/hero_turf.jpeg';
-                
-                const minRate = v.hourly_rates?.off_peak || 1000;
-                const maxRate = v.hourly_rates?.peak || 2000;
-                const rateString = v.type === 'turf' 
-                  ? `KES ${minRate.toLocaleString()} - ${maxRate.toLocaleString()} / hr`
-                  : `From KES ${minRate.toLocaleString()} / hr`;
-
+              {venues.map((option) => {
+                const isSelected = venue.resourceId === option.resourceId;
                 return (
                   <button
-                    key={v.id}
-                    onClick={() => setSelectedVenue(v)}
+                    key={option.resourceId}
+                    onClick={() => {
+                      clearSelection();
+                      setVenue(option);
+                      setPartySize(option.kind === 'turf' ? 10 : 6);
+                    }}
                     className={`relative overflow-hidden h-28 rounded-none border text-left p-4 transition-all duration-300 flex flex-col justify-end group cursor-pointer ${
-                      isSelected 
-                        ? 'border-gold ring-1 ring-gold shadow-gold-sm' 
+                      isSelected
+                        ? 'border-gold ring-1 ring-gold shadow-gold-sm'
                         : 'border-white/10 hover:border-gold/40'
                     }`}
-                    aria-label={`Select ${v.name}`}
+                    aria-label={`Select ${option.displayName}`}
                   >
-                    <Image 
-                      src={bgImg} 
-                      alt={v.name} 
-                      fill 
-                      className="object-cover absolute inset-0 opacity-15 group-hover:opacity-35 group-hover:scale-105 transition-all duration-500 z-0" 
+                    <Image
+                      src={option.imageUrl}
+                      alt={option.displayName}
+                      fill
+                      className="object-cover absolute inset-0 opacity-15 group-hover:opacity-35 group-hover:scale-105 transition-all duration-500 z-0"
                       unoptimized
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-[#061a10] via-[#061a10]/70 to-transparent z-[1]" />
-                    
                     <div className="relative z-10 w-full space-y-0.5">
                       <span className="text-[7px] font-mono font-bold uppercase tracking-wider text-gold bg-gold/10 px-1.5 py-0.5 border border-gold/20 inline-block mb-1">
-                        {v.type === 'turf' ? 'Synthetic Turf' : 'Clubhouse Lounge'}
+                        {option.badge}
                       </span>
                       <h3 className="font-bold font-display text-sm sm:text-base text-white uppercase tracking-tight leading-tight">
-                        {v.name}
+                        {option.displayName}
                       </h3>
-                      <p className="text-[10px] font-mono text-gold font-extrabold tracking-wide">
-                        {rateString}
+                      <p className="text-[10px] font-mono text-white/60 font-medium tracking-wide">
+                        {option.blurb}
                       </p>
                     </div>
                   </button>
@@ -304,35 +484,41 @@ export default function BookingWidget({ initialVenues }: { initialVenues: Venue[
             </div>
           </section>
 
-          {/* ========================================================
-              SECTION B: SELECT DATE & TIME SLOT
-              ======================================================== */}
+          {/* SECTION B: DATE, LENGTH AND SLOT */}
           <section className="space-y-6 text-left">
             <div className="space-y-2 border-b border-white/5 pb-4">
               <h2 className="text-xl font-bold font-display text-white uppercase tracking-wide flex items-center gap-2">
                 <Calendar className="w-5 h-5 text-gold" /> PICK YOUR DATE & SLOT
               </h2>
               <p className="text-xs text-charcoal-light font-medium">
-                Choose a calendar day and pick your preferred hourly slots.
+                Choose a day, how long you want to play, then a start time. The arena publishes the
+                start times it can offer, and each turf booking includes its handover afterwards.
               </p>
             </div>
 
-            {/* Date Strip */}
             <div className="space-y-3">
-              <label className="text-[10px] font-mono font-bold uppercase tracking-wider text-white/40">14-Day Horizontal Date Strip</label>
-              <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide shrink-0" data-testid="date-strip">
+              <label className="text-[10px] font-mono font-bold uppercase tracking-wider text-white/40">
+                Next 14 days
+              </label>
+              <div
+                className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide shrink-0"
+                data-testid="date-strip"
+              >
                 {next14Days.map((date) => {
                   const isSelected = isSameDay(date, selectedDate);
                   return (
                     <button
-                       key={date.toISOString()}
-                       onClick={() => setSelectedDate(date)}
-                       className={`flex flex-col items-center justify-center min-w-[76px] p-4 rounded-none border transition-all duration-300 cursor-pointer ${
-                         isSelected 
-                           ? 'border-gold bg-gold text-forest-dark shadow-gold-sm font-bold scale-[1.02]' 
-                           : 'border-white/10 bg-white/5 text-white hover:border-gold/30'
-                       }`}
-                       aria-label={`Select date ${format(date, 'EEEE, MMMM d')}`}
+                      key={date.toISOString()}
+                      onClick={() => {
+                        clearSelection();
+                        setSelectedDate(date);
+                      }}
+                      className={`flex flex-col items-center justify-center min-w-[76px] p-4 rounded-none border transition-all duration-300 cursor-pointer ${
+                        isSelected
+                          ? 'border-gold bg-gold text-forest-dark shadow-gold-sm font-bold scale-[1.02]'
+                          : 'border-white/10 bg-white/5 text-white hover:border-gold/30'
+                      }`}
+                      aria-label={`Select date ${format(date, 'EEEE, MMMM d')}`}
                     >
                       <span className="text-[9px] uppercase font-mono tracking-widest text-white/50">
                         {format(date, 'EEE')}
@@ -347,62 +533,122 @@ export default function BookingWidget({ initialVenues }: { initialVenues: Venue[
               </div>
             </div>
 
-            {/* Time Slots Grid */}
+            <div className="space-y-3">
+              <label className="text-[10px] font-mono font-bold uppercase tracking-wider text-white/40">
+                How long?
+              </label>
+              <div className="flex flex-wrap gap-2" data-testid="duration-options">
+                {DURATION_OPTIONS.map((option) => (
+                  <button
+                    key={option.minutes}
+                    onClick={() => {
+                      clearSelection();
+                      setDurationMinutes(option.minutes);
+                    }}
+                    className={`px-4 py-2.5 border text-xs font-mono font-bold uppercase tracking-wider transition-all cursor-pointer ${
+                      durationMinutes === option.minutes
+                        ? 'border-gold bg-gold text-forest-dark'
+                        : 'border-white/10 bg-white/5 text-white hover:border-gold/30'
+                    }`}
+                  >
+                    {option.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
             <div className="space-y-4 pt-2">
-              <label className="text-[10px] font-mono font-bold uppercase tracking-wider text-white/40">Available Hourly Time Slots (6:00 AM - 11:00 PM)</label>
+              <label className="text-[10px] font-mono font-bold uppercase tracking-wider text-white/40">
+                Start times ({timezone})
+              </label>
+
               {isLoadingSlots ? (
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 animate-pulse" data-testid="slot-grid-skeleton">
-                  {[1,2,3,4,5].map(i => (
+                <div
+                  className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 animate-pulse"
+                  data-testid="slot-grid-skeleton"
+                >
+                  {[1, 2, 3, 4, 5].map((i) => (
                     <div key={i} className="bg-white/5 h-16 rounded-none border border-white/5" />
                   ))}
                 </div>
+              ) : slotsFailure ? (
+                <div
+                  className="p-8 bg-amber-500/5 border border-amber-500/30 rounded-none space-y-3"
+                  data-testid="backend-unreachable"
+                >
+                  <p className="flex items-center gap-2 text-amber-300 text-xs font-bold uppercase tracking-widest">
+                    <AlertTriangle className="w-4 h-4" /> Live availability unavailable
+                  </p>
+                  <p className="text-sm text-charcoal-light font-medium leading-relaxed">
+                    {slotsFailure.message} This does not mean the arena is full — we simply cannot
+                    see the diary from here. Reception can check and confirm your slot.
+                  </p>
+                  <div className="flex gap-3">
+                    <button
+                      onClick={() => void loadSlots()}
+                      className="px-5 py-3 border border-white/20 text-white text-[10px] font-display font-bold uppercase tracking-widest hover:bg-white/5 transition-all"
+                      data-testid="retry-availability"
+                    >
+                      Try again
+                    </button>
+                  </div>
+                  {contactRoute}
+                </div>
               ) : slots.length === 0 ? (
-                <div className="p-12 text-center bg-card border border-dashed border-white/10 rounded-none">
+                <div
+                  className="p-12 text-center bg-card border border-dashed border-white/10 rounded-none space-y-2"
+                  data-testid="slots-empty"
+                >
                   <Clock className="w-10 h-10 mx-auto mb-3 text-white/20" />
                   <p className="text-xs text-charcoal-light font-medium">
-                    No slots generated for this date. Please contact reception at 0798 258 950.
+                    Nothing of that length is left on this date. Try a shorter booking or another
+                    day, or call reception on {bookingsPhone}.
                   </p>
                 </div>
               ) : (
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3" data-testid="slot-grid">
+                <div
+                  className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3"
+                  data-testid="slot-grid"
+                >
                   {slots.map((slot) => {
-                    const isSelected = selectedSlots.includes(slot.id);
-                    const isAvailable = slot.status === 'available';
-                    const isPeak = slot.price_tier === 'peak' || slot.price_tier === 'weekend';
-                    const slotPrice = getSlotPrice(slot);
-
+                    const isSelected = selectedSlot?.slot_id === slot.slot_id;
                     return (
                       <button
-                        key={slot.id}
-                        disabled={!isAvailable}
-                        onClick={() => toggleSlot(slot.id)}
-                        className={`relative p-4 rounded-none border text-center transition-all duration-300 cursor-pointer flex flex-col items-center justify-center ${
-                          !isAvailable 
-                            ? 'bg-white/5 border-white/5 opacity-20 cursor-not-allowed text-white/30'
-                            : isSelected 
-                              ? 'border-gold bg-gold text-forest-dark font-bold scale-[1.02] shadow-gold-sm'
-                              : 'bg-white/5 border-white/10 text-white hover:border-gold/30 hover:bg-gold/10'
+                        key={slot.slot_id}
+                        disabled={!slot.bookable}
+                        onClick={() => {
+                          setSelectedSlot(slot);
+                          setActionFailure(null);
+                          setHandoverNotice('');
+                        }}
+                        title={slot.unbookable_reason ?? undefined}
+                        className={`relative p-4 rounded-none border text-center transition-all duration-300 flex flex-col items-center justify-center ${
+                          !slot.bookable
+                            ? 'bg-white/5 border-white/5 opacity-25 cursor-not-allowed text-white/30'
+                            : isSelected
+                              ? 'border-gold bg-gold text-forest-dark font-bold scale-[1.02] shadow-gold-sm cursor-pointer'
+                              : 'bg-white/5 border-white/10 text-white hover:border-gold/30 hover:bg-gold/10 cursor-pointer'
                         }`}
-                        aria-label={`Slot ${slot.start_time.substring(0, 5)} - KES ${slotPrice}`}
+                        aria-label={`Start at ${localTime(slot.local.start_local)} — ${slot.price.display}`}
                       >
                         <span className="block font-mono font-bold text-sm">
-                          {slot.start_time.substring(0, 5)}
+                          {localTime(slot.local.start_local)}
                         </span>
-                        <span className={`text-[8px] font-extrabold mt-1 uppercase tracking-wider px-2 py-0.5 rounded-full ${
-                          isSelected 
-                            ? 'bg-forest-dark/20 text-forest-dark border border-forest-dark/30' 
-                            : isPeak 
-                              ? 'bg-amber-500/10 text-amber-500 border border-amber-500/20' 
-                              : 'bg-white/10 text-white/80 border border-white/15'
-                        }`}>
-                          {isPeak ? 'PEAK' : 'OFF-PEAK'}
+                        <span
+                          className={`text-[9px] font-mono mt-1 ${isSelected ? 'text-forest-dark' : 'text-white/60'}`}
+                        >
+                          {slot.price.display}
                         </span>
-                        <span className={`text-[9px] font-mono mt-1 ${isSelected ? 'text-forest-dark' : 'text-white/60'}`}>
-                          KES {slotPrice}
-                        </span>
-                        {!isAvailable && (
+                        {slot.handover_minutes > 0 && (
+                          <span
+                            className={`text-[7px] font-mono uppercase mt-0.5 ${isSelected ? 'text-forest-dark/70' : 'text-white/35'}`}
+                          >
+                            +{slot.handover_minutes}m handover
+                          </span>
+                        )}
+                        {!slot.bookable && (
                           <span className="absolute top-1 right-1 text-[6px] font-black uppercase bg-error text-white px-1">
-                            Booked
+                            Taken
                           </span>
                         )}
                       </button>
@@ -412,58 +658,69 @@ export default function BookingWidget({ initialVenues }: { initialVenues: Venue[
               )}
             </div>
           </section>
-
-          {/* Client Details Section is now moved to the Booking Summary sidebar panel */}
-
         </div>
 
-        {/* Right Column: Sticky Booking Summary Panel (1/3 width on desktop) */}
+        {/* SUMMARY PANEL */}
         <div className="lg:col-span-1 lg:sticky lg:top-32 space-y-6 text-left">
-          
           <div className="bg-card border border-white/10 p-8 rounded-none relative overflow-hidden shadow-sm space-y-6">
             <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-gold/50 via-gold/10 to-gold/50" />
-            
+
             <h3 className="font-display font-bold text-lg text-white border-b border-white/5 pb-2 uppercase tracking-wide">
               Booking Summary
             </h3>
 
             <div className="space-y-4">
               <div className="flex justify-between text-sm">
-                <span className="text-charcoal-light font-medium">Selected Venue:</span>
-                <span className="font-bold text-white uppercase text-right max-w-[60%] truncate">{selectedVenue?.name || 'None'}</span>
+                <span className="text-charcoal-light font-medium">Venue:</span>
+                <span className="font-bold text-white uppercase text-right max-w-[60%]">
+                  {venue.displayName}
+                </span>
               </div>
               <div className="flex justify-between text-sm border-t border-white/5 pt-3">
                 <span className="text-charcoal-light font-medium">Date:</span>
-                <span className="font-bold text-white">{format(selectedDate, 'EEEE, MMM do, yyyy')}</span>
+                <span className="font-bold text-white">
+                  {format(selectedDate, 'EEEE, MMM do, yyyy')}
+                </span>
               </div>
               <div className="flex justify-between text-sm border-t border-white/5 pt-3">
-                <span className="text-charcoal-light font-medium">Time Slots:</span>
-                <span className="font-bold text-white font-mono break-all text-right max-w-[60%]">{selectedSlots.length > 0 ? getSelectedSlotsTimeString() : 'No slots selected'}</span>
+                <span className="text-charcoal-light font-medium">Paid play:</span>
+                <span className="font-bold text-white font-mono text-right max-w-[60%]">
+                  {selectedSlot
+                    ? `${localTime(selectedSlot.local.start_local)}–${localTime(selectedSlot.local.end_local)}`
+                    : 'No slot selected'}
+                </span>
               </div>
-              <div className="flex justify-between text-sm border-t border-white/5 pt-3">
-                <span className="text-charcoal-light font-medium">Rate Tier:</span>
-                <span className="font-bold text-gold uppercase tracking-wider">{selectedSlots.length > 0 ? getPeakStatus() : 'None'}</span>
-              </div>
+              {selectedSlot && selectedSlot.handover_minutes > 0 && (
+                <div className="flex justify-between text-sm border-t border-white/5 pt-3">
+                  <span className="text-charcoal-light font-medium">Handover until:</span>
+                  <span className="font-bold text-white/70 font-mono">
+                    {localTime(selectedSlot.local.handover_ends_local)}
+                  </span>
+                </div>
+              )}
               <div className="flex justify-between items-center border-t-2 border-white/10 pt-4 mt-2">
-                <span className="text-sm font-bold text-white uppercase tracking-wider">Total Price:</span>
-                <span className="font-mono font-black text-2xl text-gold">KES {total.toLocaleString()}</span>
+                <span className="text-sm font-bold text-white uppercase tracking-wider">Price:</span>
+                <span className="font-mono font-black text-2xl text-gold" data-testid="price-total">
+                  {selectedSlot ? selectedSlot.price.display : '—'}
+                </span>
               </div>
             </div>
-            
-            {/* Contact Details Fields */}
+
+            {/* Customer details */}
             <div className="space-y-4 pt-4 border-t border-white/10">
               <h4 className="text-xs font-bold text-white uppercase tracking-wider">
                 Enter Your Details
               </h4>
-              
+
               <div className="space-y-3">
-                {/* Full Name */}
                 <div className="space-y-1.5">
-                  <label className="block text-[10px] font-bold text-white/60 uppercase tracking-wider">Full Name</label>
+                  <label className="block text-[10px] font-bold text-white/60 uppercase tracking-wider">
+                    Full Name
+                  </label>
                   <div className="relative">
                     <User className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-white/40" />
-                    <input 
-                      type="text" 
+                    <input
+                      type="text"
                       required
                       value={clientName}
                       onChange={(e) => setClientName(e.target.value)}
@@ -473,13 +730,14 @@ export default function BookingWidget({ initialVenues }: { initialVenues: Venue[
                   </div>
                 </div>
 
-                {/* Phone Number */}
                 <div className="space-y-1.5">
-                  <label className="block text-[10px] font-bold text-white/60 uppercase tracking-wider">Phone Number</label>
+                  <label className="block text-[10px] font-bold text-white/60 uppercase tracking-wider">
+                    Phone Number
+                  </label>
                   <div className="relative">
                     <Phone className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-white/40" />
-                    <input 
-                      type="tel" 
+                    <input
+                      type="tel"
                       required
                       value={clientPhone}
                       onChange={(e) => setClientPhone(e.target.value)}
@@ -488,31 +746,116 @@ export default function BookingWidget({ initialVenues }: { initialVenues: Venue[
                     />
                   </div>
                 </div>
+
+                <div className="space-y-1.5">
+                  <label className="block text-[10px] font-bold text-white/60 uppercase tracking-wider">
+                    How many people?
+                  </label>
+                  <div className="relative">
+                    <Users className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-white/40" />
+                    <input
+                      type="number"
+                      min={1}
+                      max={500}
+                      value={partySize}
+                      onChange={(e) => setPartySize(Number.parseInt(e.target.value, 10) || 0)}
+                      className="w-full pl-9 pr-3 py-2.5 border border-white/10 bg-white/5 text-white font-mono focus:outline-none focus:border-gold transition-all text-xs rounded-none"
+                    />
+                  </div>
+                </div>
               </div>
             </div>
 
-            {errorMessage && (
-              <p className="text-error text-xs font-semibold bg-error/10 border border-error/20 p-3 text-center">{errorMessage}</p>
+            {formError && (
+              <p className="text-error text-xs font-semibold bg-error/10 border border-error/20 p-3 text-center">
+                {formError}
+              </p>
             )}
 
-            <button
-              onClick={handleWhatsAppRedirect}
-              disabled={isHolding}
-              className="w-full py-5 bg-gold hover:bg-gold-muted text-forest-dark border border-gold font-display text-xs font-extrabold uppercase tracking-widest transition-all rounded-none flex items-center justify-center gap-2.5 shadow-gold-sm cursor-pointer hover:scale-[1.02] active:scale-[0.98] spring-bounce animate-pulse-gold disabled:opacity-50"
-            >
-              {isHolding ? 'Reserving Slot...' : 'Reserve via WhatsApp'}
-            </button>
-            
-            <p className="text-[10px] text-white/40 italic font-medium pt-2 text-center leading-relaxed">
-              *Tapping button redirects to WhatsApp chat to confirm instantly.
-            </p>
+            {actionFailure && (
+              <div
+                className="text-xs font-semibold bg-amber-500/10 border border-amber-500/30 text-amber-200 p-3 space-y-1"
+                data-testid="action-failure"
+              >
+                <p>{actionFailure.message}</p>
+              </div>
+            )}
+
+            {handoverNotice && (
+              <div
+                className="text-xs font-semibold bg-white/5 border border-white/15 text-white/80 p-3"
+                data-testid="identity-handover"
+              >
+                {handoverNotice}
+              </div>
+            )}
+
+            {/* Hold panel, then confirm */}
+            {hold ? (
+              <div className="space-y-4" data-testid="hold-panel">
+                <div className="p-4 border border-gold/30 bg-gold/5 space-y-1">
+                  <p className="text-[10px] font-mono font-bold uppercase tracking-widest text-gold">
+                    Slot held
+                  </p>
+                  <p className="text-xs text-white font-medium">
+                    {hold.resource_name}, {localTime(hold.start_local)}–{localTime(hold.end_local)}{' '}
+                    · {hold.price_display}
+                  </p>
+                  <p className="text-xs text-charcoal-light font-mono" data-testid="hold-countdown">
+                    Held for another {Math.floor(secondsLeft / 60)}m{' '}
+                    {String(secondsLeft % 60).padStart(2, '0')}s
+                  </p>
+                </div>
+
+                <textarea
+                  rows={2}
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                  placeholder="Anything reception should know? (optional)"
+                  className="w-full px-3 py-2.5 border border-white/10 bg-white/5 text-white placeholder-white/30 focus:outline-none focus:border-gold transition-all text-xs rounded-none resize-none"
+                />
+
+                <button
+                  onClick={() => void handleConfirm()}
+                  disabled={isConfirming}
+                  className="w-full py-5 bg-gold hover:bg-gold-muted text-forest-dark border border-gold font-display text-xs font-extrabold uppercase tracking-widest transition-all rounded-none shadow-gold-sm cursor-pointer disabled:opacity-50"
+                  data-testid="confirm-booking"
+                >
+                  {isConfirming ? 'Confirming…' : 'Confirm booking'}
+                </button>
+                <p className="text-[10px] text-white/40 italic font-medium text-center leading-relaxed">
+                  Payment is made at reception. Nothing is charged on this site.
+                </p>
+              </div>
+            ) : bookingWritesEnabled ? (
+              <div className="space-y-3">
+                <button
+                  onClick={() => void handleHold()}
+                  disabled={isHolding || !selectedSlot}
+                  className="w-full py-5 bg-gold hover:bg-gold-muted text-forest-dark border border-gold font-display text-xs font-extrabold uppercase tracking-widest transition-all rounded-none shadow-gold-sm cursor-pointer disabled:opacity-50"
+                  data-testid="hold-slot"
+                >
+                  {isHolding ? 'Holding your slot…' : 'Hold this slot for 15 minutes'}
+                </button>
+                <p className="text-[10px] text-white/40 italic font-medium text-center leading-relaxed">
+                  We hold the slot for 15 minutes while you check the details, then you confirm.
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-3" data-testid="whatsapp-handover">
+                <div className="p-3 border border-white/15 bg-white/5">
+                  <p className="text-[11px] text-white/80 font-medium leading-relaxed">
+                    Online reservations are not switched on yet, so{' '}
+                    <strong className="text-white">this does not hold the slot</strong>. Send the
+                    details to reception and they will confirm the booking with you.
+                  </p>
+                </div>
+                {contactRoute}
+              </div>
+            )}
           </div>
-          
         </div>
       </div>
-
-      {/* Mobile fixed bottom bar removed to keep checkout consolidated in summary panel */}
-
     </div>
   );
 }

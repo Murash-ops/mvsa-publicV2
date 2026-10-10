@@ -1,107 +1,38 @@
-'use client';
-
-import { useState, useEffect } from 'react';
-import { useParams, useRouter } from 'next/navigation';
-import { createClient } from '@/utils/supabase/client';
+import { notFound } from 'next/navigation';
+import { getAcademyProgram } from '@/lib/academy-programs';
+import { contact } from '@/content/site';
 import { 
   Trophy, 
   Users, 
   Clock, 
   ArrowLeft,
-  Loader2,
-  Calendar,
   User,
-  ShieldAlert,
   Compass,
   Lock,
   ChevronRight
 } from 'lucide-react';
 import Link from 'next/link';
 
-export default function ProgramDetailsPage() {
-  const supabase = createClient();
-  const router = useRouter();
-  const params = useParams();
-  const programId = params?.id;
+/**
+ * Programme data comes from src/lib/academy-programs: checked-in seed data,
+ * because the backend contract has no programmes endpoint. Enrolment is an
+ * enquiry over WhatsApp — nothing on this page reserves a place or takes money.
+ */
+export default async function ProgramDetailsPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+  const program = getAcademyProgram(id);
 
-  // State
-  const [program, setProgram] = useState<any>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  if (!program) notFound();
 
-  useEffect(() => {
-    if (programId) {
-      fetchProgramDetails();
-    }
-  }, [programId]);
-
-  async function fetchProgramDetails() {
-    setIsLoading(true);
-    try {
-      const { data, error } = await supabase
-        .from('programs')
-        .select(`
-          *,
-          instructor:instructor_id (name)
-        `)
-        .eq('id', programId)
-        .single();
-
-      if (!error && data) {
-        setProgram(data);
-      } else {
-        router.push('/programs');
-      }
-    } catch (err) {
-      console.error('Error fetching program:', err);
-    } finally {
-      setIsLoading(false);
-    }
-  }
-
-  const getAgeLevel = () => {
-    if (!program) return 'Ages 6-16';
-    if (program?.type === 'academy') {
-      return program?.schedule?.includes('Ages') ? program?.schedule : 'Ages 6 - 16';
-    }
-    return 'Ages 16+ / Adults';
-  };
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-surface flex items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-14 h-14 border-4 border-forest/10 border-t-gold rounded-full animate-spin" />
-          <p className="font-display font-bold text-gold tracking-tight animate-pulse">Loading details...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!program) {
-    return (
-      <div className="min-h-screen bg-surface flex items-center justify-center text-center">
-        <div className="max-w-md mx-auto p-8 glass rounded-none border border-white/10 bg-card space-y-6">
-          <div className="w-16 h-16 bg-red-500/10 text-red-500 rounded-none border border-red-500/20 flex items-center justify-center mx-auto">
-            <ShieldAlert className="w-8 h-8" />
-          </div>
-          <div className="space-y-2">
-            <h2 className="text-2xl text-white font-display font-bold uppercase tracking-tight">Program not found</h2>
-            <p className="text-charcoal-light text-sm font-medium">This program could not be found or is no longer active.</p>
-          </div>
-          <Link 
-            href="/programs"
-            className="inline-block w-full py-4 bg-gold hover:bg-gold-muted text-forest-dark font-display text-xs font-bold uppercase tracking-widest rounded-none shadow-gold-sm transition-all duration-300 active:scale-[0.98]"
-          >
-            Back to Programs
-          </Link>
-        </div>
-      </div>
-    );
-  }
+  const getAgeLevel = () => program.age_group;
 
   // Build conversational WhatsApp link using program name
-  const whatsAppUrl = `https://wa.me/254798258950?text=${encodeURIComponent(
-    `Hi MVSA 👋 I'm interested in enrolling in ${program?.name || 'this program'}. My name is [Name]. Could you share more details on enrollment?`
+  const whatsAppUrl = `https://wa.me/${contact.whatsappNumber}?text=${encodeURIComponent(
+    `Hi MVSA 👋 I'm interested in enrolling in ${program.name}. My name is [Name]. Could you share more details on enrollment?`
   )}`;
 
   return (
@@ -123,12 +54,12 @@ export default function ProgramDetailsPage() {
         
         {/* Banner Details */}
         <div className="absolute inset-x-0 bottom-12 max-w-7xl mx-auto px-6 lg:px-10 z-10">
-          <button 
-            onClick={() => router.push('/programs')}
+          <Link 
+            href="/programs"
             className="inline-flex items-center gap-2 text-white/80 hover:text-white transition-colors text-xs font-bold uppercase tracking-widest mb-6 border border-white/20 backdrop-blur-md px-4 py-2 rounded-none hover:bg-white/10"
           >
             <ArrowLeft className="w-4 h-4" /> All Programs
-          </button>
+          </Link>
           
           <div className="space-y-4">
             <div className="inline-flex items-center gap-2 px-3 py-1 bg-gold text-forest-dark text-[9px] font-black uppercase tracking-widest font-mono">
