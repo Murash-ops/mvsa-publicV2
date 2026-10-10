@@ -1,14 +1,14 @@
 'use client';
 
 import { useState } from 'react';
-import { createClient } from '@/utils/supabase/client';
+import { contact as venueContact, social } from '@/content/site';
+import { isValidKenyanPhone } from '@/lib/booking/phone';
 import { 
   Phone, 
   Mail, 
   MapPin, 
   Clock,
   Send,
-  Loader2,
   CheckCircle2,
   MessageSquare
 } from 'lucide-react';
@@ -32,94 +32,53 @@ const TikTok = ({ className }: { className?: string }) => (
   </svg>
 );
 
+/**
+ * The backend contract has no inquiries endpoint, so this page cannot store a
+ * message and does not pretend to. The form composes the message and hands it
+ * to the venue's WhatsApp line, which is where enquiries are actually read,
+ * and says so before and after sending. See docs/backend-migration.md, gap 4.
+ */
 export default function ContactPage() {
-  const supabase = createClient();
   const [formData, setFormData] = useState({ name: '', phone: '', message: '' });
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
+  const [handoverUrl, setHandoverUrl] = useState<string | null>(null);
   const [errorMsg, setErrorMsg] = useState('');
 
-  const contacts = [
-    { 
-      name: "Arena Bookings (Turf)", 
-      value: "0798 258 950", 
-      href: "tel:0798258950",
-      icon: Phone, 
-      color: "text-forest", 
-      bg: "bg-forest/5" 
-    },
-    { 
-      name: "Academy & Programs", 
-      value: "0116 619 476", 
-      href: "tel:0116619476",
-      icon: Phone, 
-      color: "text-forest", 
-      bg: "bg-forest/5" 
-    },
-    { 
-      name: "Secondary Line", 
-      value: "0783 209 442", 
-      href: "tel:0783209442",
-      icon: Phone, 
-      color: "text-forest", 
-      bg: "bg-forest/5" 
-    },
-    { 
-      name: "Official Email", 
-      value: "mtviewsportsarena@gmail.com", 
-      href: "mailto:mtviewsportsarena@gmail.com",
-      icon: Mail, 
-      color: "text-forest", 
-      bg: "bg-forest/5" 
-    },
-  ];
+  const contacts = venueContact.channels.map((channel) => ({
+    name: channel.name,
+    value: channel.value,
+    href: channel.href,
+    icon: channel.href.startsWith('mailto:') ? Mail : Phone,
+    color: "text-forest",
+    bg: "bg-forest/5"
+  }));
 
   const socialLinks = [
-    { name: "Instagram", handle: "@mtviewsportsarena", icon: Instagram, href: "https://instagram.com/mtviewsportsarena" },
-    { name: "Facebook", handle: "MtView Sports Arena", icon: Facebook, href: "https://facebook.com/mtviewsportsarena" },
-    { name: "TikTok", handle: "@mountainviewsportsarena", icon: TikTok, href: "https://www.tiktok.com/@mountainviewsportsarena" },
+    { name: "Instagram", handle: `@${social.instagram}`, icon: Instagram, href: `https://instagram.com/${social.instagram}` },
+    { name: "Facebook", handle: "MtView Sports Arena", icon: Facebook, href: `https://facebook.com/${social.facebook}` },
+    { name: "TikTok", handle: `@${social.tiktok}`, icon: TikTok, href: `https://www.tiktok.com/@${social.tiktok}` },
   ];
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true);
     setErrorMsg('');
 
-    // Form Validations
     if (!formData.name.trim() || !formData.phone.trim() || !formData.message.trim()) {
       setErrorMsg('Please populate all inputs before sending.');
-      setIsSubmitting(false);
       return;
     }
 
-    // Phone validation checking (Kenyan formats)
-    const phoneClean = formData.phone.trim().replace(/\s+/g, '');
-    const phoneRegex = /^(?:\+254|0)[17]\d{8}$/;
-    if (!phoneRegex.test(phoneClean)) {
+    if (!isValidKenyanPhone(formData.phone)) {
       setErrorMsg('Please enter a valid Kenyan phone number (e.g. 07xxxxxxxx or 01xxxxxxxx).');
-      setIsSubmitting(false);
       return;
     }
 
-    try {
-      const { error } = await supabase
-        .from('inquiries')
-        .insert([{
-          name: formData.name.trim(),
-          phone: formData.phone.trim(),
-          message: formData.message.trim(),
-          status: 'unread'
-        }]);
+    // Nothing is stored here: the message is handed to WhatsApp, which is the
+    // channel the venue actually reads.
+    const message = `Hi MVSA \u{1F44B} ${formData.message.trim()}\n\nMy name is ${formData.name.trim()}, my number is ${formData.phone.trim()}.`;
+    const url = `https://wa.me/${venueContact.whatsappNumber}?text=${encodeURIComponent(message)}`;
 
-      if (error) throw error;
-      
-      setIsSuccess(true);
-      setFormData({ name: '', phone: '', message: '' });
-    } catch (err: any) {
-      setErrorMsg(err.message || 'Something went wrong. Please try again.');
-    } finally {
-      setIsSubmitting(false);
-    }
+    window.open(url, '_blank', 'noopener,noreferrer');
+    setHandoverUrl(url);
   };
 
   return (
@@ -219,20 +178,40 @@ export default function ContactPage() {
                 Drop Us A Message
               </h2>
 
-              {isSuccess ? (
-                <div className="py-12 flex flex-col items-center justify-center text-center gap-4 animate-in fade-in duration-300">
+              <p className="text-xs text-charcoal-light font-medium leading-relaxed border border-white/10 bg-white/5 p-3" data-testid="inquiry-disclosure">
+                Messages are not stored on this site. Pressing send opens WhatsApp with your
+                message ready, so it reaches reception on the line they actually watch.
+              </p>
+
+              {handoverUrl ? (
+                <div className="py-12 flex flex-col items-center justify-center text-center gap-4 animate-in fade-in duration-300" data-testid="inquiry-handover">
                   <div className="w-16 h-16 rounded-none bg-green-500/10 border border-green-500/25 flex items-center justify-center text-green-600">
                     <CheckCircle2 className="w-10 h-10" />
                   </div>
-                  <h3 className="font-display font-bold text-xl uppercase text-white">Inquiry Logged successfully!</h3>
+                  <h3 className="font-display font-bold text-xl uppercase text-white">Your message is ready in WhatsApp</h3>
                   <p className="text-charcoal-light text-sm max-w-sm font-medium">
-                    Thank you. Your message has been logged straight in our dashboard system. A representative will contact you shortly.
+                    Send it in WhatsApp and reception will reply there. Nothing was stored on this
+                    site, so the message only reaches us once you send it.
                   </p>
+                  <a
+                    href={handoverUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-2 px-6 py-3 bg-gold hover:bg-gold-muted text-forest-dark border border-gold rounded-none font-extrabold text-xs tracking-widest uppercase transition-all"
+                  >
+                    Open WhatsApp again
+                  </a>
+                  <a
+                    href={venueContact.bookingsPhoneHref}
+                    className="text-xs font-bold uppercase tracking-widest text-white/70 hover:text-gold transition-colors"
+                  >
+                    Or call {venueContact.bookingsPhone}
+                  </a>
                   <button 
-                    onClick={() => setIsSuccess(false)}
+                    onClick={() => setHandoverUrl(null)}
                     className="mt-4 px-6 py-2.5 bg-forest hover:bg-forest-light text-white rounded-none font-bold text-xs uppercase tracking-widest transition-all"
                   >
-                    Send another inquiry
+                    Write another message
                   </button>
                 </div>
               ) : (
@@ -281,20 +260,11 @@ export default function ContactPage() {
 
                   <button
                     type="submit"
-                    disabled={isSubmitting}
-                    className="w-full flex items-center justify-center gap-2.5 px-8 py-5 bg-gold hover:bg-gold-muted text-forest-dark border border-gold rounded-none font-extrabold text-xs tracking-[0.15em] uppercase hover:shadow-gold-sm active:scale-98 transition-all disabled:opacity-60 cursor-pointer"
+                    className="w-full flex items-center justify-center gap-2.5 px-8 py-5 bg-gold hover:bg-gold-muted text-forest-dark border border-gold rounded-none font-extrabold text-xs tracking-[0.15em] uppercase hover:shadow-gold-sm active:scale-98 transition-all cursor-pointer"
+                    data-testid="inquiry-submit"
                   >
-                    {isSubmitting ? (
-                      <>
-                        <Loader2 className="w-4 h-4 animate-spin text-forest-dark" />
-                        SENDING...
-                      </>
-                    ) : (
-                      <>
-                        SEND INQUIRY
-                        <Send className="w-4 h-4 text-forest-dark stroke-[2.5px]" />
-                      </>
-                    )}
+                    SEND ON WHATSAPP
+                    <Send className="w-4 h-4 text-forest-dark stroke-[2.5px]" />
                   </button>
                 </form>
               )}
@@ -303,7 +273,7 @@ export default function ContactPage() {
             {/* Location Map Card below the form */}
             <div className="glass p-4 rounded-none border border-white/10 shadow-pitch h-[280px] relative overflow-hidden group bg-card">
               <iframe 
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15955.15647573428!2d36.75!3d-1.26!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x182f19f6a6c42171%3A0x6b40e704043f053e!2sMountain%20View%20Mall!5e0!3m2!1sen!2ske!4v1700000000000!5m2!1sen!2ske" 
+                src={venueContact.mapsEmbedUrl}
                 className="w-full h-full rounded-none border-0 grayscale hover:grayscale-0 transition-all duration-700 pointer-events-auto" 
                 allowFullScreen={true} 
                 loading="lazy" 
