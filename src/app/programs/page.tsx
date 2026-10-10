@@ -1,70 +1,19 @@
-'use client';
-
-import { useState, useEffect } from 'react';
-import { createClient } from '@/utils/supabase/client';
+import { getAcademyPrograms } from '@/lib/academy-programs';
 import { Trophy, CalendarDays, ArrowRight, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 
+/**
+ * Programme data comes from src/lib/academy-programs: checked-in seed data,
+ * because the backend contract has no programmes endpoint. See that module and
+ * docs/backend-migration.md before wiring this page to anything live.
+ */
 export default function ProgramsPage() {
-  const supabase = createClient();
-  const [programs, setPrograms] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const programs = getAcademyPrograms();
 
-  useEffect(() => {
-    async function fetchPrograms() {
-      try {
-        const { data, error } = await supabase
-          .from('programs')
-          .select('*')
-          .eq('is_active', true)
-          .order('name', { ascending: true });
+  const getAgeLevel = (program: { age_group: string }) => program.age_group;
 
-        if (!error && data) {
-          setPrograms(data);
-        }
-      } catch (err) {
-        console.error('Error fetching programs:', err);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-
-    fetchPrograms();
-  }, []);
-
-  const getPriceLabel = (pricingJson: any) => {
-    if (!pricingJson) return 'KES 1,500 / Session';
-    const term = pricingJson.term;
-    const monthly = pricingJson.monthly;
-    const session = pricingJson.session;
-    
-    if (term) return `KES ${term.toLocaleString()} / Term`;
-    if (monthly) return `KES ${monthly.toLocaleString()} / Month`;
-    if (session) return `KES ${session.toLocaleString()} / Session`;
-    return 'KES 1,500 / Session';
-  };
-
-  const getAgeLevel = (program: any) => {
-    // If program is academy, it is for kids; if fitness, for adults
-    if (program.type === 'academy') {
-      return program.schedule?.includes('Ages') ? program.schedule : 'Ages 6 - 16';
-    }
-    return 'Ages 16+ / Adults';
-  };
-
-  const youthAcademies = programs.filter(p => p.type === 'academy');
-  const fitnessWellness = programs.filter(p => p.type !== 'academy');
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-surface flex items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-14 h-14 border-4 border-forest/10 border-t-gold rounded-full animate-spin" />
-          <p className="font-display font-bold text-gold tracking-tight animate-pulse">Loading Programs...</p>
-        </div>
-      </div>
-    );
-  }
+  const youthAcademies = programs.filter((p) => p.type === 'academy');
+  const fitnessWellness = programs.filter((p) => p.type !== 'academy');
 
   return (
     <main className="min-h-screen pt-32 pb-24 bg-transparent text-charcoal text-left">
