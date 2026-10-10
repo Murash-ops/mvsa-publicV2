@@ -5,9 +5,7 @@ import {
   Wifi, 
   Droplets, 
   Lock, 
-  Users,
-  MapPin,
-  Clock
+  Users
 } from 'lucide-react';
 
 // Page copy is checked in (src/content/site.ts), so this page needs no data layer.

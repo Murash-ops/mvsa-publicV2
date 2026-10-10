@@ -15,7 +15,6 @@
  * handlers so the bearer token stays on the server.
  */
 
-import { bookingWritesEnabled, isApiConfigured } from './config';
 import { newIdempotencyKey, request } from './http';
 import type {
   ActivitiesData,

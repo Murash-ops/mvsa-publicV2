@@ -166,9 +166,25 @@ export default function BookingWidget({
   }, [durationMinutes, selectedDate, venue.resourceId]);
 
   useEffect(() => {
-    setSelectedSlot(null);
-    void loadSlots();
+    // Deferred by a microtask: loadSlots sets the loading state as it starts,
+    // and doing that synchronously inside the effect would cascade an extra
+    // render pass. `active` drops the result if the query changed meanwhile.
+    let active = true;
+    void Promise.resolve().then(() => {
+      if (active) void loadSlots();
+    });
+    return () => {
+      active = false;
+    };
   }, [loadSlots]);
+
+  /** Any change to the query invalidates the chosen slot and any stale notice. */
+  const clearSelection = () => {
+    setSelectedSlot(null);
+    setActionFailure(null);
+    setHandoverNotice('');
+    setFormError('');
+  };
 
   // Hold countdown. When it runs out the hold is gone in the backend too, so
   // the customer is told and availability is refreshed.
@@ -432,6 +448,7 @@ export default function BookingWidget({
                   <button
                     key={option.resourceId}
                     onClick={() => {
+                      clearSelection();
                       setVenue(option);
                       setPartySize(option.kind === 'turf' ? 10 : 6);
                     }}
@@ -492,7 +509,10 @@ export default function BookingWidget({
                   return (
                     <button
                       key={date.toISOString()}
-                      onClick={() => setSelectedDate(date)}
+                      onClick={() => {
+                        clearSelection();
+                        setSelectedDate(date);
+                      }}
                       className={`flex flex-col items-center justify-center min-w-[76px] p-4 rounded-none border transition-all duration-300 cursor-pointer ${
                         isSelected
                           ? 'border-gold bg-gold text-forest-dark shadow-gold-sm font-bold scale-[1.02]'
@@ -521,7 +541,10 @@ export default function BookingWidget({
                 {DURATION_OPTIONS.map((option) => (
                   <button
                     key={option.minutes}
-                    onClick={() => setDurationMinutes(option.minutes)}
+                    onClick={() => {
+                      clearSelection();
+                      setDurationMinutes(option.minutes);
+                    }}
                     className={`px-4 py-2.5 border text-xs font-mono font-bold uppercase tracking-wider transition-all cursor-pointer ${
                       durationMinutes === option.minutes
                         ? 'border-gold bg-gold text-forest-dark'

@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import Image from 'next/image';
 import { getVenueFacts, isMvsaApiError, type PricingSummaryItem } from '@/lib/mvsa-api';
 import { getAcademyPrograms } from '@/lib/academy-programs';
 import { booking, contact, home, social } from '@/content/site';
@@ -8,10 +7,7 @@ import {
   Lock, 
   Wifi, 
   Clock, 
-  ChevronRight,
-  Shield,
-  HelpCircle,
-  Activity
+  ChevronRight
 } from 'lucide-react';
 
 export const revalidate = 0; // Venue facts come from the backend on every request
