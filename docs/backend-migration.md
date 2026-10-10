@@ -299,7 +299,23 @@ In order. The first item blocks everything after it.
    customers. The site shows a reference and says payment is due at reception;
    nothing is charged online.
 
-## 9. Known limits of this branch
+## 9. One more thing to weigh: this site's own `/api` routes
+
+`GET /api/availability` is public, as it must be for the widget to work without
+a sign-in. It validates the date, the resource and the duration against what the
+venue offers before forwarding, and it exposes nothing but published
+availability — but it is still an unauthenticated path that causes a backend
+call, and this site does not rate-limit it. Vercel's own firewall can do that
+per path if abuse ever shows up; worth setting at the same time as rate limiting
+on the backend, and worth watching once the API is reachable.
+
+The two booking routes are unauthenticated too, by the same necessity. They are
+protected in three ways instead: they are off unless
+`MVSA_BOOKING_WRITES_ENABLED` is true, every field is validated before the
+backend is called, and no booking can be created for an interval the backend has
+not offered.
+
+## 10. Known limits of this branch
 
 - No endpoint was invented. `POST /v1/conversations/messages` exists in the
   contract but is not used by the site; it is the WhatsApp gateway's.
