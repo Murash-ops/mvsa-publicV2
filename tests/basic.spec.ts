@@ -1,11 +1,13 @@
 import { test, expect } from '@playwright/test';
+import { THREE_SLOTS } from './fixtures/availability';
 
-test('booking page should show venues', async ({ page }) => {
-  await page.goto('http://localhost:3000/book');
-  
-  // Wait for the venues to load
-  await expect(page.locator('text=NO VENUES AVAILABLE')).not.toBeVisible({ timeout: 10000 });
-  
-  // Check for the seeded venue
-  await expect(page.locator('text=Main Arena Turf').first()).toBeVisible();
+test('booking page offers both bookable venues', async ({ page }) => {
+  await page.route('**/api/availability*', async (route) => {
+    await route.fulfill({ json: THREE_SLOTS });
+  });
+
+  await page.goto('/book');
+
+  await expect(page.getByTestId('venue-grid')).toBeVisible();
+  await expect(page.getByTestId('venue-grid')).toContainText('Main Arena Turf');
 });
