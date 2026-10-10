@@ -1,6 +1,8 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import { createClient } from '@/utils/supabase/server';
+import { getVenueFacts, isMvsaApiError, type PricingSummaryItem } from '@/lib/mvsa-api';
+import { getAcademyPrograms } from '@/lib/academy-programs';
+import { booking, contact, home, social } from '@/content/site';
 import { 
   ArrowRight, 
   Lock, 
@@ -12,54 +14,43 @@ import {
   Activity
 } from 'lucide-react';
 
-export const revalidate = 0; // Ensure live database changes propagate instantly
+export const revalidate = 0; // Venue facts come from the backend on every request
+
+/**
+ * Prices are venue facts, so they come from GET /v1/knowledge/facts and are
+ * never hard-coded or recalculated here. If the backend cannot be reached we
+ * say so and point at reception rather than printing a number we cannot stand
+ * behind.
+ */
+async function loadPricingSummary(): Promise<{
+  rows: PricingSummaryItem[];
+  unreachable: boolean;
+}> {
+  try {
+    const facts = await getVenueFacts();
+    return { rows: facts.facts.pricing_summary, unreachable: false };
+  } catch (error) {
+    if (!isMvsaApiError(error)) throw error;
+    return { rows: [], unreachable: true };
+  }
+}
 
 export default async function Home() {
-  const supabase = await createClient();
-  
-  // Parallel fetch to eliminate waterfalls
-  const [programsRes, venuesRes, siteContentRes] = await Promise.all([
-    supabase.from('programs').select('*').eq('is_active', true).limit(4),
-    supabase.from('venues').select('*').order('id', { ascending: true }),
-    supabase.from('site_content').select('*')
-  ]);
+  const { rows: pricingRows, unreachable: pricingUnreachable } = await loadPricingSummary();
 
-  const dbVenues = venuesRes?.data || [];
-  const dbPrograms = programsRes?.data || [];
-  const siteContent = siteContentRes?.data || [];
+  const turfPricing = pricingRows.filter((row) => row.activity_id.startsWith('turf'));
+  const meetingPricing = pricingRows.find((row) => row.activity_id === 'meeting_room');
 
-  // 1. Parse dynamic content keys with hardcoded fallbacks
-  const homepageRow = siteContent.find((r: any) => r.key === 'homepage_content');
-  const homepageData = homepageRow?.value || {};
+  const programs = getAcademyPrograms().slice(0, 4);
 
-  const heroHeadline = homepageData.hero_headline || "Home of Football \n& Fitness";
-  const heroSubheading = homepageData.hero_subheading || "Premium synthetic turf. Floodlit nights. Behind Mountain View Mall, Waiyaki Way.";
-  const heroTextAboveCta = homepageData.hero_text_above_cta || "Want to see the arena in action? Follow us on Instagram and TikTok @mtviewsportsarena";
-  const closingCtaHeadline = homepageData.closing_cta_headline || "Book Your Slot Today";
-  
-  const instagramHandle = homepageData.instagram || "mtviewsportsarena";
-  const tiktokHandle = homepageData.tiktok || "mtviewsportsarena";
-
-  const trustCard1Title = homepageData.trust_card_1_title || "Changing Rooms & Lockers";
-  const trustCard1Desc = homepageData.trust_card_1_desc || "Private premium changing stalls and secure smart lockers for your gear.";
-  const trustCard2Title = homepageData.trust_card_2_title || "Free WiFi & Water";
-  const trustCard2Desc = homepageData.trust_card_2_desc || "High-speed clubhouse connection and unlimited filtered hydration station.";
-  const trustCard3Title = homepageData.trust_card_3_title || "Floodlit Until 11PM";
-  const trustCard3Desc = homepageData.trust_card_3_desc || "FIFA-standard shadow-free matches under our high-intensity lighting systems.";
-
-  const appearanceRow = siteContent.find((r: any) => r.key === 'appearance_settings');
-  const appearanceData = appearanceRow?.value || {};
-  
-  const heroImgUrl = homepageData.hero_image_url || appearanceData.hero_image_url || "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?q=80&w=1920";
-
-  // Determine Turf rates from database
-  const turfVenue = dbVenues.find((v: any) => v.type === 'turf' || v.name.includes('Turf'));
-  const turfOffPeak = turfVenue?.hourly_rates?.off_peak || 1500;
-  const turfPeak = turfVenue?.hourly_rates?.peak || 2000;
-
-  // Determine Meeting Room rates from database
-  const meetingVenue = dbVenues.find((v: any) => v.type === 'meeting_room' || v.name.includes('Meeting'));
-  const meetingMinRate = meetingVenue?.hourly_rates?.off_peak || 1000;
+  const heroHeadline = home.heroHeadline;
+  const heroSubheading = home.heroSubheading;
+  const heroTextAboveCta = home.heroTextAboveCta;
+  const closingCtaHeadline = home.closingCtaHeadline;
+  const heroImgUrl = home.heroImageUrl;
+  const instagramHandle = social.instagram;
+  const tiktokHandle = social.tiktok;
+  const [trustCard1, trustCard2, trustCard3] = home.trustCards;
 
   const renderHeadline = (text: string) => {
     return text.split('\n').map((line, index) => (
@@ -123,9 +114,9 @@ export default async function Home() {
                 <Lock className="w-5 h-5" />
               </div>
               <div className="space-y-1">
-                <h4 className="font-display font-bold text-sm text-white uppercase tracking-wider">{trustCard1Title}</h4>
+                <h4 className="font-display font-bold text-sm text-white uppercase tracking-wider">{trustCard1.title}</h4>
                 <p className="font-sans text-xs text-white/50 leading-relaxed font-medium">
-                  {trustCard1Desc}
+                  {trustCard1.description}
                 </p>
               </div>
             </div>
@@ -136,9 +127,9 @@ export default async function Home() {
                 <Wifi className="w-5 h-5" />
               </div>
               <div className="space-y-1">
-                <h4 className="font-display font-bold text-sm text-white uppercase tracking-wider">{trustCard2Title}</h4>
+                <h4 className="font-display font-bold text-sm text-white uppercase tracking-wider">{trustCard2.title}</h4>
                 <p className="font-sans text-xs text-white/50 leading-relaxed font-medium">
-                  {trustCard2Desc}
+                  {trustCard2.description}
                 </p>
               </div>
             </div>
@@ -149,9 +140,9 @@ export default async function Home() {
                 <Clock className="w-5 h-5" />
               </div>
               <div className="space-y-1">
-                <h4 className="font-display font-bold text-sm text-white uppercase tracking-wider">{trustCard3Title}</h4>
+                <h4 className="font-display font-bold text-sm text-white uppercase tracking-wider">{trustCard3.title}</h4>
                 <p className="font-sans text-xs text-white/50 leading-relaxed font-medium">
-                  {trustCard3Desc}
+                  {trustCard3.description}
                 </p>
               </div>
             </div>
@@ -160,7 +151,7 @@ export default async function Home() {
       </section>
 
       {/* ============================================
-          3. PRICING TEASER (2 TIERS ONLY, DIRECT BUTTON)
+          3. PRICING TEASER (LIVE VENUE FACTS)
           ============================================ */}
       <section className="py-24 bg-transparent relative z-20">
         <div className="max-w-5xl mx-auto px-6 text-center space-y-12">
@@ -171,47 +162,38 @@ export default async function Home() {
             <div className="w-12 h-1 bg-gold mx-auto rounded-none" />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto text-left">
-            {/* Off-Peak Tier */}
-            <div className="p-8 border border-white/10 bg-card hover:border-gold transition-all duration-300">
-              <div className="flex justify-between items-center">
-                <div className="space-y-1.5">
-                  <span className="px-2.5 py-0.5 bg-white/5 text-[9px] font-mono font-bold uppercase text-white/80 border border-white/10">
-                    OFF-PEAK RATE
-                  </span>
-                  <h4 className="font-display font-bold text-lg text-white uppercase tracking-wide">Weekday Morning/Afternoon</h4>
-                  <p className="text-xs text-charcoal-light font-medium">Monday–Friday, 6AM–5PM</p>
-                </div>
-                <div className="text-right">
-                  <p className="text-gold font-mono font-black text-2xl">KES {turfOffPeak.toLocaleString()}</p>
-                  <p className="text-[9px] text-muted font-bold uppercase mt-1">Per hour</p>
-                </div>
-              </div>
+          {pricingUnreachable ? (
+            <div className="max-w-2xl mx-auto p-8 border border-amber-500/30 bg-amber-500/5 text-left space-y-2" data-testid="pricing-unreachable">
+              <p className="text-amber-300 text-xs font-bold uppercase tracking-widest">Live rates unavailable</p>
+              <p className="text-charcoal-light text-sm font-medium leading-relaxed">
+                {booking.unreachableNotice} For today&apos;s turf and meeting room rates, call reception on{' '}
+                <a href={contact.bookingsPhoneHref} className="text-gold font-bold">{contact.bookingsPhone}</a>.
+              </p>
             </div>
-
-            {/* Peak Tier */}
-            <div className="p-8 border border-gold/30 bg-gold/10 hover:border-gold transition-all duration-300">
-              <div className="flex justify-between items-center">
-                <div className="space-y-1.5">
-                  <span className="px-2.5 py-0.5 bg-gold/15 text-[9px] font-mono font-bold uppercase text-gold border border-gold/20">
-                    PEAK ACTION
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto text-left" data-testid="pricing-grid">
+              {turfPricing.map((row) => (
+                <div
+                  key={`${row.activity_id}-${row.label}`}
+                  className="p-6 border border-white/10 bg-card hover:border-gold transition-all duration-300 space-y-2"
+                >
+                  <span className="px-2.5 py-0.5 bg-white/5 text-[9px] font-mono font-bold uppercase text-white/80 border border-white/10 inline-block">
+                    Turf hire
                   </span>
-                  <h4 className="font-display font-bold text-lg text-white uppercase tracking-wide">Evenings & Weekends</h4>
-                  <p className="text-xs text-charcoal-light font-medium">Nights & Sat-Sun All-Day</p>
+                  <h4 className="font-display font-bold text-base text-white uppercase tracking-wide">{row.label}</h4>
+                  <p className="text-gold font-mono font-bold text-lg">{row.display}</p>
                 </div>
-                <div className="text-right">
-                  <p className="text-gold font-mono font-black text-2xl">KES {turfPeak.toLocaleString()}</p>
-                  <p className="text-[9px] text-muted font-bold uppercase mt-1">Per hour</p>
-                </div>
-              </div>
+              ))}
             </div>
-          </div>
+          )}
 
           <div className="space-y-8">
             {/* Secondary Option line below cards */}
-            <p className="text-charcoal-light font-sans text-sm font-semibold tracking-wide">
-              Meeting Room from KES {meetingMinRate.toLocaleString()}/hr
-            </p>
+            {meetingPricing && (
+              <p className="text-charcoal-light font-sans text-sm font-semibold tracking-wide">
+                {meetingPricing.label}: {meetingPricing.display}
+              </p>
+            )}
             
             {/* Single CTA button pointing to booking page */}
             <div className="flex justify-center">
@@ -226,7 +208,6 @@ export default async function Home() {
           </div>
         </div>
       </section>
-
       {/* ============================================
           4. PROGRAMS STRIP (SLIM PATHWAYS CAROUSEL)
           ============================================ */}
@@ -242,28 +223,23 @@ export default async function Home() {
 
           {/* Grid Layout (Desktop) / Horizontal Scroll (Mobile) */}
           <div className="flex md:grid md:grid-cols-2 lg:grid-cols-4 gap-6 overflow-x-auto md:overflow-x-visible pb-4 md:pb-0 scrollbar-hide shrink-0">
-            {(dbPrograms.length > 0 ? dbPrograms : [
-              { name: "Football Academy", schedule: "Ages 6-16" },
-              { name: "Chess Club", schedule: "Ages 4-18" },
-              { name: "Dance & Rhythm", schedule: "Ages 6-16" },
-              { name: "Arena Fitness", schedule: "Ages 16+" }
-            ]).map((program: any, index: number) => {
+            {programs.map((program) => {
               return (
                 <div 
-                  key={index} 
+                  key={program.id}
                   className="bg-card border border-white/10 p-6 rounded-none flex flex-col justify-between min-w-[280px] md:min-w-0 h-[150px] shadow-sm hover:border-gold hover:-translate-y-1 transition-all duration-300"
                 >
                   <div className="space-y-4 text-left">
                     <div className="flex justify-between items-center">
                       <span className="w-1.5 h-1.5 bg-gold rounded-full" />
                       <span className="text-[9px] font-mono font-bold uppercase bg-white/10 px-2 py-0.5 text-white/80 border border-white/10">
-                        {program.schedule || 'Ages 6-16'}
+                        {program.age_group}
                       </span>
                     </div>
                     <div>
                       <h4 className="text-white font-bold text-base uppercase tracking-wide font-display">{program.name}</h4>
                       <p className="text-[10px] text-gold/60 font-medium uppercase tracking-widest mt-1.5 font-mono">
-                        {program.age_group || 'All levels welcome'}
+                        {program.schedule}
                       </p>
                     </div>
                   </div>

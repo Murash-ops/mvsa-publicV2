@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import { createClient } from '@/utils/supabase/server';
+import { about } from '@/content/site';
 import { 
   Heart, 
   Wifi, 
@@ -10,25 +10,14 @@ import {
   Clock
 } from 'lucide-react';
 
-export const revalidate = 0; // Prevent caching to ensure site content edits propagate immediately
-
-export default async function AboutPage() {
-  const supabase = await createClient();
-  
-  // Fetch dynamic copy from database site_content table
-  const { data: contentData } = await supabase
-    .from('site_content')
-    .select('*')
-    .eq('key', 'about_page')
-    .single();
-
-  const content = contentData?.value || {
-    title: "THE HEART OF NAIROBI SPORTS",
-    subtitle: "A premium recreational sanctuary dedicated to physical mastery, elite training, and community connection.",
-    story_title: "Our Mission",
-    story_text: "Mountain View Sports Arena (MVSA) was born from a simple vision: to create a world-class sports destination in the heart of our community.\n\nWe believe that sports have the power to transform lives—building character in youth, health in adults, and unity in communities. MVSA provides more than just a pitch; we provide an ecosystem where athletes of all levels can thrive and excel.",
-    turf_spec: "100% Premium Synthetic Turf",
-    security_spec: "24/7 Monitored Facility Security"
+// Page copy is checked in (src/content/site.ts), so this page needs no data layer.
+export default function AboutPage() {
+  const content = {
+    subtitle: about.subtitle,
+    story_title: about.storyTitle,
+    story_text: about.storyText,
+    turf_spec: about.turfSpec,
+    security_spec: about.securitySpec,
   };
 
   const amenities = [
