@@ -33,7 +33,7 @@ export const venues: VenuePresentation[] = [
     kind: 'turf',
     activityId: 'turf_hire',
     badge: 'Synthetic Turf',
-    imageUrl: '/images/hero_turf.jpeg',
+    imageUrl: '/images/gallery/shot-03.webp',
     blurb: 'Floodlit 5-aside pitch with premium synthetic turf, open until midnight.',
   },
   {
@@ -42,7 +42,7 @@ export const venues: VenuePresentation[] = [
     kind: 'meeting_room',
     activityId: 'meeting_room',
     badge: 'Clubhouse Lounge',
-    imageUrl: '/images/meeting_hall.jpeg',
+    imageUrl: '/images/gallery/shot-14.webp',
     blurb: 'A quiet room for team talks, training sessions and small events.',
   },
 ];

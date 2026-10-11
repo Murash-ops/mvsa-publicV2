@@ -1,7 +1,9 @@
+import Image from 'next/image';
 import Link from 'next/link';
 import { getVenueFacts, isMvsaApiError, type PricingSummaryItem } from '@/lib/mvsa-api';
 import { getAcademyPrograms } from '@/lib/academy-programs';
 import { booking, contact, home, social } from '@/content/site';
+import { gallery, heroPhoto } from '@/content/photos';
 import { 
   ArrowRight, 
   Lock, 
@@ -43,7 +45,6 @@ export default async function Home() {
   const heroSubheading = home.heroSubheading;
   const heroTextAboveCta = home.heroTextAboveCta;
   const closingCtaHeadline = home.closingCtaHeadline;
-  const heroImgUrl = home.heroImageUrl;
   const instagramHandle = social.instagram;
   const tiktokHandle = social.tiktok;
   const [trustCard1, trustCard2, trustCard3] = home.trustCards;
@@ -60,28 +61,30 @@ export default async function Home() {
   return (
     <main className="min-h-screen text-charcoal selection:bg-gold selection:text-forest-dark overflow-x-hidden">
       {/* ============================================
-          1. HERO SECTION (FULL BLEED OVERLAY)
-          ============================================ */}
-      <section 
-        className="relative h-screen flex items-center justify-center pt-20 z-10 overflow-hidden bg-cover bg-center bg-no-repeat"
-        style={{ backgroundImage: `url('${heroImgUrl}')` }}
-      >
-        {/* Lighter atmospheric overlay letting background show through */}
-        <div className="absolute inset-0 bg-gradient-to-b from-[#061a10]/40 via-[#061a10]/20 to-[#061a10]/80 z-0" />
+          1. HERO - TEXT BESIDE THE PHOTOGRAPH
 
-        <div className="max-w-7xl mx-auto px-6 lg:px-10 w-full relative z-20 pt-10 text-center space-y-8 animate-slide-up">
+          Every photograph of the arena is portrait: these were taken on a
+          phone held upright. Cropping one into a letterbox banner throws away
+          most of the frame and softens what is left, which is what the old
+          full-bleed background did. So the photograph keeps its own shape and
+          the headline sits beside it on a wide screen, above it on a narrow
+          one. One <Image>, no duplicate download per breakpoint.
+          ============================================ */}
+      <section className="relative z-10 pt-28 pb-16 lg:pt-36 lg:pb-24 overflow-hidden">
+        <div className="max-w-7xl mx-auto px-6 lg:px-10 grid lg:grid-cols-12 gap-10 lg:gap-14 items-center">
+          <div className="lg:col-span-7 text-center lg:text-left space-y-8 animate-slide-up">
           {/* Headline - Cinzel, large, white, sharp */}
-          <h1 className="font-display text-5xl sm:text-7xl md:text-8xl font-black uppercase tracking-tight text-white leading-[0.95] drop-shadow-lg">
+          <h1 className="font-display text-5xl sm:text-7xl lg:text-7xl xl:text-8xl font-black uppercase tracking-tight text-white leading-[0.95] text-balance">
             {renderHeadline(heroHeadline)}
           </h1>
           
           {/* Subheading - DM Sans, muted white, one line */}
-          <p className="font-sans text-sm sm:text-base md:text-lg text-white/80 max-w-3xl mx-auto font-medium tracking-wide">
+          <p className="font-sans text-sm sm:text-base md:text-lg text-white/75 max-w-xl mx-auto lg:mx-0 font-medium tracking-wide">
             {heroSubheading}
           </p>
           
           {/* Double CTAs - Stacked on Mobile, Side-by-Side on Desktop */}
-          <div className="pt-4 flex flex-col sm:flex-row gap-4 justify-center items-center">
+          <div className="pt-4 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start items-center">
             <Link 
               href="/book" 
               className="relative h-16 w-64 bg-gold text-forest-dark hover:bg-gold-muted border border-gold font-display text-sm font-extrabold uppercase tracking-[0.2em] flex items-center justify-center rounded-none shadow-gold-sm transition-all duration-300 hover:scale-[1.03] active:scale-[0.97]"
@@ -94,6 +97,23 @@ export default async function Home() {
             >
               Explore Programs
             </Link>
+          </div>
+          </div>
+
+          {/* The photograph, in its own proportions. object-contain would letterbox
+              it; a 4:5 frame crops a little from top and bottom and no more. */}
+          <div className="lg:col-span-5">
+            <figure className="relative aspect-[4/5] w-full max-w-md mx-auto lg:max-w-none overflow-hidden border border-white/10 bg-forest-light/20">
+              <Image
+                src={heroPhoto.src}
+                alt="The covered pitch at Mountain View Sports Arena"
+                fill
+                priority
+                sizes="(max-width: 1024px) 90vw, 40vw"
+                className="object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#061a10]/55 via-transparent to-transparent" />
+            </figure>
           </div>
         </div>
       </section>
@@ -258,7 +278,44 @@ export default async function Home() {
       </section>
 
       {/* ============================================
-          5. CLOSING CTA (DOMINANT GOLD BOOK NOW)
+          5. THE ARENA, PHOTOGRAPHED
+          ============================================ */}
+      <section className="py-24 relative z-20 border-t border-white/5">
+        <div className="max-w-7xl mx-auto px-6 lg:px-10">
+          <div className="mb-12 max-w-2xl">
+            <h2 className="font-display text-3xl sm:text-4xl font-extrabold uppercase tracking-tight text-white">
+              The Arena
+            </h2>
+            <p className="mt-3 font-sans text-sm sm:text-base text-white/70">
+              Every photograph here was taken at Mountain View. Nothing is stock.
+            </p>
+          </div>
+
+          {/* Columns rather than a grid: portrait and landscape frames sit
+              together without cropping either into the wrong shape. */}
+          <div className="columns-2 md:columns-3 lg:columns-4 gap-3 [column-fill:_balance]">
+            {gallery.map((photo, i) => (
+              <figure
+                key={photo.src}
+                className="mb-3 break-inside-avoid overflow-hidden border border-white/10 bg-forest-light/20"
+              >
+                <Image
+                  src={photo.src}
+                  alt="Mountain View Sports Arena"
+                  width={photo.w}
+                  height={photo.h}
+                  loading={i < 4 ? 'eager' : 'lazy'}
+                  sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                  className="w-full h-auto object-cover transition-transform duration-500 hover:scale-[1.03]"
+                />
+              </figure>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ============================================
+          6. CLOSING CTA (DOMINANT GOLD BOOK NOW)
           ============================================ */}
       <section className="py-28 bg-transparent relative z-20 text-center text-white overflow-hidden">
         {/* Subtle grid-blur patterns */}

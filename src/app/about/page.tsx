@@ -47,11 +47,11 @@ export default function AboutPage() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center mb-32 text-left">
           <div className="lg:col-span-7 relative h-[400px] lg:h-[600px] rounded-none overflow-hidden shadow-sm border border-white/10">
             <Image 
-              src="/images/hero_turf.jpeg" 
-              alt="MVSA Arena Turf Facility" 
+              src="/images/gallery/shot-02.webp" 
+              alt="The floodlit pitch at Mountain View Sports Arena" 
               fill 
               className="object-cover" 
-              unoptimized
+              sizes="(max-width: 1024px) 100vw, 58vw"
             />
             <div className="absolute inset-0 bg-gradient-to-r from-[#061a10]/60 to-transparent" />
           </div>
@@ -106,11 +106,11 @@ export default function AboutPage() {
             {/* 1. Turf recreational */}
             <div className="relative rounded-none overflow-hidden border border-white/10 group h-[320px]">
               <Image 
-                src="/images/hero_turf.jpeg" 
-                alt="Main Arena Turf - Recreational Play" 
+                src="/images/gallery/shot-05.webp" 
+                alt="The main turf set up for a five-a-side game" 
                 fill 
                 className="object-cover transition-transform duration-500 group-hover:scale-105" 
-                unoptimized
+                sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-forest-dark/70 via-transparent to-transparent" />
               <div className="absolute bottom-6 left-6 text-white z-10">
@@ -122,11 +122,11 @@ export default function AboutPage() {
             {/* 2. Turf academy */}
             <div className="relative rounded-none overflow-hidden border border-white/10 group h-[320px]">
               <Image 
-                src="/images/academy.jpeg" 
-                alt="Main Arena - Youth Training (Conducted on Main Turf)" 
+                src="/images/gallery/shot-07.webp" 
+                alt="Youth training on the main turf" 
                 fill 
                 className="object-cover transition-transform duration-500 group-hover:scale-105" 
-                unoptimized
+                sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-forest-dark/70 via-transparent to-transparent" />
               <div className="absolute bottom-6 left-6 text-white z-10">
@@ -138,11 +138,11 @@ export default function AboutPage() {
             {/* 3. Meeting Hall */}
             <div className="relative rounded-none overflow-hidden border border-white/10 group h-[320px]">
               <Image 
-                src="/images/meeting_hall.jpeg" 
-                alt="Meeting Hall strategist rooms" 
+                src="/images/gallery/shot-14.webp" 
+                alt="The clubhouse lounge laid out for a team talk" 
                 fill 
                 className="object-cover transition-transform duration-500 group-hover:scale-105" 
-                unoptimized
+                sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-forest-dark/70 via-transparent to-transparent" />
               <div className="absolute bottom-6 left-6 text-white z-10">

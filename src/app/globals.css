@@ -32,18 +32,13 @@
 }
 
 @layer base {
+  /* A flat, deliberate ground colour. The photographs now appear where they
+     belong - the hero, the venue cards, the gallery - rather than as one
+     fixed image behind the whole site. `background-attachment: fixed` was
+     also ignored on iOS and forced a repaint on every scroll frame. */
   body {
-    background-image: 
-      linear-gradient(
-        rgba(6, 26, 16, 0.40),
-        rgba(6, 26, 16, 0.70)
-      ),
-      url('/images/hero_turf.jpeg');
-    background-size: cover;
-    background-position: center;
-    background-attachment: fixed;
-    background-repeat: no-repeat;
-    @apply text-charcoal-light font-sans min-h-screen antialiased bg-surface;
+    background-color: var(--color-surface);
+    @apply text-charcoal-light font-sans min-h-screen antialiased;
   }
 
   h1, h2, h3, h4, h5, h6 {

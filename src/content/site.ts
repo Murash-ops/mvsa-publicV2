@@ -53,7 +53,7 @@ export const home = {
   heroTextAboveCta:
     'Want to see the arena in action? Follow us on Instagram and TikTok @mtviewsportsarena',
   /** Local asset: keeps the hero out of the Content-Security-Policy img-src list. */
-  heroImageUrl: '/images/hero_turf.jpeg',
+  heroImageUrl: '/images/gallery/shot-01.webp',
   closingCtaHeadline: 'Book Your Slot Today',
   trustCards: [
     {
