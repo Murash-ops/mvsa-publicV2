@@ -11,6 +11,7 @@ import {
   Lock,
   ChevronRight
 } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
 
 /**
@@ -40,10 +41,13 @@ export default async function ProgramDetailsPage({
       {/* Hero Header */}
       <div className="relative w-full h-[50vh] overflow-hidden">
         {program?.image_url ? (
-          <img 
-            src={program?.image_url} 
-            alt={program?.name} 
-            className="w-full h-full object-cover select-none filter brightness-[0.7]" 
+          <Image
+            src={program.image_url}
+            alt={program.name}
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover select-none filter brightness-[0.7]"
           />
         ) : (
           <div className="w-full h-full bg-gradient-to-r from-forest-dark via-forest to-forest-dark flex items-center justify-center">

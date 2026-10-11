@@ -464,7 +464,7 @@ export default function BookingWidget({
                       alt={option.displayName}
                       fill
                       className="object-cover absolute inset-0 opacity-15 group-hover:opacity-35 group-hover:scale-105 transition-all duration-500 z-0"
-                      unoptimized
+                      sizes="(max-width: 640px) 50vw, 240px"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-[#061a10] via-[#061a10]/70 to-transparent z-[1]" />
                     <div className="relative z-10 w-full space-y-0.5">
