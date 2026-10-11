@@ -46,6 +46,11 @@ const SEED: AcademyProgram[] = [
   {
     id: 'football_academy',
     name: 'Football Academy',
+    // The academy trains on the main turf, so this photograph is of the real
+    // place. The other four programmes have no photograph on purpose: nobody
+    // has confirmed which frames show chess, dance, boxing or yoga, and a
+    // caption the picture does not support is worse than no picture.
+    image_url: '/images/gallery/shot-04.webp',
     type: 'academy',
     schedule: 'Saturday 14:00–16:00',
     age_group: 'Ages 6 - 16',
