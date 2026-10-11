@@ -15,6 +15,13 @@ import {
 export const revalidate = 0; // Venue facts come from the backend on every request
 
 /**
+ * How many photographs the home page shows. All 35 made the page 7,900px tall
+ * on a desktop and nearly 30,000px on a phone, which is a scroll nobody
+ * finishes. These are portrait frames, so they stack tall quickly.
+ */
+const GALLERY_ON_HOME = 12;
+
+/**
  * Prices are venue facts, so they come from GET /v1/knowledge/facts and are
  * never hard-coded or recalculated here. If the backend cannot be reached we
  * say so and point at reception rather than printing a number we cannot stand
@@ -294,7 +301,7 @@ export default async function Home() {
           {/* Columns rather than a grid: portrait and landscape frames sit
               together without cropping either into the wrong shape. */}
           <div className="columns-2 md:columns-3 lg:columns-4 gap-3 [column-fill:_balance]">
-            {gallery.map((photo, i) => (
+            {gallery.slice(0, GALLERY_ON_HOME).map((photo, i) => (
               <figure
                 key={photo.src}
                 className="mb-3 break-inside-avoid overflow-hidden border border-white/10 bg-forest-light/20"
