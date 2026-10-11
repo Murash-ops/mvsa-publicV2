@@ -84,8 +84,23 @@ export const featured: GalleryPhoto[] = FEATURED
   .map(byName)
   .filter((p): p is GalleryPhoto => Boolean(p));
 
-/** The opening photograph: a game, not an empty pitch. */
-export const heroPhoto: GalleryPhoto = featured[0] ?? gallery[0];
+/**
+ * The opening photograph: a game, not an empty pitch.
+ *
+ * Every frame of the arena is portrait, taken on a phone held upright, so a
+ * hero has to be a band cut out of the middle of one. This is the only
+ * full-resolution frame whose subject survives that cut - a player driving
+ * with the ball, two others in shot. The pitch-level frame is the better
+ * photograph but it came through WhatsApp at 960px, and a 16:9 band off it
+ * is 540px tall, which is soft across a desktop.
+ *
+ * `objectPosition` holds the right band. A browser centring the crop itself
+ * would put the players' heads at the top edge.
+ */
+export const heroPhoto: GalleryPhoto & { objectPosition: string } = {
+  ...(gallery.find((p) => p.src.includes('shot-28.')) ?? gallery[0]),
+  objectPosition: '50% 34%',
+};
 
 /** The square mark, on white. Artwork, not a photograph. */
 export const brandMark: Photo = { src: "/images/brand/mark.webp", w: 1600, h: 1600 };

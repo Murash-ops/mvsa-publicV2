@@ -65,59 +65,51 @@ export default async function Home() {
   return (
     <main className="min-h-screen text-charcoal selection:bg-gold selection:text-forest-dark overflow-x-hidden">
       {/* ============================================
-          1. HERO - TEXT BESIDE THE PHOTOGRAPH
+          1. HERO - FULL BLEED, TEXT OVER THE PHOTOGRAPH
 
-          Every photograph of the arena is portrait: these were taken on a
-          phone held upright. Cropping one into a letterbox banner throws away
-          most of the frame and softens what is left, which is what the old
-          full-bleed background did. So the photograph keeps its own shape and
-          the headline sits beside it on a wide screen, above it on a narrow
-          one. One <Image>, no duplicate download per breakpoint.
+          The photograph is portrait, so this shows a band cut from its
+          middle, held in place by objectPosition. The scrim is a left-to-
+          right gradient rather than a flat wash, so the headline has
+          something solid behind it while the right of the frame stays
+          legible as a photograph.
           ============================================ */}
-      <section className="relative z-10 pt-28 pb-16 lg:pt-36 lg:pb-24 overflow-hidden">
-        <div className="max-w-7xl mx-auto px-6 lg:px-10 grid lg:grid-cols-12 gap-10 lg:gap-14 items-center">
-          <div className="lg:col-span-7 text-center lg:text-left space-y-8 animate-slide-up">
-          {/* Headline - Cinzel, large, white, sharp */}
-          <h1 className="font-display text-5xl sm:text-7xl lg:text-7xl xl:text-8xl font-black uppercase tracking-tight text-white leading-[0.95] text-balance">
-            {renderHeadline(heroHeadline)}
-          </h1>
-          
-          {/* Subheading - DM Sans, muted white, one line */}
-          <p className="font-sans text-sm sm:text-base md:text-lg text-white/75 max-w-xl mx-auto lg:mx-0 font-medium tracking-wide">
-            {heroSubheading}
-          </p>
-          
-          {/* Double CTAs - Stacked on Mobile, Side-by-Side on Desktop */}
-          <div className="pt-4 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start items-center">
-            <Link 
-              href="/book" 
-              className="relative h-16 w-64 bg-gold text-forest-dark hover:bg-gold-muted border border-gold font-display text-sm font-extrabold uppercase tracking-[0.2em] flex items-center justify-center rounded-none shadow-gold-sm transition-all duration-300 hover:scale-[1.03] active:scale-[0.97]"
-            >
-              Book Now
-            </Link>
-            <Link 
-              href="/programs" 
-              className="relative h-16 w-64 bg-transparent text-white hover:bg-gold/10 border border-gold font-display text-sm font-extrabold uppercase tracking-[0.2em] flex items-center justify-center rounded-none transition-all duration-300 hover:scale-[1.03] active:scale-[0.97]"
-            >
-              Explore Programs
-            </Link>
-          </div>
-          </div>
+      <section className="relative z-10 min-h-[78vh] lg:min-h-[86vh] flex items-end overflow-hidden">
+        <Image
+          src={heroPhoto.src}
+          alt="A player driving with the ball on the turf at Mountain View Sports Arena"
+          fill
+          priority
+          sizes="100vw"
+          style={{ objectPosition: heroPhoto.objectPosition }}
+          className="object-cover -z-10"
+        />
+        <div className="absolute inset-0 -z-10 bg-gradient-to-r from-[#061a10] via-[#061a10]/75 to-[#061a10]/25" />
+        <div className="absolute inset-x-0 bottom-0 h-40 -z-10 bg-gradient-to-t from-[#061a10] to-transparent" />
 
-          {/* The photograph, in its own proportions. object-contain would letterbox
-              it; a 4:5 frame crops a little from top and bottom and no more. */}
-          <div className="lg:col-span-5">
-            <figure className="relative aspect-[4/5] w-full max-w-md mx-auto lg:max-w-none overflow-hidden border border-white/10 bg-forest-light/20">
-              <Image
-                src={heroPhoto.src}
-                alt="A game under way on the turf at Mountain View Sports Arena"
-                fill
-                priority
-                sizes="(max-width: 1024px) 90vw, 40vw"
-                className="object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#061a10]/55 via-transparent to-transparent" />
-            </figure>
+        <div className="max-w-7xl mx-auto px-6 lg:px-10 w-full pb-16 lg:pb-24 pt-32">
+          <div className="max-w-2xl space-y-7 animate-slide-up">
+            <h1 className="font-display text-5xl sm:text-7xl xl:text-8xl font-black uppercase tracking-tight text-white leading-[0.92] text-balance">
+              {renderHeadline(heroHeadline)}
+            </h1>
+
+            <p className="font-sans text-sm sm:text-base md:text-lg text-white/80 max-w-lg font-medium tracking-wide">
+              {heroSubheading}
+            </p>
+
+            <div className="pt-2 flex flex-col sm:flex-row gap-4">
+              <Link
+                href="/book"
+                className="relative h-16 w-full sm:w-60 bg-gold text-forest-dark hover:bg-gold-muted border border-gold font-display text-sm font-extrabold uppercase tracking-[0.2em] flex items-center justify-center rounded-none shadow-gold-sm transition-all duration-300 hover:scale-[1.03] active:scale-[0.97]"
+              >
+                Book Now
+              </Link>
+              <Link
+                href="/programs"
+                className="relative h-16 w-full sm:w-60 bg-white/5 text-white hover:bg-gold/10 border border-white/25 hover:border-gold font-display text-sm font-extrabold uppercase tracking-[0.2em] flex items-center justify-center rounded-none transition-all duration-300 hover:scale-[1.03] active:scale-[0.97]"
+              >
+                Explore Programs
+              </Link>
+            </div>
           </div>
         </div>
       </section>
