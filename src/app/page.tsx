@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { getVenueFacts, isMvsaApiError, type PricingSummaryItem } from '@/lib/mvsa-api';
 import { getAcademyPrograms } from '@/lib/academy-programs';
 import { booking, contact, home, social } from '@/content/site';
-import { gallery, heroPhoto } from '@/content/photos';
+import { featured, heroPhoto } from '@/content/photos';
 import { 
   ArrowRight, 
   Lock, 
@@ -14,12 +14,9 @@ import {
 
 export const revalidate = 0; // Venue facts come from the backend on every request
 
-/**
- * How many photographs the home page shows. All 35 made the page 7,900px tall
- * on a desktop and nearly 30,000px on a phone, which is a scroll nobody
- * finishes. These are portrait frames, so they stack tall quickly.
- */
-const GALLERY_ON_HOME = 12;
+/* The home page shows the curated set from content/photos.ts - twelve frames,
+   chosen for variety. Showing all 35 made the page 7,900px tall on a desktop
+   and nearly 30,000px on a phone, and most of them were the same empty pitch. */
 
 /**
  * Prices are venue facts, so they come from GET /v1/knowledge/facts and are
@@ -113,7 +110,7 @@ export default async function Home() {
             <figure className="relative aspect-[4/5] w-full max-w-md mx-auto lg:max-w-none overflow-hidden border border-white/10 bg-forest-light/20">
               <Image
                 src={heroPhoto.src}
-                alt="The covered pitch at Mountain View Sports Arena"
+                alt="A game under way on the turf at Mountain View Sports Arena"
                 fill
                 priority
                 sizes="(max-width: 1024px) 90vw, 40vw"
@@ -301,14 +298,14 @@ export default async function Home() {
           {/* Columns rather than a grid: portrait and landscape frames sit
               together without cropping either into the wrong shape. */}
           <div className="columns-2 md:columns-3 lg:columns-4 gap-3 [column-fill:_balance]">
-            {gallery.slice(0, GALLERY_ON_HOME).map((photo, i) => (
+            {featured.map((photo, i) => (
               <figure
                 key={photo.src}
                 className="mb-3 break-inside-avoid overflow-hidden border border-white/10 bg-forest-light/20"
               >
                 <Image
                   src={photo.src}
-                  alt="Mountain View Sports Arena"
+                  alt="At Mountain View Sports Arena"
                   width={photo.w}
                   height={photo.h}
                   loading={i < 4 ? 'eager' : 'lazy'}
