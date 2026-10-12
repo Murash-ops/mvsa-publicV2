@@ -5,7 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Menu, X, CalendarDays } from 'lucide-react';
-import { catalogue } from '@/content/shop';
+import { shopIsListed } from '@/content/shop';
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -20,12 +20,12 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // The shop is listed only when the catalogue has something in it, so an
-  // empty shop can never be linked from the navigation by accident.
+  // The shop is listed only once its catalogue is real, so a draft or empty
+  // shop can never be linked from the navigation by accident.
   const navLinks = [
     { name: 'Home', href: '/' },
     { name: 'Programs', href: '/programs' },
-    ...(catalogue.length > 0 ? [{ name: 'Shop', href: '/shop' }] : []),
+    ...(shopIsListed ? [{ name: 'Shop', href: '/shop' }] : []),
     { name: 'About', href: '/about' },
     { name: 'Contact', href: '/contact' },
   ];

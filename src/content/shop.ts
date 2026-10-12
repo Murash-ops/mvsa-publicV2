@@ -7,9 +7,10 @@
  * payment capture, refunds and reconciliation, none of which exist, and a
  * page that takes money it cannot account for is worse than no shop.
  *
- * Nothing here is live until `catalogue` has entries. While it is empty the
- * shop link is hidden from the navigation and the page explains itself, so a
- * half-filled catalogue can never go out as if it were finished.
+ * While `draft` is true the list is a placeholder for review. The item names
+ * are the real ranges, but no price, size or photograph is published, because
+ * a price on a public page is a price the venue has to honour. The page is
+ * reachable at /shop and stays out of the navigation until the list is real.
  *
  * Prices are whole shillings, written the way the rest of the site writes
  * money: `KES 1,500`. Keep them in step with what reception charges - there
@@ -33,11 +34,44 @@ export type ShopItem = {
 };
 
 /**
- * Empty on purpose. Add real items with real prices; do not seed examples,
- * because an example product on a public page is a product the venue is
- * advertising.
+ * True until the real names, prices and photographs are in. It gates the
+ * navigation link and puts a notice on the page, so a half-filled catalogue
+ * can never go out as if it were finished.
  */
-export const catalogue: ShopItem[] = [];
+export const draft = true;
+
+/**
+ * The ranges the arena sells. Prices and sizes are deliberately absent while
+ * `draft` is true - every card asks the customer to check on WhatsApp, which
+ * is true today and will stay true for anything that varies.
+ */
+export const catalogue: ShopItem[] = [
+  {
+    id: 'club-tee',
+    name: 'Mountain View T-Shirt',
+    description: 'The arena tee, worn on and off the pitch.',
+  },
+  {
+    id: 'jersey',
+    name: 'Match Jersey',
+    description: 'Playing jersey in the club colours, for teams and for keeping.',
+  },
+  {
+    id: 'trainers',
+    name: 'Trainers',
+    description: 'Footwear for turf and for the gym floor.',
+  },
+  {
+    id: 'yoga-kit',
+    name: 'Yoga Equipment',
+    description: 'Mats, blocks and straps for the studio sessions.',
+  },
+  {
+    id: 'balls',
+    name: 'Balls',
+    description: 'Match and training balls, sized for the five-a-side pitch.',
+  },
+];
 
 export const shop = {
   title: 'Arena Shop',
@@ -49,7 +83,13 @@ export const shop = {
     'There is nothing listed yet. Ask at reception for kit and match essentials, or send us a message and we will tell you what is in.',
   /** Said once, near the ordering buttons, so nobody expects a checkout. */
   orderNote: 'Nothing is bought on this page. The button opens WhatsApp with your item filled in.',
+  /** Shown while `draft` is true, in place of the ordering note. */
+  draftNote:
+    'Draft. These are the ranges we stock - prices, sizes and photographs are still being confirmed, so ask on WhatsApp for what is in today.',
 } as const;
+
+/** The navigation lists the shop only once the real list is in. */
+export const shopIsListed = !draft && catalogue.length > 0;
 
 export function formatKes(amount: number): string {
   return `KES ${amount.toLocaleString('en-KE')}`;

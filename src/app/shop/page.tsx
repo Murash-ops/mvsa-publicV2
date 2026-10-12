@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import type { Metadata } from 'next';
 import { contact } from '@/content/site';
-import { catalogue, formatKes, orderUrl, shop } from '@/content/shop';
+import { catalogue, draft, formatKes, orderUrl, shop } from '@/content/shop';
 
 export const metadata: Metadata = {
   title: 'Shop | Mountain View Sports Arena',
@@ -42,7 +42,15 @@ export default function ShopPage() {
           </section>
         ) : (
           <>
-            <p className="mt-10 font-mono text-[11px] uppercase tracking-widest text-gold/80">
+            {draft ? (
+              /* A draft list says so in plain words, above the grid, so nothing
+                 on the page can be mistaken for a published price. */
+              <p className="mt-10 border-l-2 border-gold/60 pl-4 font-sans text-sm text-white/70 leading-relaxed max-w-2xl">
+                {shop.draftNote}
+              </p>
+            ) : null}
+
+            <p className="mt-8 font-mono text-[11px] uppercase tracking-widest text-gold/80">
               {shop.orderNote}
             </p>
 
@@ -109,6 +117,24 @@ export default function ShopPage() {
                 {contact.whatsappDisplay}.
               </p>
             ) : null}
+
+            {/* The grid is short, so the page closes on the one thing a
+                customer does next: ask a person. */}
+            <section className="mt-16 border-t border-white/10 pt-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
+              <p className="font-sans text-sm text-white/60 leading-relaxed max-w-md">
+                Not sure of your size, or after something that is not listed? Ask reception on{' '}
+                <span className="text-white/80">{contact.whatsappDisplay}</span> and we will tell
+                you what is in.
+              </p>
+              <a
+                href={`https://wa.me/${contact.whatsappNumber}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="h-14 w-full sm:w-64 shrink-0 bg-gold text-forest-dark hover:bg-gold-muted border border-gold font-display text-xs font-extrabold uppercase tracking-[0.2em] flex items-center justify-center transition-colors"
+              >
+                Message reception
+              </a>
+            </section>
           </>
         )}
       </div>
