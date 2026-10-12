@@ -56,25 +56,29 @@ export const gallery: GalleryPhoto[] = [
 /**
  * The photographs worth showing, in the order they should appear.
  *
- * Most of the shoot is the same empty pitch from slightly different angles.
- * A gallery of those reads as one picture printed twelve times, so this list
- * is hand-picked for variety: a game first, then training, then the chess
- * table, then the building and the turf itself. People before architecture,
- * because an empty pitch sells nothing.
+ * No child appears on this website. Every frame of the shoot with a player in
+ * it is a child at an academy session, and a parent has not agreed to their
+ * face being on a public page, so those frames are out - all of them, not the
+ * closest-cropped ones. That rules out the liveliest pictures and leaves the
+ * building, so this list works for variety instead: wide, then close, then
+ * detail, so it does not read as one picture printed twelve times.
+ *
+ * If consent is gathered later, the excluded frames are shot-24 to shot-28,
+ * shot-30, shot-31 and shot-34, and they are better pictures than these.
  */
 const FEATURED = [
-  'shot-28', // a game in progress, red against black
-  'shot-26', // two players in the green training kit
-  'shot-24', // the chess table
-  'shot-34', // a young keeper in the goalmouth
   'shot-03', // the pitch end to end, goals in frame
-  'shot-27', // three players, one in keeper's kit
-  'shot-08', // the turf itself, close
-  'shot-30', // two players mid-session
   'shot-02', // the stand and the bench, sky behind
-  'shot-31', // a player with the ball at the corner
+  'shot-16', // the turf at pitch level, the white line running out
   'shot-13', // the pitch from the far line
-  'shot-25', // a child with a ball
+  'shot-08', // the turf itself, close
+  'shot-07', // the benches and the cage, tree line behind
+  'shot-18', // the line and the turf, close
+  'shot-12', // the far side, open to the sky
+  'shot-22', // the goalmouth and the centre circle
+  'shot-04', // the length of the pitch, floodlights above
+  'shot-29', // the goals from the corner
+  'shot-21', // the bench under the cage, daylight
 ] as const;
 
 const byName = (name: string) => gallery.find((p) => p.src.includes(name + '.'));
@@ -85,21 +89,19 @@ export const featured: GalleryPhoto[] = FEATURED
   .filter((p): p is GalleryPhoto => Boolean(p));
 
 /**
- * The opening photograph: a game, not an empty pitch.
+ * The opening photograph: the pitch, goals in frame.
  *
  * Every frame of the arena is portrait, taken on a phone held upright, so a
- * hero has to be a band cut out of the middle of one. This is the only
- * full-resolution frame whose subject survives that cut - a player driving
- * with the ball, two others in shot. The pitch-level frame is the better
- * photograph but it came through WhatsApp at 960px, and a 16:9 band off it
- * is 540px tall, which is soft across a desktop.
+ * hero has to be a band cut out of the middle of one. This is a
+ * full-resolution frame whose lower band holds the goals, the centre circle
+ * and the length of the turf, which is what the band ends up showing.
  *
- * `objectPosition` holds the right band. A browser centring the crop itself
- * would put the players' heads at the top edge.
+ * `objectPosition` holds that band. A browser centring the crop itself would
+ * show the roof and the back wall instead.
  */
 export const heroPhoto: GalleryPhoto & { objectPosition: string } = {
-  ...(gallery.find((p) => p.src.includes('shot-28.')) ?? gallery[0]),
-  objectPosition: '50% 34%',
+  ...(gallery.find((p) => p.src.includes('shot-03.')) ?? gallery[0]),
+  objectPosition: '50% 68%',
 };
 
 /** The square mark, on white. Artwork, not a photograph. */

@@ -76,7 +76,7 @@ export default async function Home() {
       <section className="relative z-10 min-h-[78vh] lg:min-h-[86vh] flex items-end overflow-hidden">
         <Image
           src={heroPhoto.src}
-          alt="A player driving with the ball on the turf at Mountain View Sports Arena"
+          alt="The pitch at Mountain View Sports Arena, goals and centre circle in frame"
           fill
           priority
           sizes="100vw"
