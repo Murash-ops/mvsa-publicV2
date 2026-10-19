@@ -9,9 +9,10 @@
  * must never reach the browser.
  *
  * Three honesty rules are load-bearing here:
- *  - If the backend cannot be reached we say exactly that and offer the phone
- *    and WhatsApp route. We never render an empty slot list, which would read
- *    as "fully booked".
+ *  - If the backend cannot be reached the page shows one calm block instead:
+ *    book on WhatsApp or by phone, with the kick-off picker, and a line that
+ *    online booking is coming. Never a dead date picker, and never an empty
+ *    slot list, which would read as "fully booked".
  *  - A 409 means the interval went while the customer was deciding, or their
  *    15-minute hold lapsed. We say so and re-fetch availability.
  *  - When booking writes are switched off, the WhatsApp handover says in plain
@@ -26,17 +27,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { format, addDays, isSameDay } from 'date-fns';
 import Image from 'next/image';
 import Link from 'next/link';
-import {
-  Calendar,
-  Clock,
-  MapPin,
-  User,
-  Phone,
-  Users,
-  CheckCircle2,
-  AlertTriangle,
-  MessageSquare,
-} from 'lucide-react';
+import { AskForKickoff, KickoffChips, KickoffProvider } from '@/components/arena/Kickoff';
+import { booking as bookingCopy } from '@/content/site';
 import type { VenuePresentation } from '@/content/venues';
 import type {
   AvailabilityResponseBody,
@@ -66,6 +58,12 @@ interface BookingWidgetProps {
   whatsappNumber: string;
   bookingsPhone: string;
   bookingsPhoneHref: string;
+  /**
+   * True when the server could not reach the backend while rendering. The
+   * calm block shows straight away, and the widget only appears if a quiet
+   * check for live times succeeds.
+   */
+  initiallyOffline?: boolean;
 }
 
 function localTime(value: string): string {
@@ -94,6 +92,7 @@ export default function BookingWidget({
   whatsappNumber,
   bookingsPhone,
   bookingsPhoneHref,
+  initiallyOffline = false,
 }: BookingWidgetProps) {
   const [venue, setVenue] = useState<VenuePresentation>(venues[0]);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
@@ -103,6 +102,7 @@ export default function BookingWidget({
   const [timezone, setTimezone] = useState<string>('Africa/Nairobi');
   const [isLoadingSlots, setIsLoadingSlots] = useState(true);
   const [slotsFailure, setSlotsFailure] = useState<Failure | null>(null);
+  const [hasLoaded, setHasLoaded] = useState(false);
   const [selectedSlot, setSelectedSlot] = useState<AvailabilitySlot | null>(null);
 
   const [clientName, setClientName] = useState('');
@@ -153,6 +153,7 @@ export default function BookingWidget({
       const body = (await response.json()) as AvailabilityResponseBody;
       setSlots(body.slots);
       setTimezone(body.timezone);
+      setHasLoaded(true);
     } catch {
       if (requestId !== requestRef.current) return;
       setSlots([]);
@@ -219,7 +220,7 @@ export default function BookingWidget({
     const priceLabel = selectedSlot ? ` (${selectedSlot.price.display})` : '';
     const hours = durationMinutes / 60;
     const message =
-      `Hi MVSA 👋 I'd like to book the ${venue.displayName} on ${dayLabel}, ${timeLabel}` +
+      `Hi MVSA, I would like to book ${venue.requestName} on ${dayLabel}, ${timeLabel}` +
       `${priceLabel} for ${hours} ${hours === 1 ? 'hour' : 'hours'}, ${partySize} people.` +
       `${clientName.trim() ? ` My name is ${clientName.trim()}.` : ''}` +
       `${clientPhone.trim() ? ` My number is ${clientPhone.trim()}.` : ''}`;
@@ -231,7 +232,7 @@ export default function BookingWidget({
     partySize,
     selectedDate,
     selectedSlot,
-    venue.displayName,
+    venue.requestName,
     whatsappNumber,
   ]);
 
@@ -364,257 +365,225 @@ export default function BookingWidget({
   };
 
   const contactRoute = (
-    <div className="flex flex-col sm:flex-row gap-3 pt-2">
+    <div className="flex flex-col gap-3 sm:flex-row">
       <a
         href={whatsappUrl}
         target="_blank"
         rel="noopener noreferrer"
-        className="flex-1 inline-flex items-center justify-center gap-2 px-6 py-4 bg-gold hover:bg-gold-muted text-forest-dark border border-gold font-display text-xs font-extrabold uppercase tracking-widest transition-all"
+        className="btn btn-gold btn-sm flex-1"
         data-testid="whatsapp-route"
       >
-        <MessageSquare className="w-4 h-4" /> Message reception on WhatsApp
+        Message reception on WhatsApp
       </a>
-      <a
-        href={bookingsPhoneHref}
-        className="flex-1 inline-flex items-center justify-center gap-2 px-6 py-4 bg-transparent hover:bg-white/5 text-white border border-white/20 font-display text-xs font-extrabold uppercase tracking-widest transition-all"
-        data-testid="phone-route"
-      >
-        <Phone className="w-4 h-4" /> Call {bookingsPhone}
+      <a href={bookingsPhoneHref} className="btn btn-ghost btn-sm flex-1" data-testid="phone-route">
+        Call {bookingsPhone}
       </a>
     </div>
   );
+
+  /* ------------------------------ calm block ------------------------------ */
+
+  // One calm block while live times are not available: today that is always.
+  const showOffline = slotsFailure !== null || (initiallyOffline && !hasLoaded);
+
+  if (showOffline && !hold && !booking) {
+    return (
+      <KickoffProvider>
+        <section
+          className="flex flex-col gap-6 border border-t-4 border-white/10 border-t-gold bg-surface p-[clamp(20px,4vw,44px)]"
+          data-testid="booking-offline"
+          aria-labelledby="booking-offline-title"
+        >
+          <h2 id="booking-offline-title" className="display m-0 text-[clamp(44px,6vw,72px)] leading-[0.9]">
+            {bookingCopy.offline.title}
+          </h2>
+          <p className="m-0 max-w-[620px] text-lg leading-[1.55] text-fog">{bookingCopy.offline.body}</p>
+          <KickoffChips />
+          <div className="flex flex-wrap gap-3">
+            <AskForKickoff />
+            <a href={bookingsPhoneHref} className="btn btn-ghost" data-testid="phone-route">
+              Call {bookingsPhone}
+            </a>
+          </div>
+          <div className="flex flex-wrap items-center justify-between gap-3 border-t border-white/10 pt-5">
+            <p className="m-0 text-base text-mute">{bookingCopy.offline.coming}</p>
+            <button
+              type="button"
+              onClick={() => void loadSlots()}
+              disabled={isLoadingSlots}
+              className="text-link text-[15px] disabled:opacity-60"
+              data-testid="retry-availability"
+            >
+              {isLoadingSlots ? 'Checking…' : bookingCopy.offline.retry}
+            </button>
+          </div>
+        </section>
+      </KickoffProvider>
+    );
+  }
 
   /* --------------------------- confirmed booking -------------------------- */
 
   if (booking) {
     return (
       <div
-        className="max-w-xl mx-auto text-center py-16 animate-entrance space-y-10"
+        className="mx-auto flex max-w-xl flex-col items-center gap-6 border border-t-4 border-white/10 border-t-grass bg-surface px-6 py-12 text-center"
         data-testid="booking-confirmed"
       >
-        <div className="w-20 h-20 bg-emerald-500/10 text-emerald-600 rounded-none border border-emerald-500/20 flex items-center justify-center mx-auto">
-          <CheckCircle2 className="w-10 h-10" />
-        </div>
-
-        <div className="space-y-4">
-          <h2 className="text-4xl text-white tracking-tighter uppercase leading-none font-display font-bold">
-            Your slot is booked
-          </h2>
-          <p className="text-charcoal-light text-base max-w-md mx-auto leading-relaxed font-medium">
-            {booking.resource_name}, {localTime(booking.start_local)}–
-            {localTime(booking.end_local)} on{' '}
-            {format(new Date(booking.start_local), 'EEEE d MMM yyyy')}.
-          </p>
-          <p className="font-mono text-gold text-lg font-bold">Reference {booking.reference}</p>
-          <p className="text-charcoal-light text-sm max-w-md mx-auto leading-relaxed font-medium">
-            {booking.amount_due_display} is due at reception. Keep the reference — reception can
-            find your booking with it.
-          </p>
-        </div>
-
-        <div className="pt-4 flex justify-center">
-          <Link
-            href="/"
-            className="px-10 py-5 bg-gold hover:bg-gold-muted text-forest-dark font-display text-xs font-bold uppercase tracking-widest rounded-none shadow-gold-sm transition-all border border-gold"
-          >
-            Back to Home
-          </Link>
-        </div>
+        <h2 className="display m-0 text-6xl leading-[0.9]">
+          Your slot is <span className="text-gold">booked</span>
+        </h2>
+        <p className="m-0 text-lg text-fog">
+          {booking.resource_name}, {localTime(booking.start_local)}–{localTime(booking.end_local)} on{' '}
+          {format(new Date(booking.start_local), 'EEEE d MMM yyyy')}.
+        </p>
+        <p className="display m-0 text-4xl text-gold">Reference {booking.reference}</p>
+        <p className="m-0 text-base text-fog">
+          {booking.amount_due_display} is due at reception. Keep the reference — reception can find your booking with it.
+        </p>
+        <Link href="/" className="btn btn-gold">
+          Back to the home page
+        </Link>
       </div>
     );
   }
 
   /* ------------------------------- main form ------------------------------ */
 
+  const stepTitle = 'display m-0 text-[clamp(36px,4vw,48px)] leading-[0.9]';
+  const fieldLabel = 'label mb-2 block text-[15px] text-white';
+  const option = (selected: boolean) =>
+    `border-2 transition-colors ${selected ? 'border-gold bg-gold text-ink' : 'border-white/20 bg-transparent text-white hover:border-gold'}`;
+
   return (
     <div className="w-full">
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start pb-24">
-        <div className="lg:col-span-2 space-y-10">
-          {/* SECTION A: VENUE */}
-          <section className="space-y-6 text-left">
-            <div className="space-y-2 border-b border-white/5 pb-4">
-              <h2 className="text-xl font-bold font-display text-white uppercase tracking-wide flex items-center gap-2">
-                <MapPin className="w-5 h-5 text-gold" /> SELECT YOUR VENUE
-              </h2>
-              <p className="text-xs text-charcoal-light font-medium">
-                Choose between our premium Floodlit Turf Pitch or Strategist Meeting Room.
-              </p>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4" data-testid="venue-grid">
-              {venues.map((option) => {
-                const isSelected = venue.resourceId === option.resourceId;
+      <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-3">
+        <div className="flex flex-col gap-12 lg:col-span-2">
+          {/* VENUE */}
+          <section className="flex flex-col gap-5">
+            <h2 className={stepTitle}>
+              <span className="text-gold">1.</span> What are you booking?
+            </h2>
+            <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2" data-testid="venue-grid">
+              {venues.map((choice) => {
+                const isSelected = venue.resourceId === choice.resourceId;
                 return (
                   <button
-                    key={option.resourceId}
+                    key={choice.resourceId}
+                    type="button"
                     onClick={() => {
                       clearSelection();
-                      setVenue(option);
-                      setPartySize(option.kind === 'turf' ? 10 : 6);
+                      setVenue(choice);
+                      setPartySize(choice.kind === 'turf' ? 10 : 6);
                     }}
-                    className={`relative overflow-hidden h-28 rounded-none border text-left p-4 transition-all duration-300 flex flex-col justify-end group cursor-pointer ${
-                      isSelected
-                        ? 'border-gold ring-1 ring-gold shadow-gold-sm'
-                        : 'border-white/10 hover:border-gold/40'
+                    aria-pressed={isSelected}
+                    className={`group relative flex h-36 flex-col justify-end overflow-hidden border-2 p-5 text-left ${
+                      isSelected ? 'border-gold' : 'border-white/10 hover:border-gold/60'
                     }`}
-                    aria-label={`Select ${option.displayName}`}
+                    aria-label={`Select ${choice.displayName}`}
                   >
                     <Image
-                      src={option.imageUrl}
-                      alt={option.displayName}
+                      src={choice.imageUrl}
+                      alt=""
                       fill
-                      className="object-cover absolute inset-0 opacity-15 group-hover:opacity-35 group-hover:scale-105 transition-all duration-500 z-0"
-                      sizes="(max-width: 640px) 50vw, 240px"
+                      className="object-cover opacity-30"
+                      sizes="(max-width: 640px) 100vw, 400px"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#061a10] via-[#061a10]/70 to-transparent z-[1]" />
-                    <div className="relative z-10 w-full space-y-0.5">
-                      <span className="text-[7px] font-mono font-bold uppercase tracking-wider text-gold bg-gold/10 px-1.5 py-0.5 border border-gold/20 inline-block mb-1">
-                        {option.badge}
-                      </span>
-                      <h3 className="font-bold font-display text-sm sm:text-base text-white uppercase tracking-tight leading-tight">
-                        {option.displayName}
-                      </h3>
-                      <p className="text-[10px] font-mono text-white/60 font-medium tracking-wide">
-                        {option.blurb}
-                      </p>
-                    </div>
+                    <div className="absolute inset-0 bg-[linear-gradient(to_top,#070A07,rgba(7,10,7,0.4))]" />
+                    <span className="relative label text-sm text-gold">{choice.badge}</span>
+                    <span className="relative display text-4xl leading-none text-white">{choice.displayName}</span>
+                    <span className="relative text-sm text-fog">{choice.blurb}</span>
                   </button>
                 );
               })}
             </div>
           </section>
 
-          {/* SECTION B: DATE, LENGTH AND SLOT */}
-          <section className="space-y-6 text-left">
-            <div className="space-y-2 border-b border-white/5 pb-4">
-              <h2 className="text-xl font-bold font-display text-white uppercase tracking-wide flex items-center gap-2">
-                <Calendar className="w-5 h-5 text-gold" /> PICK YOUR DATE & SLOT
-              </h2>
-              <p className="text-xs text-charcoal-light font-medium">
-                Choose a day, how long you want to play, then a start time. The arena publishes the
-                start times it can offer, and each turf booking includes its handover afterwards.
-              </p>
-            </div>
+          {/* DATE, LENGTH AND SLOT */}
+          <section className="flex flex-col gap-6">
+            <h2 className={stepTitle}>
+              <span className="text-gold">2.</span> Pick a day and a time
+            </h2>
 
-            <div className="space-y-3">
-              <label className="text-[10px] font-mono font-bold uppercase tracking-wider text-white/40">
-                Next 14 days
-              </label>
+            <div>
+              <span className={fieldLabel} id="date-label">Next 14 days</span>
               <div
-                className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide shrink-0"
+                className="scrollbar-hide flex gap-2.5 overflow-x-auto pb-2"
                 data-testid="date-strip"
+                role="group"
+                aria-labelledby="date-label"
               >
                 {next14Days.map((date) => {
                   const isSelected = isSameDay(date, selectedDate);
                   return (
                     <button
                       key={date.toISOString()}
+                      type="button"
                       onClick={() => {
                         clearSelection();
                         setSelectedDate(date);
                       }}
-                      className={`flex flex-col items-center justify-center min-w-[76px] p-4 rounded-none border transition-all duration-300 cursor-pointer ${
-                        isSelected
-                          ? 'border-gold bg-gold text-forest-dark shadow-gold-sm font-bold scale-[1.02]'
-                          : 'border-white/10 bg-white/5 text-white hover:border-gold/30'
-                      }`}
+                      aria-pressed={isSelected}
+                      className={`flex min-w-[76px] flex-col items-center justify-center px-3 py-3 ${option(isSelected)}`}
                       aria-label={`Select date ${format(date, 'EEEE, MMMM d')}`}
                     >
-                      <span className="text-[9px] uppercase font-mono tracking-widest text-white/50">
-                        {format(date, 'EEE')}
-                      </span>
-                      <span className="text-xl font-bold font-mono my-1">{format(date, 'd')}</span>
-                      <span className="text-[9px] uppercase font-mono tracking-widest text-white/50">
-                        {format(date, 'MMM')}
-                      </span>
+                      <span className="label text-xs">{format(date, 'EEE')}</span>
+                      <span className="display text-3xl leading-none">{format(date, 'd')}</span>
+                      <span className="label text-xs">{format(date, 'MMM')}</span>
                     </button>
                   );
                 })}
               </div>
             </div>
 
-            <div className="space-y-3">
-              <label className="text-[10px] font-mono font-bold uppercase tracking-wider text-white/40">
-                How long?
-              </label>
-              <div className="flex flex-wrap gap-2" data-testid="duration-options">
-                {DURATION_OPTIONS.map((option) => (
+            <div>
+              <span className={fieldLabel} id="duration-label">How long?</span>
+              <div className="flex flex-wrap gap-2.5" data-testid="duration-options" role="group" aria-labelledby="duration-label">
+                {DURATION_OPTIONS.map((choice) => (
                   <button
-                    key={option.minutes}
+                    key={choice.minutes}
+                    type="button"
                     onClick={() => {
                       clearSelection();
-                      setDurationMinutes(option.minutes);
+                      setDurationMinutes(choice.minutes);
                     }}
-                    className={`px-4 py-2.5 border text-xs font-mono font-bold uppercase tracking-wider transition-all cursor-pointer ${
-                      durationMinutes === option.minutes
-                        ? 'border-gold bg-gold text-forest-dark'
-                        : 'border-white/10 bg-white/5 text-white hover:border-gold/30'
-                    }`}
+                    aria-pressed={durationMinutes === choice.minutes}
+                    className={`label min-h-12 px-4 text-base ${option(durationMinutes === choice.minutes)}`}
                   >
-                    {option.label}
+                    {choice.label}
                   </button>
                 ))}
               </div>
             </div>
 
-            <div className="space-y-4 pt-2">
-              <label className="text-[10px] font-mono font-bold uppercase tracking-wider text-white/40">
-                Start times ({timezone})
-              </label>
+            <div>
+              <span className={fieldLabel}>Start times ({timezone})</span>
 
               {isLoadingSlots ? (
                 <div
-                  className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 animate-pulse"
+                  className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5"
                   data-testid="slot-grid-skeleton"
+                  aria-busy="true"
                 >
                   {[1, 2, 3, 4, 5].map((i) => (
-                    <div key={i} className="bg-white/5 h-16 rounded-none border border-white/5" />
+                    <div key={i} className="h-20 border border-white/10 bg-white/[0.04]" />
                   ))}
                 </div>
-              ) : slotsFailure ? (
-                <div
-                  className="p-8 bg-amber-500/5 border border-amber-500/30 rounded-none space-y-3"
-                  data-testid="backend-unreachable"
-                >
-                  <p className="flex items-center gap-2 text-amber-300 text-xs font-bold uppercase tracking-widest">
-                    <AlertTriangle className="w-4 h-4" /> Live availability unavailable
-                  </p>
-                  <p className="text-sm text-charcoal-light font-medium leading-relaxed">
-                    {slotsFailure.message} This does not mean the arena is full — we simply cannot
-                    see the diary from here. Reception can check and confirm your slot.
-                  </p>
-                  <div className="flex gap-3">
-                    <button
-                      onClick={() => void loadSlots()}
-                      className="px-5 py-3 border border-white/20 text-white text-[10px] font-display font-bold uppercase tracking-widest hover:bg-white/5 transition-all"
-                      data-testid="retry-availability"
-                    >
-                      Try again
-                    </button>
-                  </div>
-                  {contactRoute}
-                </div>
               ) : slots.length === 0 ? (
-                <div
-                  className="p-12 text-center bg-card border border-dashed border-white/10 rounded-none space-y-2"
-                  data-testid="slots-empty"
-                >
-                  <Clock className="w-10 h-10 mx-auto mb-3 text-white/20" />
-                  <p className="text-xs text-charcoal-light font-medium">
-                    Nothing of that length is left on this date. Try a shorter booking or another
-                    day, or call reception on {bookingsPhone}.
+                <div className="border border-dashed border-white/15 bg-surface p-8 text-center" data-testid="slots-empty">
+                  <p className="m-0 text-base text-fog">
+                    Nothing of that length is left on this date. Try a shorter booking or another day, or call reception
+                    on {bookingsPhone}.
                   </p>
                 </div>
               ) : (
-                <div
-                  className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3"
-                  data-testid="slot-grid"
-                >
+                <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5" data-testid="slot-grid">
                   {slots.map((slot) => {
                     const isSelected = selectedSlot?.slot_id === slot.slot_id;
                     return (
                       <button
                         key={slot.slot_id}
+                        type="button"
                         disabled={!slot.bookable}
                         onClick={() => {
                           setSelectedSlot(slot);
@@ -622,34 +591,21 @@ export default function BookingWidget({
                           setHandoverNotice('');
                         }}
                         title={slot.unbookable_reason ?? undefined}
-                        className={`relative p-4 rounded-none border text-center transition-all duration-300 flex flex-col items-center justify-center ${
+                        aria-pressed={isSelected}
+                        className={`relative flex min-h-20 flex-col items-center justify-center px-2 py-3 text-center ${
                           !slot.bookable
-                            ? 'bg-white/5 border-white/5 opacity-25 cursor-not-allowed text-white/30'
-                            : isSelected
-                              ? 'border-gold bg-gold text-forest-dark font-bold scale-[1.02] shadow-gold-sm cursor-pointer'
-                              : 'bg-white/5 border-white/10 text-white hover:border-gold/30 hover:bg-gold/10 cursor-pointer'
+                            ? 'cursor-not-allowed border-2 border-white/5 bg-white/[0.03] text-white/35'
+                            : option(isSelected)
                         }`}
                         aria-label={`Start at ${localTime(slot.local.start_local)} — ${slot.price.display}`}
                       >
-                        <span className="block font-mono font-bold text-sm">
-                          {localTime(slot.local.start_local)}
-                        </span>
-                        <span
-                          className={`text-[9px] font-mono mt-1 ${isSelected ? 'text-forest-dark' : 'text-white/60'}`}
-                        >
-                          {slot.price.display}
-                        </span>
+                        <span className="display text-3xl leading-none">{localTime(slot.local.start_local)}</span>
+                        <span className="label mt-1 text-xs">{slot.price.display}</span>
                         {slot.handover_minutes > 0 && (
-                          <span
-                            className={`text-[7px] font-mono uppercase mt-0.5 ${isSelected ? 'text-forest-dark/70' : 'text-white/35'}`}
-                          >
-                            +{slot.handover_minutes}m handover
-                          </span>
+                          <span className="mt-0.5 text-[11px] opacity-70">+{slot.handover_minutes}m handover</span>
                         )}
                         {!slot.bookable && (
-                          <span className="absolute top-1 right-1 text-[6px] font-black uppercase bg-error text-white px-1">
-                            Taken
-                          </span>
+                          <span className="label absolute top-1 right-1 bg-white/10 px-1 text-[10px] text-fog">Taken</span>
                         )}
                       </button>
                     );
@@ -661,195 +617,154 @@ export default function BookingWidget({
         </div>
 
         {/* SUMMARY PANEL */}
-        <div className="lg:col-span-1 lg:sticky lg:top-32 space-y-6 text-left">
-          <div className="bg-card border border-white/10 p-8 rounded-none relative overflow-hidden shadow-sm space-y-6">
-            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-gold/50 via-gold/10 to-gold/50" />
+        <div className="lg:sticky lg:top-28 lg:col-span-1">
+          <div className="flex flex-col gap-6 border border-t-4 border-white/10 border-t-gold bg-surface p-7">
+            <h3 className="display m-0 text-4xl leading-none">Your booking</h3>
 
-            <h3 className="font-display font-bold text-lg text-white border-b border-white/5 pb-2 uppercase tracking-wide">
-              Booking Summary
-            </h3>
-
-            <div className="space-y-4">
-              <div className="flex justify-between text-sm">
-                <span className="text-charcoal-light font-medium">Venue:</span>
-                <span className="font-bold text-white uppercase text-right max-w-[60%]">
-                  {venue.displayName}
-                </span>
+            <dl className="m-0 flex flex-col gap-3 text-base">
+              <div className="flex justify-between gap-4">
+                <dt className="text-mute">Booking</dt>
+                <dd className="m-0 text-right font-semibold text-white">{venue.displayName}</dd>
               </div>
-              <div className="flex justify-between text-sm border-t border-white/5 pt-3">
-                <span className="text-charcoal-light font-medium">Date:</span>
-                <span className="font-bold text-white">
-                  {format(selectedDate, 'EEEE, MMM do, yyyy')}
-                </span>
+              <div className="flex justify-between gap-4 border-t border-white/10 pt-3">
+                <dt className="text-mute">Date</dt>
+                <dd className="m-0 text-right font-semibold text-white">{format(selectedDate, 'EEE d MMM yyyy')}</dd>
               </div>
-              <div className="flex justify-between text-sm border-t border-white/5 pt-3">
-                <span className="text-charcoal-light font-medium">Paid play:</span>
-                <span className="font-bold text-white font-mono text-right max-w-[60%]">
+              <div className="flex justify-between gap-4 border-t border-white/10 pt-3">
+                <dt className="text-mute">Play</dt>
+                <dd className="m-0 text-right font-semibold text-white">
                   {selectedSlot
                     ? `${localTime(selectedSlot.local.start_local)}–${localTime(selectedSlot.local.end_local)}`
                     : 'No slot selected'}
-                </span>
+                </dd>
               </div>
               {selectedSlot && selectedSlot.handover_minutes > 0 && (
-                <div className="flex justify-between text-sm border-t border-white/5 pt-3">
-                  <span className="text-charcoal-light font-medium">Handover until:</span>
-                  <span className="font-bold text-white/70 font-mono">
-                    {localTime(selectedSlot.local.handover_ends_local)}
-                  </span>
+                <div className="flex justify-between gap-4 border-t border-white/10 pt-3">
+                  <dt className="text-mute">Handover until</dt>
+                  <dd className="m-0 text-right text-fog">{localTime(selectedSlot.local.handover_ends_local)}</dd>
                 </div>
               )}
-              <div className="flex justify-between items-center border-t-2 border-white/10 pt-4 mt-2">
-                <span className="text-sm font-bold text-white uppercase tracking-wider">Price:</span>
-                <span className="font-mono font-black text-2xl text-gold" data-testid="price-total">
+              <div className="flex items-center justify-between gap-4 border-t-2 border-white/15 pt-4">
+                <dt className="label text-white">Price</dt>
+                <dd className="display m-0 text-4xl leading-none text-gold" data-testid="price-total">
                   {selectedSlot ? selectedSlot.price.display : '—'}
-                </span>
+                </dd>
               </div>
-            </div>
+            </dl>
 
-            {/* Customer details */}
-            <div className="space-y-4 pt-4 border-t border-white/10">
-              <h4 className="text-xs font-bold text-white uppercase tracking-wider">
-                Enter Your Details
-              </h4>
-
-              <div className="space-y-3">
-                <div className="space-y-1.5">
-                  <label className="block text-[10px] font-bold text-white/60 uppercase tracking-wider">
-                    Full Name
-                  </label>
-                  <div className="relative">
-                    <User className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-white/40" />
-                    <input
-                      type="text"
-                      required
-                      value={clientName}
-                      onChange={(e) => setClientName(e.target.value)}
-                      placeholder="e.g. Wyclife Osengo"
-                      className="w-full pl-9 pr-3 py-2.5 border border-white/10 bg-white/5 text-white placeholder-white/30 focus:outline-none focus:border-gold transition-all text-xs font-medium rounded-none"
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="block text-[10px] font-bold text-white/60 uppercase tracking-wider">
-                    Phone Number
-                  </label>
-                  <div className="relative">
-                    <Phone className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-white/40" />
-                    <input
-                      type="tel"
-                      required
-                      value={clientPhone}
-                      onChange={(e) => setClientPhone(e.target.value)}
-                      placeholder="e.g. 0798258950"
-                      className="w-full pl-9 pr-3 py-2.5 border border-white/10 bg-white/5 text-white placeholder-white/30 font-mono focus:outline-none focus:border-gold transition-all text-xs rounded-none"
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="block text-[10px] font-bold text-white/60 uppercase tracking-wider">
-                    How many people?
-                  </label>
-                  <div className="relative">
-                    <Users className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-white/40" />
-                    <input
-                      type="number"
-                      min={1}
-                      max={500}
-                      value={partySize}
-                      onChange={(e) => setPartySize(Number.parseInt(e.target.value, 10) || 0)}
-                      className="w-full pl-9 pr-3 py-2.5 border border-white/10 bg-white/5 text-white font-mono focus:outline-none focus:border-gold transition-all text-xs rounded-none"
-                    />
-                  </div>
-                </div>
+            <div className="flex flex-col gap-4 border-t border-white/10 pt-5">
+              <div>
+                <label htmlFor="booking-name" className={fieldLabel}>Full name</label>
+                <input
+                  id="booking-name"
+                  type="text"
+                  required
+                  autoComplete="name"
+                  value={clientName}
+                  onChange={(e) => setClientName(e.target.value)}
+                  placeholder="e.g. Wyclife Osengo"
+                  className="field"
+                />
+              </div>
+              <div>
+                <label htmlFor="booking-phone" className={fieldLabel}>Phone number</label>
+                <input
+                  id="booking-phone"
+                  type="tel"
+                  required
+                  autoComplete="tel"
+                  value={clientPhone}
+                  onChange={(e) => setClientPhone(e.target.value)}
+                  placeholder="e.g. 0798258950"
+                  className="field"
+                />
+              </div>
+              <div>
+                <label htmlFor="booking-party" className={fieldLabel}>How many people?</label>
+                <input
+                  id="booking-party"
+                  type="number"
+                  min={1}
+                  max={500}
+                  value={partySize}
+                  onChange={(e) => setPartySize(Number.parseInt(e.target.value, 10) || 0)}
+                  className="field"
+                />
               </div>
             </div>
 
             {formError && (
-              <p className="text-error text-xs font-semibold bg-error/10 border border-error/20 p-3 text-center">
+              <p className="m-0 border border-gold/40 bg-gold/10 px-4 py-3 text-base text-gold-light" role="alert">
                 {formError}
               </p>
             )}
 
             {actionFailure && (
-              <div
-                className="text-xs font-semibold bg-amber-500/10 border border-amber-500/30 text-amber-200 p-3 space-y-1"
-                data-testid="action-failure"
-              >
-                <p>{actionFailure.message}</p>
+              <div className="border border-gold/40 bg-gold/10 px-4 py-3 text-base text-gold-light" data-testid="action-failure" role="alert">
+                <p className="m-0">{actionFailure.message}</p>
               </div>
             )}
 
             {handoverNotice && (
-              <div
-                className="text-xs font-semibold bg-white/5 border border-white/15 text-white/80 p-3"
-                data-testid="identity-handover"
-              >
+              <div className="border border-white/15 bg-white/5 px-4 py-3 text-base text-fog" data-testid="identity-handover">
                 {handoverNotice}
               </div>
             )}
 
-            {/* Hold panel, then confirm */}
             {hold ? (
-              <div className="space-y-4" data-testid="hold-panel">
-                <div className="p-4 border border-gold/30 bg-gold/5 space-y-1">
-                  <p className="text-[10px] font-mono font-bold uppercase tracking-widest text-gold">
-                    Slot held
+              <div className="flex flex-col gap-4" data-testid="hold-panel">
+                <div className="flex flex-col gap-1 border border-gold/40 bg-gold/5 px-4 py-3">
+                  <p className="label m-0 text-sm text-gold">Slot held</p>
+                  <p className="m-0 text-base text-white">
+                    {hold.resource_name}, {localTime(hold.start_local)}–{localTime(hold.end_local)} · {hold.price_display}
                   </p>
-                  <p className="text-xs text-white font-medium">
-                    {hold.resource_name}, {localTime(hold.start_local)}–{localTime(hold.end_local)}{' '}
-                    · {hold.price_display}
-                  </p>
-                  <p className="text-xs text-charcoal-light font-mono" data-testid="hold-countdown">
-                    Held for another {Math.floor(secondsLeft / 60)}m{' '}
-                    {String(secondsLeft % 60).padStart(2, '0')}s
+                  <p className="m-0 text-sm text-fog" data-testid="hold-countdown">
+                    Held for another {Math.floor(secondsLeft / 60)}m {String(secondsLeft % 60).padStart(2, '0')}s
                   </p>
                 </div>
 
+                <label htmlFor="booking-notes" className="sr-only">Notes for reception</label>
                 <textarea
+                  id="booking-notes"
                   rows={2}
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
                   placeholder="Anything reception should know? (optional)"
-                  className="w-full px-3 py-2.5 border border-white/10 bg-white/5 text-white placeholder-white/30 focus:outline-none focus:border-gold transition-all text-xs rounded-none resize-none"
+                  className="field resize-none"
                 />
 
                 <button
+                  type="button"
                   onClick={() => void handleConfirm()}
                   disabled={isConfirming}
-                  className="w-full py-5 bg-gold hover:bg-gold-muted text-forest-dark border border-gold font-display text-xs font-extrabold uppercase tracking-widest transition-all rounded-none shadow-gold-sm cursor-pointer disabled:opacity-50"
+                  className="btn btn-gold w-full disabled:opacity-50"
                   data-testid="confirm-booking"
                 >
                   {isConfirming ? 'Confirming…' : 'Confirm booking'}
                 </button>
-                <p className="text-[10px] text-white/40 italic font-medium text-center leading-relaxed">
-                  Payment is made at reception. Nothing is charged on this site.
-                </p>
+                <p className="m-0 text-center text-sm text-mute">Payment is made at reception. Nothing is charged on this site.</p>
               </div>
             ) : bookingWritesEnabled ? (
-              <div className="space-y-3">
+              <div className="flex flex-col gap-3">
                 <button
+                  type="button"
                   onClick={() => void handleHold()}
                   disabled={isHolding || !selectedSlot}
-                  className="w-full py-5 bg-gold hover:bg-gold-muted text-forest-dark border border-gold font-display text-xs font-extrabold uppercase tracking-widest transition-all rounded-none shadow-gold-sm cursor-pointer disabled:opacity-50"
+                  className="btn btn-gold w-full disabled:opacity-50"
                   data-testid="hold-slot"
                 >
                   {isHolding ? 'Holding your slot…' : 'Hold this slot for 15 minutes'}
                 </button>
-                <p className="text-[10px] text-white/40 italic font-medium text-center leading-relaxed">
+                <p className="m-0 text-center text-sm text-mute">
                   We hold the slot for 15 minutes while you check the details, then you confirm.
                 </p>
               </div>
             ) : (
-              <div className="space-y-3" data-testid="whatsapp-handover">
-                <div className="p-3 border border-white/15 bg-white/5">
-                  <p className="text-[11px] text-white/80 font-medium leading-relaxed">
-                    Online reservations are not switched on yet, so{' '}
-                    <strong className="text-white">this does not hold the slot</strong>. Send the
-                    details to reception and they will confirm the booking with you.
-                  </p>
-                </div>
+              <div className="flex flex-col gap-3" data-testid="whatsapp-handover">
+                <p className="m-0 border-l-2 border-gold pl-4 text-base text-fog">
+                  Online reservations are not switched on yet, so <strong className="text-white">this does not hold the slot</strong>.
+                  Send the details to reception and they will confirm the booking with you.
+                </p>
                 {contactRoute}
               </div>
             )}

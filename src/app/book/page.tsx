@@ -1,73 +1,55 @@
+import type { Metadata } from 'next';
 import BookingWidget from '@/components/booking/BookingWidget';
+import PageHeader from '@/components/arena/PageHeader';
 import { bookingWritesEnabled, getVenueFacts, isMvsaApiError } from '@/lib/mvsa-api';
 import { venues } from '@/content/venues';
 import { booking as bookingCopy, contact } from '@/content/site';
-import { AlertTriangle, CalendarDays } from 'lucide-react';
 
 export const revalidate = 0; // Availability and venue facts are never cached
 
+export const metadata: Metadata = {
+  title: 'Book the Arena | Mountain View Sports Arena',
+  description: bookingCopy.intro,
+};
+
 /**
  * The bookable resources are fixed by the backend (res_turf and
- * res_meeting_room), so the page always renders the widget. Venue facts are
- * fetched only for the hours note; if that call fails the page says so and the
- * widget still offers the phone and WhatsApp route.
+ * res_meeting_room). Venue facts are fetched for the hours note. If that call
+ * fails the backend is treated as unreachable: the widget opens on its one
+ * calm block (WhatsApp, phone and the kick-off picker) and only switches to
+ * live times if a quiet check of availability succeeds.
  */
 export default async function BookPage() {
   let hoursNote: string | null = null;
-  let factsUnreachable = false;
+  let backendUnreachable = false;
 
   try {
     const facts = await getVenueFacts();
     hoursNote = facts.facts.hours_note ?? null;
   } catch (error) {
     if (!isMvsaApiError(error)) throw error;
-    factsUnreachable = true;
+    backendUnreachable = true;
   }
 
   return (
-    <main className="min-h-screen bg-transparent relative overflow-hidden">
-      <div className="max-w-7xl mx-auto relative z-10 pt-32 pb-16 px-4 sm:px-8">
-        <header className="mb-12 animate-slide-up text-left">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 border border-white/10 rounded-none mb-6">
-            <CalendarDays className="w-4 h-4 text-white" />
-            <span className="text-white text-[10px] font-bold uppercase tracking-[0.2em]">
-              Online Booking
-            </span>
-          </div>
-          <h1 className="text-4xl md:text-6xl font-bold font-display text-white mb-4 tracking-tight uppercase">
-            RESERVE YOUR <span className="text-gold">PITCH</span>
-          </h1>
-          <p className="text-charcoal-light text-lg max-w-3xl font-medium">
-            Pick your venue, date and start time — we hold the slot while you confirm.
-          </p>
-          {hoursNote && (
-            <p className="text-charcoal-light/70 text-sm max-w-3xl font-medium mt-3">{hoursNote}</p>
-          )}
-          {factsUnreachable && (
-            <div
-              className="mt-6 p-4 border border-amber-500/30 bg-amber-500/5 max-w-3xl"
-              data-testid="facts-unreachable"
-            >
-              <p className="flex items-center gap-2 text-amber-300 text-xs font-bold uppercase tracking-widest mb-1">
-                <AlertTriangle className="w-4 h-4" /> Venue details unavailable
-              </p>
-              <p className="text-sm text-charcoal-light font-medium">
-                {bookingCopy.unreachableNotice} {bookingCopy.unreachableAction} Call{' '}
-                <a href={contact.bookingsPhoneHref} className="text-gold font-bold">
-                  {contact.bookingsPhone}
-                </a>
-                .
-              </p>
-            </div>
-          )}
-        </header>
+    <main>
+      <PageHeader
+        eyebrow={bookingCopy.eyebrow}
+        titleTop={bookingCopy.titleTop}
+        titleBottom={bookingCopy.titleBottom}
+        intro={bookingCopy.intro}
+      >
+        {hoursNote && <p className="m-0 max-w-[600px] text-base text-mute">{hoursNote}</p>}
+      </PageHeader>
 
+      <div className="wrap pb-[clamp(72px,9vw,112px)]">
         <BookingWidget
           venues={venues}
           bookingWritesEnabled={bookingWritesEnabled()}
           whatsappNumber={contact.whatsappNumber}
           bookingsPhone={contact.bookingsPhone}
           bookingsPhoneHref={contact.bookingsPhoneHref}
+          initiallyOffline={backendUnreachable}
         />
       </div>
     </main>
