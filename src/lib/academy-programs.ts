@@ -46,56 +46,51 @@ const SEED: AcademyProgram[] = [
   {
     id: 'football_academy',
     name: 'Football Academy',
-    // The academy trains on the main turf, so this photograph is of the real
-    // place. The other four programmes have no photograph on purpose: nobody
-    // has confirmed which frames show chess, dance, boxing or yoga, and a
-    // caption the picture does not support is worse than no picture.
+    // The academy trains on the Arena, so this photograph is of the real
+    // place, with nobody in it. The other four programmes have no photograph
+    // on purpose: a caption the picture does not support is worse than none.
     image_url: '/images/gallery/shot-04.webp',
     type: 'academy',
-    schedule: 'Saturday 14:00–16:00',
-    age_group: 'Ages 6 - 16',
+    schedule: 'Saturdays, 2–4pm',
+    age_group: 'Ages 6–16',
     description:
-      'Structured youth football development on the main arena turf: technique, small-sided games and match play, led by the academy coaching team. Registration includes kit, shoes excluded.',
+      'Youth football on the Arena every Saturday afternoon: technique, small-sided games and match play, led by the academy coaches.',
     booking_mode: 'enquiry_only',
   },
   {
     id: 'chess',
     name: 'Chess Club',
     type: 'academy',
-    schedule: 'Weekly sessions',
-    age_group: 'Ages 4 - 18',
-    description:
-      'Coached chess sessions in the clubhouse for beginners through to tournament players.',
-    booking_mode: 'enquiry_only',
-  },
-  {
-    id: 'dance',
-    name: 'Dance & Rhythm',
-    type: 'academy',
-    schedule: 'Weekly sessions',
-    age_group: 'Ages 6 - 16',
-    description:
-      'Rhythm, movement and choreography classes for children, run in the clubhouse hall.',
+    schedule: 'Saturdays, 10am',
+    age_group: 'All ages',
+    description: 'Chess on Saturday mornings, for beginners and for players who want a proper game.',
     booking_mode: 'enquiry_only',
   },
   {
     id: 'boxing',
     name: 'Boxing',
     type: 'fitness',
-    schedule: 'Sunday 15:00',
-    age_group: 'Ages 16+ / Adults',
-    description:
-      'Conditioning, pad work and technique for adults, from first session to regular training.',
+    schedule: 'Ask reception for class times',
+    age_group: 'Adults',
+    description: 'Conditioning, pad work and technique, from a first session to regular training.',
     booking_mode: 'enquiry_only',
   },
   {
     id: 'community_yoga',
     name: 'Community Yoga',
     type: 'fitness',
-    schedule: 'Friday 09:00',
-    age_group: 'All levels welcome',
-    description:
-      'A free community yoga session in the clubhouse. Donations welcome, mats provided.',
+    schedule: 'Ask reception for class times',
+    age_group: 'All levels',
+    description: 'A yoga class open to everyone, whatever your level.',
+    booking_mode: 'enquiry_only',
+  },
+  {
+    id: 'dance',
+    name: 'Dance & Rhythm',
+    type: 'academy',
+    schedule: 'Ask reception for class times',
+    age_group: 'Ages 6–16',
+    description: 'Rhythm, movement and choreography classes for children.',
     booking_mode: 'enquiry_only',
   },
 ];

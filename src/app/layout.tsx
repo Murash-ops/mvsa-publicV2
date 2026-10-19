@@ -1,46 +1,58 @@
-import type { Metadata } from "next";
-import { DM_Sans, Cinzel, JetBrains_Mono } from "next/font/google";
-import "./globals.css";
-import Navbar from "@/components/layout/Navbar";
-import Footer from "@/components/layout/Footer";
-import WhatsAppButton from "@/components/layout/WhatsAppButton";
+import type { Metadata, Viewport } from 'next';
+import { Bebas_Neue, Barlow, Barlow_Condensed } from 'next/font/google';
+import './globals.css';
+import Navbar from '@/components/layout/Navbar';
+import Footer from '@/components/layout/Footer';
+import WhatsAppButton from '@/components/layout/WhatsAppButton';
 
-const dmSans = DM_Sans({
-  variable: "--font-dm-sans",
-  subsets: ["latin"],
-  weight: ["400", "500", "700"],
-  preload: false,
+const bebas = Bebas_Neue({
+  variable: '--font-bebas',
+  subsets: ['latin'],
+  weight: '400',
+  display: 'swap',
 });
 
-
-const cinzel = Cinzel({
-  variable: "--font-cinzel",
-  subsets: ["latin"],
-  weight: ["400", "700"],
-  preload: false,
+const barlow = Barlow({
+  variable: '--font-barlow',
+  subsets: ['latin'],
+  weight: ['400', '500', '600'],
+  display: 'swap',
 });
 
-const jetbrainsMono = JetBrains_Mono({
-  variable: "--font-jetbrains-mono",
-  subsets: ["latin"],
-  weight: ["400"],
-  preload: false,
+const barlowCondensed = Barlow_Condensed({
+  variable: '--font-barlow-condensed',
+  subsets: ['latin'],
+  weight: ['600', '700', '800'],
+  display: 'swap',
 });
 
-
+function siteUrl(): URL {
+  const explicit = process.env.NEXT_PUBLIC_SITE_URL;
+  if (explicit) return new URL(explicit);
+  const vercel = process.env.VERCEL_PROJECT_PRODUCTION_URL ?? process.env.VERCEL_URL;
+  if (vercel) return new URL(`https://${vercel}`);
+  return new URL('http://localhost:3000');
+}
 
 export const metadata: Metadata = {
-  title: "Mountain View Sports Arena | Play • Compete • Connect",
-  description: "Nairobi's premium 5-aside football turf and recreational facility. Book your pitch today.",
-  icons: {
-    icon: [
-      { url: '/favicon.ico', sizes: 'any' },
-      { url: '/favicon-192x192.png', sizes: '192x192', type: 'image/png' }
-    ],
-    apple: [
-      { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' }
-    ]
-  }
+  metadataBase: siteUrl(),
+  title: "Mountain View Sports Arena | Let's meet at the Arena",
+  description:
+    'Floodlit 5-aside at the Arena, behind Mountain View Mall on Waiyaki Way. Open every day, 08:00 to midnight. Book on WhatsApp.',
+  openGraph: {
+    title: "Let's meet at the Arena",
+    description:
+      'Floodlit 5-aside behind Mountain View Mall, Waiyaki Way. Open every day, 08:00 to midnight.',
+    siteName: 'Mountain View Sports Arena',
+    locale: 'en_KE',
+    type: 'website',
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: '#070A07',
+  width: 'device-width',
+  initialScale: 1,
 };
 
 export default function RootLayout({
@@ -50,15 +62,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${dmSans.variable} ${cinzel.variable} ${jetbrainsMono.variable} font-sans antialiased bg-surface text-charcoal min-h-screen flex flex-col`}>
+      <body
+        className={`${bebas.variable} ${barlow.variable} ${barlowCondensed.variable} min-h-screen flex flex-col`}
+      >
         <Navbar />
-        <div className="flex-1">
-          {children}
-        </div>
+        <div className="flex-1">{children}</div>
         <Footer />
         <WhatsAppButton />
       </body>
     </html>
   );
 }
-

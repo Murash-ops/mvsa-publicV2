@@ -59,7 +59,7 @@ export const catalogue: ShopItem[] = [
   {
     id: 'trainers',
     name: 'Trainers',
-    description: 'Footwear for turf and for the gym floor.',
+    description: 'Footwear for the pitch and for the gym floor.',
   },
   {
     id: 'yoga-kit',
@@ -76,7 +76,7 @@ export const catalogue: ShopItem[] = [
 export const shop = {
   title: 'Arena Shop',
   intro:
-    'Kit and essentials, sold at the arena. Pick what you want and send us a message - we confirm stock and price on WhatsApp, and you pay at the counter or on M-Pesa.',
+    'Kit and essentials, sold at the Arena. Pick what you want and send us a message - we confirm stock and price on WhatsApp, and you pay at the counter or on M-Pesa.',
   /** Shown instead of the grid while the catalogue is empty. */
   emptyHeading: 'The shop is being set up',
   emptyBody:

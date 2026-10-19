@@ -1,125 +1,80 @@
-import Image from 'next/image';
 import Link from 'next/link';
-import { Phone, MapPin, Mail } from 'lucide-react';
+import Logo from '@/components/brand/Logo';
+import { contact, social } from '@/content/site';
+import { getAcademyPrograms } from '@/lib/academy-programs';
 
-// Brand icons removed from lucide-react v0.470+; inline SVG wrappers
-const Instagram = ({ className }: { className?: string }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <rect width="20" height="20" x="2" y="2" rx="5" ry="5" /><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" /><line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
-  </svg>
-);
+const pages = [
+  { href: '/book', label: 'Book the Arena' },
+  { href: '/programs', label: 'Programs' },
+  { href: '/about', label: 'About' },
+  { href: '/contact', label: 'Contact' },
+];
 
-const Facebook = ({ className }: { className?: string }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
-  </svg>
-);
+const linkClass = 'inline-flex min-h-11 items-center text-gold hover:text-gold-light';
 
 export default function Footer() {
-  const currentYear = new Date().getFullYear();
+  const programs = getAcademyPrograms();
 
   return (
-    <footer className="bg-forest-dark text-white pt-20 pb-10 overflow-hidden relative border-t border-gold/15">
-      {/* Background Decoration */}
-      <div className="absolute inset-0 turf-pattern opacity-5" />
-      
-      <div className="max-w-7xl mx-auto px-6 lg:px-10 relative z-10">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-20">
-          {/* Brand Info */}
-          <div className="space-y-6">
-            <Link href="/" className="flex items-center gap-3 group">
-              <div className="relative w-12 h-12 bg-white rounded-none p-1 border border-white/20 transition-all duration-300 group-hover:scale-105 spring-bounce flex items-center justify-center shrink-0 shadow-sm">
-                <div className="relative w-full h-full">
-                  <Image src="/images/logo.png" alt="Mountain View Sports Arena" fill sizes="72px" className="object-contain" />
-                </div>
-              </div>
-              <div>
-                <h2 className="font-brand font-bold text-xl tracking-tighter leading-none text-white">MVSA</h2>
-                <p className="text-[10px] text-gold font-bold uppercase tracking-widest leading-none mt-1">Arena & Academy</p>
-              </div>
+    <footer className="border-t border-white/[0.08]">
+      <div className="wrap flex flex-col gap-9 pt-14 pb-10">
+        <div className="grid gap-8 text-base leading-relaxed text-fog [grid-template-columns:repeat(auto-fit,minmax(200px,1fr))]">
+          <div className="flex flex-col gap-3">
+            <Link href="/" aria-label="Mountain View Sports Arena, home" className="self-start text-gold hover:text-gold-light">
+              <Logo variant="emblem" width={236} decorative />
             </Link>
-            <p className="text-white/50 text-xs sm:text-sm leading-relaxed max-w-xs font-medium">
-              Nairobi&apos;s premium sports destination for 5-aside football, group fitness, and youth development. Play, compete, and connect.
-            </p>
-            <div className="flex items-center gap-3">
-              <a href="https://instagram.com/mtviewsportsarena" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-white/5 hover:bg-gold rounded-none flex items-center justify-center transition-all duration-300 group hover:shadow-gold-sm spring-bounce border border-white/10" aria-label="Instagram">
-                <Instagram className="w-5 h-5 text-white/70 group-hover:text-forest-dark group-hover:scale-110 transition-all duration-300" />
-              </a>
-              <a href="https://facebook.com/mtviewsportsarena" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-white/5 hover:bg-gold rounded-none flex items-center justify-center transition-all duration-300 group hover:shadow-gold-sm spring-bounce border border-white/10" aria-label="Facebook">
-                <Facebook className="w-5 h-5 text-white/70 group-hover:text-forest-dark group-hover:scale-110 transition-all duration-300" />
-              </a>
-              <a href="https://www.tiktok.com/@mountainviewsportsarena" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-white/5 hover:bg-gold rounded-none flex items-center justify-center transition-all duration-300 group hover:shadow-gold-sm spring-bounce border border-white/10" aria-label="TikTok">
-                <svg className="w-5 h-5 text-white/70 group-hover:text-forest-dark group-hover:scale-110 transition-all duration-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5" />
-                </svg>
-              </a>
-            </div>
+            <span>{contact.addressLine}</span>
           </div>
 
-          {/* Quick Links */}
-          <div className="space-y-6">
-            <h3 className="font-display font-bold text-[13px] text-gold uppercase tracking-widest">Explore</h3>
-            <ul className="space-y-3">
-              {[
-                { href: '/book', label: 'Book a Pitch' },
-                { href: '/programs', label: 'Our Programs' },
-                { href: '/about', label: 'About the Facility' },
-                { href: '/contact', label: 'Get in Touch' },
-              ].map(link => (
-                <li key={link.href}>
-                  <Link href={link.href} className="text-white/60 hover:text-gold hover:translate-x-1 transition-all duration-300 text-xs uppercase tracking-wider font-bold inline-block">
-                    {link.label}
+          <div className="flex flex-col">
+            <h2 className="label text-base tracking-[0.14em] text-white">Arena bookings</h2>
+            <a href={contact.bookingsPhoneHref} className={linkClass}>{contact.bookingsPhone}</a>
+            <a href={contact.secondPhoneHref} className={linkClass}>{contact.secondPhone}</a>
+            <h2 className="label mt-4 text-base tracking-[0.14em] text-white">Academy</h2>
+            <a href={contact.academyPhoneHref} className={linkClass}>{contact.academyPhone}</a>
+            <a href={`mailto:${contact.email}`} className={`${linkClass} break-all`}>{contact.email}</a>
+          </div>
+
+          <div className="flex flex-col">
+            <h2 className="label text-base tracking-[0.14em] text-white">Programs</h2>
+            <ul>
+              {programs.map((program) => (
+                <li key={program.id}>
+                  <Link href={`/programs/${program.id}`} className={linkClass}>
+                    {program.name}
                   </Link>
                 </li>
               ))}
             </ul>
           </div>
 
-          {/* Programs */}
-          <div className="space-y-6">
-            <h3 className="font-display font-bold text-[13px] text-gold uppercase tracking-widest">Programs</h3>
-            <ul className="space-y-3">
-              {['Football Academy', 'Zumba & Fitness', 'Chess Club', 'Martial Arts'].map(name => (
-                <li key={name}>
-                  <span className="text-white/60 text-xs sm:text-sm font-medium">{name}</span>
+          <div className="flex flex-col">
+            <h2 className="label text-base tracking-[0.14em] text-white">Open</h2>
+            <span className="min-h-11 py-2.5">{contact.hours}</span>
+            <a
+              href={`https://instagram.com/${social.instagram}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={linkClass}
+            >
+              @{social.instagram}
+            </a>
+            <h2 className="label mt-4 text-base tracking-[0.14em] text-white">Pages</h2>
+            <ul>
+              {pages.map((page) => (
+                <li key={page.href}>
+                  <Link href={page.href} className={linkClass}>
+                    {page.label}
+                  </Link>
                 </li>
               ))}
             </ul>
           </div>
-
-          {/* Contact */}
-          <div className="space-y-6">
-            <h3 className="font-display font-bold text-[13px] text-gold uppercase tracking-widest">Visit Us</h3>
-            <ul className="space-y-4">
-              <li className="flex items-start gap-3">
-                <MapPin className="w-5 h-5 text-gold shrink-0 mt-0.5" />
-                <span className="text-white/65 text-xs sm:text-sm leading-relaxed font-medium">Waiyaki Way, Behind Mountain View Mall, Kangemi, Nairobi</span>
-              </li>
-              <li className="flex items-start gap-3">
-                <Phone className="w-5 h-5 text-gold shrink-0 mt-0.5" />
-                <div className="space-y-1 text-left">
-                  <p className="text-white/65 text-xs sm:text-sm font-medium leading-tight">Turf Bookings: 0798 258 950</p>
-                  <p className="text-white/65 text-xs sm:text-sm font-medium leading-tight">Academy & Programs: 0116 619 476</p>
-                </div>
-              </li>
-              <li className="flex items-center gap-3">
-                <Mail className="w-5 h-5 text-gold shrink-0" />
-                <a href="mailto:mtviewsportsarena@gmail.com" className="text-white/65 hover:text-gold transition-colors text-xs sm:text-sm font-medium">
-                  mtviewsportsarena@gmail.com
-                </a>
-              </li>
-            </ul>
-          </div>
         </div>
 
-        <div className="pt-10 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6">
-          <p className="text-white/30 text-[10px] font-bold tracking-widest uppercase">
-            © {currentYear} Mountain View Sports Arena. All Rights Reserved.
-          </p>
-          <div className="flex gap-8">
-            <Link href="/privacy" className="text-white/30 hover:text-gold text-[10px] font-bold uppercase tracking-widest transition-colors duration-300">Privacy</Link>
-            <Link href="/terms" className="text-white/30 hover:text-gold text-[10px] font-bold uppercase tracking-widest transition-colors duration-300">Terms</Link>
-          </div>
+        <div className="flex flex-wrap items-center justify-between gap-4 border-t border-white/[0.08] pt-6">
+          <span className="label text-[15px] tracking-[0.2em] text-mute">Play · Compete · Connect</span>
+          <span className="text-sm text-mute">© {new Date().getFullYear()} Mountain View Sports Arena</span>
         </div>
       </div>
     </footer>

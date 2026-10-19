@@ -1,128 +1,113 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import Image from 'next/image';
+import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Menu, X, CalendarDays } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
+import Logo from '@/components/brand/Logo';
 import { shopIsListed } from '@/content/shop';
 
+/**
+ * Sticky glass navigation with the shining gold call to action.
+ * Below 1024px the links fold into a drawer behind a menu button.
+ */
 export default function Navbar() {
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [open, setOpen] = useState(false);
   const pathname = usePathname();
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
 
   // The shop is listed only once its catalogue is real, so a draft or empty
   // shop can never be linked from the navigation by accident.
-  const navLinks = [
-    { name: 'Home', href: '/' },
+  const links = [
+    { name: 'This week', href: '/#week' },
     { name: 'Programs', href: '/programs' },
     ...(shopIsListed ? [{ name: 'Shop', href: '/shop' }] : []),
     { name: 'About', href: '/about' },
     { name: 'Contact', href: '/contact' },
   ];
 
+  const isActive = (href: string) => !href.includes('#') && pathname === href;
+
   return (
-    <nav className={`
-      fixed top-0 left-0 right-0 z-50 transition-colors duration-300 transition-[padding] duration-300 border-b
-      ${isScrolled 
-        ? 'bg-forest-dark/85 backdrop-blur-xl py-3 border-white/5 shadow-gold-sm' 
-        : 'bg-[#061a10]/80 backdrop-blur-md py-4 border-transparent'}
-    `}>
-      <div className="max-w-7xl mx-auto px-6 lg:px-10 flex items-center justify-between">
-        {/* Logo */}
-        <Link href="/" className="flex items-center gap-3 group">
-          <div className="relative w-12 h-12 bg-white rounded-none p-1 border border-white/20 transition-all duration-300 group-hover:scale-105 spring-bounce flex items-center justify-center shadow-sm">
-            <div className="relative w-full h-full">
-              <Image src="/images/logo.png" alt="Mountain View Sports Arena" fill sizes="56px" className="object-contain" priority />
-            </div>
-          </div>
-          <div>
-            <h1 className="font-brand font-bold text-xl lg:text-2xl transition-colors duration-500 tracking-tighter leading-none text-white">MVSA</h1>
-            <p className="text-[9px] text-gold font-bold uppercase tracking-widest leading-none mt-1">Arena & Academy</p>
-          </div>
+    <header
+      className="sticky top-0 z-50 border-b border-white/[0.08] bg-[rgba(7,10,7,0.72)] backdrop-blur-[14px]"
+    >
+      <div className="wrap flex items-center justify-between gap-3.5 py-3">
+        <Link
+          href="/"
+          aria-label="Mountain View Sports Arena, home"
+          className="flex min-h-11 items-center text-white hover:text-gold-light"
+          onClick={() => setOpen(false)}
+        >
+          <Logo variant="helmets" width={92} decorative />
         </Link>
 
-        {/* Desktop Links */}
-        <div className="hidden lg:flex items-center gap-8">
-          {navLinks.map((link) => (
-            <Link 
-              key={link.href} 
+        <nav aria-label="Main" className="hidden items-center gap-[clamp(10px,2.2vw,30px)] lg:flex">
+          {links.map((link) => (
+            <Link
+              key={link.href}
               href={link.href}
-              className={`
-                group relative text-[11px] font-bold tracking-widest uppercase transition-colors duration-300 py-2
-                ${pathname === link.href 
-                  ? 'text-gold' 
-                  : 'text-white/80 hover:text-gold'}
-              `}
+              aria-current={isActive(link.href) ? 'page' : undefined}
+              className={`label inline-flex min-h-11 items-center text-[17px] tracking-[0.08em] ${
+                isActive(link.href) ? 'text-gold' : 'text-fog hover:text-gold-light'
+              }`}
             >
               {link.name}
-              {/* Active underline indicator */}
-              <span className={`
-                absolute bottom-0 left-0 h-[2px] bg-gold transition-all duration-300 spring-bounce
-                ${pathname === link.href ? 'w-full' : 'w-0 group-hover:w-full'}
-              `} />
             </Link>
           ))}
-          <Link 
-            href="/book" 
-            className="bg-gold hover:bg-gold-muted text-forest-dark px-6 py-3 rounded-none font-bold text-xs tracking-widest uppercase transition-all duration-300 shadow-gold-sm active:scale-[0.98] flex items-center gap-2 spring-bounce border border-gold"
-          >
-            <CalendarDays className="w-4 h-4" />
-            Book Now
+          <Link href="/book" className="btn btn-sm shine">
+            Book the Arena
           </Link>
-        </div>
+        </nav>
 
-        {/* Mobile Toggle */}
-        <button 
-          className="lg:hidden p-2 hover:bg-white/10 rounded-none transition-colors text-white"
-          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          aria-label={isMobileMenuOpen ? 'Close menu' : 'Open menu'}
-        >
-          {isMobileMenuOpen ? <X className="w-7 h-7" /> : <Menu className="w-7 h-7" />}
-        </button>
+        <div className="flex items-center gap-2 lg:hidden">
+          <Link href="/book" className="btn btn-sm shine hidden px-4 text-[15px] sm:inline-flex">
+            Book the Arena
+          </Link>
+          <button
+            type="button"
+            className="flex h-12 w-12 items-center justify-center text-white hover:text-gold-light"
+            onClick={() => setOpen((value) => !value)}
+            aria-expanded={open}
+            aria-controls="mobile-menu"
+            aria-label={open ? 'Close menu' : 'Open menu'}
+          >
+            {open ? <X className="h-7 w-7" aria-hidden /> : <Menu className="h-7 w-7" aria-hidden />}
+          </button>
+        </div>
       </div>
 
-      {/* Mobile Menu */}
-      {isMobileMenuOpen && (
-        <div className="lg:hidden fixed inset-x-0 top-[80px] bg-forest-dark/95 backdrop-blur-xl border-b border-white/10 p-8 shadow-lg">
-          <div className="flex flex-col gap-2">
-            {navLinks.map((link, i) => (
-              <Link 
-                key={link.href} 
+      {open && (
+        <div
+          id="mobile-menu"
+          className="lg:hidden fixed inset-x-0 top-[72px] bottom-0 overflow-y-auto border-t border-white/[0.08] bg-ink/95 backdrop-blur-[14px]"
+        >
+          <nav aria-label="Mobile" className="wrap flex flex-col gap-1 py-6">
+            <Link
+              href="/"
+              onClick={() => setOpen(false)}
+              className="display flex min-h-14 items-center border-b border-white/[0.08] text-[40px] text-white hover:text-gold"
+            >
+              Home
+            </Link>
+            {links.map((link) => (
+              <Link
+                key={link.href}
                 href={link.href}
-                onClick={() => setIsMobileMenuOpen(false)}
-                className={`
-                  text-lg font-display font-bold tracking-tight py-3 px-4 rounded-none transition-all duration-300
-                  animate-slide-up
-                  ${pathname === link.href 
-                    ? 'text-gold bg-gold/5 border-l-4 border-gold pl-6 font-extrabold' 
-                    : 'text-white hover:bg-white/5'}
-                `}
-                style={{ animationDelay: `${i * 50}ms` }}
+                onClick={() => setOpen(false)}
+                aria-current={isActive(link.href) ? 'page' : undefined}
+                className={`display flex min-h-14 items-center border-b border-white/[0.08] text-[40px] ${
+                  isActive(link.href) ? 'text-gold' : 'text-white hover:text-gold'
+                }`}
               >
                 {link.name}
               </Link>
             ))}
-            <Link 
-              href="/book" 
-              onClick={() => setIsMobileMenuOpen(false)}
-              className="mt-6 bg-gold hover:bg-gold-muted text-forest-dark py-5 rounded-none font-bold text-center text-md tracking-widest uppercase shadow-gold-sm animate-slide-up"
-              style={{ animationDelay: '200ms' }}
-            >
-              Book Now
+            <Link href="/book" onClick={() => setOpen(false)} className="btn shine mt-6">
+              Book the Arena
             </Link>
-          </div>
+          </nav>
         </div>
       )}
-    </nav>
+    </header>
   );
 }

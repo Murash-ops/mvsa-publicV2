@@ -1,334 +1,180 @@
 import Image from 'next/image';
-import Link from 'next/link';
+import { contact, home } from '@/content/site';
+import { heroPhoto } from '@/content/photos';
 import { getAcademyPrograms } from '@/lib/academy-programs';
-import { home, social } from '@/content/site';
-import { featured, heroPhoto } from '@/content/photos';
-import { 
-  ArrowRight, 
-  Lock, 
-  Wifi, 
-  Clock, 
-  ChevronRight
-} from 'lucide-react';
+import { whatsappUrl } from '@/lib/whatsapp';
+import StatusPill from '@/components/arena/StatusPill';
+import PricePlate from '@/components/arena/PricePlate';
+import Marquee from '@/components/arena/Marquee';
+import Pitch3D from '@/components/arena/Pitch3D';
+import Bento from '@/components/arena/Bento';
+import LampClose from '@/components/arena/LampClose';
+import { AskForKickoff, BookArenaLink, KickoffChips, KickoffProvider } from '@/components/arena/Kickoff';
 
-/* The home page shows the curated set from content/photos.ts - twelve frames,
-   chosen for variety. Showing all 35 made the page 7,900px tall on a desktop
-   and nearly 30,000px on a phone, and most of them were the same empty pitch. */
+const delay = (i: number) => `${(i * 0.07).toFixed(2)}s`;
 
-export default async function Home() {
-  const programs = getAcademyPrograms().slice(0, 4);
-
-  const heroHeadline = home.heroHeadline;
-  const heroSubheading = home.heroSubheading;
-  const heroTextAboveCta = home.heroTextAboveCta;
-  const closingCtaHeadline = home.closingCtaHeadline;
-  const instagramHandle = social.instagram;
-  const tiktokHandle = social.tiktok;
-  const [trustCard1, trustCard2, trustCard3] = home.trustCards;
-
-  const renderHeadline = (text: string) => {
-    return text.split('\n').map((line, index) => (
-      <span key={index}>
-        {line}
-        {index < text.split('\n').length - 1 && <br className="hidden sm:inline" />}
-      </span>
-    ));
-  };
+export default function Home() {
+  const programs = getAcademyPrograms();
+  const lineUrl = {
+    bookings: whatsappUrl(contact.whatsappNumber),
+    academy: whatsappUrl(contact.academyWhatsappNumber),
+  } as const;
 
   return (
-    <main className="min-h-screen text-charcoal selection:bg-gold selection:text-forest-dark overflow-x-hidden">
-      {/* ============================================
-          1. HERO - FULL BLEED, TEXT OVER THE PHOTOGRAPH
-
-          The photograph is portrait, so this shows a band cut from its
-          middle, held in place by objectPosition. The scrim is a left-to-
-          right gradient rather than a flat wash, so the headline has
-          something solid behind it while the right of the frame stays
-          legible as a photograph.
-          ============================================ */}
-      <section className="relative z-10 min-h-[78vh] lg:min-h-[86vh] flex items-end overflow-hidden">
-        <Image
-          src={heroPhoto.src}
-          alt="The pitch at Mountain View Sports Arena, goals and centre circle in frame"
-          fill
-          priority
-          sizes="100vw"
-          style={{ objectPosition: heroPhoto.objectPosition }}
-          className="object-cover -z-10"
-        />
-        <div className="absolute inset-0 -z-10 bg-gradient-to-r from-[#061a10] via-[#061a10]/75 to-[#061a10]/25" />
-        <div className="absolute inset-x-0 bottom-0 h-40 -z-10 bg-gradient-to-t from-[#061a10] to-transparent" />
-
-        <div className="max-w-7xl mx-auto px-6 lg:px-10 w-full pb-16 lg:pb-24 pt-32">
-          <div className="max-w-2xl space-y-7 animate-slide-up">
-            <h1 className="font-display text-5xl sm:text-7xl xl:text-8xl font-black uppercase tracking-tight text-white leading-[0.92] text-balance">
-              {renderHeadline(heroHeadline)}
-            </h1>
-
-            <p className="font-sans text-sm sm:text-base md:text-lg text-white/80 max-w-lg font-medium tracking-wide">
-              {heroSubheading}
-            </p>
-
-            <div className="pt-2 flex flex-col sm:flex-row gap-4">
-              <Link
-                href="/book"
-                className="relative h-16 w-full sm:w-60 bg-gold text-forest-dark hover:bg-gold-muted border border-gold font-display text-sm font-extrabold uppercase tracking-[0.2em] flex items-center justify-center rounded-none shadow-gold-sm transition-all duration-300 hover:scale-[1.03] active:scale-[0.97]"
-              >
-                Book Now
-              </Link>
-              <Link
-                href="/programs"
-                className="relative h-16 w-full sm:w-60 bg-white/5 text-white hover:bg-gold/10 border border-white/25 hover:border-gold font-display text-sm font-extrabold uppercase tracking-[0.2em] flex items-center justify-center rounded-none transition-all duration-300 hover:scale-[1.03] active:scale-[0.97]"
-              >
-                Explore Programs
-              </Link>
-            </div>
+    <KickoffProvider>
+      <main>
+        {/* Hero: the floodlights flicker on over the pitch */}
+        <section id="top" className="relative flex min-h-[clamp(640px,100svh,800px)] items-end overflow-hidden">
+          <Image
+            src={heroPhoto.src}
+            alt={home.hero.imageAlt}
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover"
+            style={{ objectPosition: heroPhoto.objectPosition }}
+          />
+          <div aria-hidden="true" className="absolute inset-0 bg-[rgba(3,6,3,0.62)]" />
+          <div aria-hidden="true" className="lights pointer-events-none absolute inset-0 mix-blend-screen">
+            <div className="absolute inset-0 bg-[conic-gradient(from_128deg_at_0%_0%,transparent_0deg,rgba(255,240,205,0.30)_12deg,rgba(255,240,205,0.06)_26deg,transparent_34deg)]" />
+            <div className="absolute inset-0 bg-[conic-gradient(from_198deg_at_100%_0%,transparent_0deg,rgba(255,240,205,0.06)_8deg,rgba(255,240,205,0.30)_22deg,transparent_34deg)]" />
+            <div className="absolute -top-10 left-[2%] h-[90px] w-[90px] rounded-full bg-[radial-gradient(circle,rgba(255,246,220,0.95),rgba(255,246,220,0)_70%)]" />
+            <div className="absolute -top-10 right-[2%] h-[90px] w-[90px] rounded-full bg-[radial-gradient(circle,rgba(255,246,220,0.95),rgba(255,246,220,0)_70%)]" />
           </div>
-        </div>
-      </section>
+          <div aria-hidden="true" className="absolute inset-x-0 bottom-0 h-3/5 bg-[linear-gradient(to_top,#070A07_6%,rgba(7,10,7,0)_100%)]" />
 
-      {/* ============================================
-          2. TRUST SIGNALS (SINGLE ROW OF EXACTLY 3)
-          ============================================ */}
-      <section className="py-20 bg-[#061a10]/60 border-y border-white/5 relative z-20 backdrop-blur-md">
-        <div className="max-w-7xl mx-auto px-6 lg:px-10">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
-            {/* Signal 1 */}
-            <div className="flex flex-col items-center md:items-start text-center md:text-left gap-4 p-6 bg-white/[0.02] border border-white/5 hover:border-gold/30 transition-all duration-300">
-              <div className="w-12 h-12 bg-gold/10 border border-gold/20 flex items-center justify-center text-gold">
-                <Lock className="w-5 h-5" />
-              </div>
-              <div className="space-y-1">
-                <h4 className="font-display font-bold text-sm text-white uppercase tracking-wider">{trustCard1.title}</h4>
-                <p className="font-sans text-xs text-white/50 leading-relaxed font-medium">
-                  {trustCard1.description}
-                </p>
+          <div className="wrap relative flex flex-wrap items-end justify-between gap-10 pb-16">
+            <div className="rise flex min-w-0 flex-[1_1_560px] flex-col gap-6">
+              <StatusPill />
+              <h1 className="display m-0 text-[clamp(84px,13.5vw,212px)] leading-[0.82]">
+                {home.hero.titleTop}
+                <br />
+                <span className="text-gold">{home.hero.titleBottom}</span>
+              </h1>
+              <p className="m-0 max-w-[540px] text-[clamp(18px,1.6vw,21px)] leading-[1.55] text-fog">{home.hero.body}</p>
+              <div className="flex flex-wrap gap-3">
+                <BookArenaLink className="btn shine">Book on WhatsApp</BookArenaLink>
+                <a href={contact.bookingsPhoneHref} className="btn btn-ghost">
+                  Call {contact.bookingsPhone}
+                </a>
               </div>
             </div>
-
-            {/* Signal 2 */}
-            <div className="flex flex-col items-center md:items-start text-center md:text-left gap-4 p-6 bg-white/[0.02] border border-white/5 hover:border-gold/30 transition-all duration-300">
-              <div className="w-12 h-12 bg-gold/10 border border-gold/20 flex items-center justify-center text-gold">
-                <Wifi className="w-5 h-5" />
-              </div>
-              <div className="space-y-1">
-                <h4 className="font-display font-bold text-sm text-white uppercase tracking-wider">{trustCard2.title}</h4>
-                <p className="font-sans text-xs text-white/50 leading-relaxed font-medium">
-                  {trustCard2.description}
-                </p>
-              </div>
-            </div>
-
-            {/* Signal 3 */}
-            <div className="flex flex-col items-center md:items-start text-center md:text-left gap-4 p-6 bg-white/[0.02] border border-white/5 hover:border-gold/30 transition-all duration-300">
-              <div className="w-12 h-12 bg-gold/10 border border-gold/20 flex items-center justify-center text-gold">
-                <Clock className="w-5 h-5" />
-              </div>
-              <div className="space-y-1">
-                <h4 className="font-display font-bold text-sm text-white uppercase tracking-wider">{trustCard3.title}</h4>
-                <p className="font-sans text-xs text-white/50 leading-relaxed font-medium">
-                  {trustCard3.description}
-                </p>
-              </div>
-            </div>
+            <PricePlate className="flex-[0_1_330px]" />
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* ============================================
-          3. PRICING TEASER (OWNER'S HEADLINE PRICE)
-          ============================================ */}
-      <section className="py-24 bg-transparent relative z-20">
-        <div className="max-w-5xl mx-auto px-6 text-center space-y-12">
-          <div className="space-y-4">
-            <h2 className="font-display text-3xl sm:text-4xl font-extrabold uppercase tracking-tight text-white">
-              Simple Arena Pricing
+        <Marquee />
+
+        {/* Interactive 3D pitch + kick-off picker */}
+        <section id="pitch" className="wrap flex flex-wrap items-center gap-14 py-[clamp(72px,9vw,112px)]">
+          <div className="flex min-w-0 flex-[1_1_420px] flex-col gap-6">
+            <span className="label text-[15px] text-gold">{home.pricing.eyebrow}</span>
+            <h2 className="h-section">
+              {home.kickoff.titleTop}
+              <br />
+              <span className="text-gold">{home.kickoff.titleBottom}</span>
             </h2>
-            <div className="w-12 h-1 bg-gold mx-auto rounded-none" />
+            <p className="m-0 max-w-[460px] text-lg leading-[1.55] text-fog">{home.kickoff.body}</p>
+            <KickoffChips />
+            <AskForKickoff />
+            <p className="m-0 max-w-[460px] text-base text-mute">{home.pricing.note}</p>
           </div>
+          <Pitch3D caption={home.kickoff.markerCaption} />
+        </section>
 
-          <div className="max-w-2xl mx-auto p-10 border border-white/10 bg-card space-y-4" data-testid="pricing-headline">
-            <span className="px-2.5 py-0.5 bg-white/5 text-[9px] font-mono font-bold uppercase text-white/80 border border-white/10 inline-block">
-              {home.pricing.eyebrow}
-            </span>
-            <p className="font-display font-extrabold text-4xl sm:text-5xl text-gold uppercase tracking-tight">
-              {home.pricing.headline}
-              <span className="block sm:inline sm:ml-3 text-base sm:text-lg font-sans font-semibold normal-case tracking-normal text-white/80">
-                {home.pricing.unit}
-              </span>
-            </p>
-            <p className="text-charcoal-light text-sm font-medium leading-relaxed">{home.pricing.pitch}</p>
-          </div>
+        {/* Bento grid with cursor spotlight */}
+        <section className="wrap flex flex-col gap-10 pb-[clamp(72px,9vw,112px)]">
+          <h2 className="h-section">
+            {home.bento.titleTop}
+            <br />
+            <span className="text-gold">{home.bento.titleBottom}</span>
+          </h2>
+          <Bento tiles={home.bento.tiles} />
+        </section>
 
-          <div className="space-y-8">
-            <p className="text-charcoal-light font-sans text-sm font-semibold tracking-wide">
-              {home.pricing.note}
-            </p>
-            
-            {/* Single CTA button pointing to booking page */}
-            <div className="flex justify-center">
-              <Link 
-                href="/book" 
-                className="inline-flex items-center justify-center gap-2.5 bg-forest hover:bg-forest-light text-white px-10 py-5 rounded-none font-display text-xs font-bold uppercase tracking-widest transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
-              >
-                See Full Availability
-                <ArrowRight className="w-4 h-4 text-gold stroke-[2.5px]" />
-              </Link>
+        {/* This week */}
+        <section id="week" className="scroll-mt-20 border-y border-white/[0.08] bg-surface">
+          <div className="wrap flex flex-col gap-9 py-[clamp(72px,9vw,104px)]">
+            <div className="flex flex-wrap items-end justify-between gap-4">
+              <h2 className="h-section">
+                {home.week.titleTop}
+                <br />
+                {home.week.titleBottom}
+              </h2>
+              <p className="m-0 max-w-[380px] text-lg leading-[1.55] text-fog">{home.week.body}</p>
             </div>
-          </div>
-        </div>
-      </section>
-      {/* ============================================
-          4. PROGRAMS STRIP (SLIM PATHWAYS CAROUSEL)
-          ============================================ */}
-      <section className="py-24 bg-[#061a10]/50 border-t border-white/5 relative z-20 backdrop-blur-sm">
-        <div className="max-w-7xl mx-auto px-6 lg:px-10 space-y-12">
-          
-          <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-8">
-            <h2 className="text-xl sm:text-2xl font-display font-bold text-white uppercase tracking-tight">
-              Programs & Training Pathways
-            </h2>
-            <div className="hidden sm:block flex-1 h-px bg-white/10" />
-          </div>
-
-          {/* Grid Layout (Desktop) / Horizontal Scroll (Mobile) */}
-          <div className="flex md:grid md:grid-cols-2 lg:grid-cols-4 gap-6 overflow-x-auto md:overflow-x-visible pb-4 md:pb-0 scrollbar-hide shrink-0">
-            {programs.map((program) => {
-              return (
-                <div 
-                  key={program.id}
-                  className="bg-card border border-white/10 p-6 rounded-none flex flex-col justify-between min-w-[280px] md:min-w-0 h-[150px] shadow-sm hover:border-gold hover:-translate-y-1 transition-all duration-300"
+            <ul className="m-0 flex list-none flex-col border-t-2 border-gold p-0">
+              {home.week.fixtures.map((fixture, i) => (
+                <li
+                  key={fixture.what}
+                  className="rise flex flex-wrap items-center gap-x-8 gap-y-3 border-b border-white/10 px-3 py-[22px]"
+                  style={{ animationDelay: delay(i) }}
                 >
-                  <div className="space-y-4 text-left">
-                    <div className="flex justify-between items-center">
-                      <span className="w-1.5 h-1.5 bg-gold rounded-full" />
-                      <span className="text-[9px] font-mono font-bold uppercase bg-white/10 px-2 py-0.5 text-white/80 border border-white/10">
-                        {program.age_group}
-                      </span>
-                    </div>
-                    <div>
-                      <h4 className="text-white font-bold text-base uppercase tracking-wide font-display">{program.name}</h4>
-                      <p className="text-[10px] text-gold/60 font-medium uppercase tracking-widest mt-1.5 font-mono">
-                        {program.schedule}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
+                  <span className="display flex-[0_0_140px] text-[44px] leading-none text-gold">{fixture.day}</span>
+                  <span className="label flex-[0_0_180px] text-2xl tracking-[0.04em] text-white">{fixture.time}</span>
+                  <span className="display min-w-0 flex-[1_1_240px] text-4xl leading-none">{fixture.what}</span>
+                  <a
+                    href={lineUrl[fixture.line]}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-link text-[17px]"
+                    aria-label={`${fixture.cta}: ${fixture.what}`}
+                  >
+                    {fixture.cta}
+                  </a>
+                </li>
+              ))}
+            </ul>
           </div>
+        </section>
 
-          <div className="pt-4 flex justify-center">
-            <Link 
-              href="/programs" 
-              className="inline-flex items-center gap-2 group text-xs font-mono font-bold uppercase text-gold hover:text-white transition-colors tracking-widest"
-            >
-              View All Programs 
-              <ChevronRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-            </Link>
-          </div>
-
-        </div>
-      </section>
-
-      {/* ============================================
-          5. THE ARENA, PHOTOGRAPHED
-          ============================================ */}
-      <section className="py-24 relative z-20 border-t border-white/5">
-        <div className="max-w-7xl mx-auto px-6 lg:px-10">
-          <div className="mb-12 max-w-2xl">
-            <h2 className="font-display text-3xl sm:text-4xl font-extrabold uppercase tracking-tight text-white">
-              The Arena
-            </h2>
-            <p className="mt-3 font-sans text-sm sm:text-base text-white/70">
-              Every photograph here was taken at Mountain View. Nothing is stock.
-            </p>
-          </div>
-
-          {/* Columns rather than a grid: portrait and landscape frames sit
-              together without cropping either into the wrong shape. */}
-          <div className="columns-2 md:columns-3 lg:columns-4 gap-3 [column-fill:_balance]">
-            {featured.map((photo, i) => (
-              <figure
-                key={photo.src}
-                className="mb-3 break-inside-avoid overflow-hidden border border-white/10 bg-forest-light/20"
+        {/* Programs */}
+        <section id="programs" className="wrap flex flex-col gap-10 py-[clamp(72px,9vw,112px)]">
+          <h2 className="h-section">
+            {home.programs.titleTop}
+            <br />
+            {home.programs.titleBottom}
+          </h2>
+          <div className="grid gap-3.5 [grid-template-columns:repeat(auto-fit,minmax(230px,1fr))]">
+            {programs.map((program, i) => (
+              <article
+                key={program.id}
+                className="rise flex min-h-[210px] flex-col gap-3 border border-t-4 border-white/10 border-t-grass bg-surface px-6 py-7"
+                style={{ animationDelay: delay(i) }}
               >
-                <Image
-                  src={photo.src}
-                  alt="At Mountain View Sports Arena"
-                  width={photo.w}
-                  height={photo.h}
-                  loading={i < 4 ? 'eager' : 'lazy'}
-                  sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                  className="w-full h-auto object-cover transition-transform duration-500 hover:scale-[1.03]"
-                />
-              </figure>
+                <span className="label text-[15px] text-gold">{program.age_group}</span>
+                <h3 className="display m-0 text-[44px] leading-[0.92]">{program.name}</h3>
+                <p className="m-0 grow text-base leading-normal text-fog">{program.schedule}.</p>
+                <a
+                  href={lineUrl.academy}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-link text-base"
+                  aria-label={`Ask to join ${program.name}`}
+                >
+                  Ask to join
+                </a>
+              </article>
             ))}
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* ============================================
-          6. CLOSING CTA (DOMINANT GOLD BOOK NOW)
-          ============================================ */}
-      <section className="py-28 bg-transparent relative z-20 text-center text-white overflow-hidden">
-        {/* Subtle grid-blur patterns */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] bg-gold/5 rounded-full blur-[100px] pointer-events-none" />
-        
-        <div className="max-w-4xl mx-auto px-6 space-y-10 relative z-10">
-          <h2 className="font-display text-4xl sm:text-5xl md:text-6xl font-black uppercase tracking-tight text-white leading-none">
-            {closingCtaHeadline}
-          </h2>
-          
-          {/* Dominant Gold CTA */}
-          <div className="pt-2 flex justify-center">
-            <Link 
-              href="/book" 
-              className="relative h-16 w-64 bg-gold text-forest-dark hover:bg-gold-muted border border-gold font-display text-sm font-extrabold uppercase tracking-[0.2em] flex items-center justify-center rounded-none shadow-gold-md transition-all duration-300 hover:scale-[1.03]"
-            >
-              Book Now
-            </Link>
-          </div>
-
-          {/* Social details in single block */}
-          <div className="pt-8 space-y-6">
-            <p className="text-white/60 font-sans text-xs sm:text-sm font-semibold tracking-wide max-w-xl mx-auto leading-relaxed">
-              {heroTextAboveCta}
-            </p>
-            
-            {/* Social Icons - Instagram and TikTok only */}
-            <div className="flex justify-center items-center gap-5">
-              {/* Instagram SVG */}
-              <a 
-                href={`https://instagram.com/${instagramHandle}`} 
-                target="_blank" 
-                rel="noopener noreferrer" 
-                className="w-10 h-10 rounded-none bg-white/5 hover:bg-gold/15 border border-white/10 hover:border-gold flex items-center justify-center text-white hover:text-gold transition-all"
-                aria-label="Instagram link"
-              >
-                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
-                  <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
-                  <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
-                </svg>
-              </a>
-
-              {/* TikTok SVG */}
-              <a 
-                href={`https://tiktok.com/@${tiktokHandle}`} 
-                target="_blank" 
-                rel="noopener noreferrer" 
-                className="w-10 h-10 rounded-none bg-white/5 hover:bg-gold/15 border border-white/10 hover:border-gold flex items-center justify-center text-white hover:text-gold transition-all"
-                aria-label="TikTok link"
-              >
-                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"></path>
-                </svg>
-              </a>
+        {/* Photo strip with hover zoom */}
+        <section aria-label="The Arena" className="grid gap-1 [grid-template-columns:repeat(auto-fit,minmax(240px,1fr))]">
+          {home.photos.map((photo) => (
+            <div key={photo.src} className="photo relative h-[clamp(300px,40vw,400px)]">
+              <Image src={photo.src} alt={photo.alt} fill sizes="(max-width: 560px) 100vw, 25vw" className="object-cover" />
             </div>
-          </div>
-        </div>
-      </section>
-    </main>
+          ))}
+        </section>
+
+        <LampClose>
+          <BookArenaLink className="btn shine">Book on WhatsApp</BookArenaLink>
+          <a href={contact.bookingsPhoneHref} className="btn btn-ghost">
+            Call {contact.bookingsPhone}
+          </a>
+        </LampClose>
+      </main>
+    </KickoffProvider>
   );
 }

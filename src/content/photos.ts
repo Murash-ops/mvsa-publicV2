@@ -8,8 +8,7 @@
  * round. next/image uses these numbers to reserve space before a photograph
  * arrives, so a wrong pair means a visibly distorted frame.
  *
- * Note the shape counts: of the venue's photographs, 34 are portrait and
- * 1 is not. There is no wide photograph of the arena, which is why
+ * Every photograph listed here is portrait. There is no wide photograph of the arena, which is why
  * the hero is built as a split layout rather than a letterbox banner.
  */
 
@@ -39,18 +38,6 @@ export const gallery: GalleryPhoto[] = [
   { src: "/images/gallery/shot-21.webp", w: 900, h: 1600, shape: "portrait" },
   { src: "/images/gallery/shot-22.webp", w: 1200, h: 1600, shape: "portrait" },
   { src: "/images/gallery/shot-23.webp", w: 1350, h: 2400, shape: "portrait" },
-  { src: "/images/gallery/shot-24.webp", w: 1350, h: 2400, shape: "portrait" },
-  { src: "/images/gallery/shot-25.webp", w: 1350, h: 2400, shape: "portrait" },
-  { src: "/images/gallery/shot-26.webp", w: 1350, h: 2400, shape: "portrait" },
-  { src: "/images/gallery/shot-27.webp", w: 1350, h: 2400, shape: "portrait" },
-  { src: "/images/gallery/shot-28.webp", w: 1350, h: 2400, shape: "portrait" },
-  { src: "/images/gallery/shot-29.webp", w: 1350, h: 2400, shape: "portrait" },
-  { src: "/images/gallery/shot-30.webp", w: 1350, h: 2400, shape: "portrait" },
-  { src: "/images/gallery/shot-31.webp", w: 1350, h: 2400, shape: "portrait" },
-  { src: "/images/gallery/shot-32.webp", w: 1350, h: 2400, shape: "portrait" },
-  { src: "/images/gallery/shot-33.webp", w: 1350, h: 2400, shape: "portrait" },
-  { src: "/images/gallery/shot-34.webp", w: 1350, h: 2400, shape: "portrait" },
-  { src: "/images/gallery/shot-35.webp", w: 900, h: 1600, shape: "portrait" },
 ];
 
 /**
@@ -63,8 +50,9 @@ export const gallery: GalleryPhoto[] = [
  * building, so this list works for variety instead: wide, then close, then
  * detail, so it does not read as one picture printed twelve times.
  *
- * If consent is gathered later, the excluded frames are shot-24 to shot-28,
- * shot-30, shot-31 and shot-34, and they are better pictures than these.
+ * The frames numbered 24 to 35 are not listed here at all, so nothing on the
+ * site can reach them by accident. If consent is gathered later, add them back
+ * one by one, deliberately.
  */
 const FEATURED = [
   'shot-03', // the pitch end to end, goals in frame
@@ -77,7 +65,6 @@ const FEATURED = [
   'shot-12', // the far side, open to the sky
   'shot-22', // the goalmouth and the centre circle
   'shot-04', // the length of the pitch, floodlights above
-  'shot-29', // the goals from the corner
   'shot-21', // the bench under the cage, daylight
 ] as const;
 
@@ -100,12 +87,6 @@ export const featured: GalleryPhoto[] = FEATURED
  * show the roof and the back wall instead.
  */
 export const heroPhoto: GalleryPhoto & { objectPosition: string } = {
-  ...(gallery.find((p) => p.src.includes('shot-03.')) ?? gallery[0]),
-  objectPosition: '50% 68%',
+  ...(gallery.find((p) => p.src.includes('shot-04.')) ?? gallery[0]),
+  objectPosition: 'center 62%',
 };
-
-/** The square mark, on white. Artwork, not a photograph. */
-export const brandMark: Photo = { src: "/images/brand/mark.webp", w: 1600, h: 1600 };
-
-/** The painted lockup from the arena's own signage. Artwork, not a photograph. */
-export const brandLockup: Photo = { src: "/images/brand/lockup.webp", w: 1600, h: 1043 };
