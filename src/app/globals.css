@@ -1,181 +1,320 @@
 @import "tailwindcss";
 
-@theme {
-  /* === CORE REDESIGN PALETTE === */
-  --color-forest: #0d2818;
-  --color-forest-dark: #061a10;
-  --color-forest-light: #1b4332;
-  
-  --color-gold: #C5A55A;           /* Luxury Gold Accent */
-  --color-gold-muted: #D4BA7A;     /* Subdued gold */
-  --color-gold-deep: #9A7B39;
-  
-  --color-charcoal: #F9FAFB;       /* Primary Typography - High-emphasis light */
-  --color-charcoal-light: #bfcfc6; /* Secondary labels & body copy */
-  --color-muted: #718a7a;          /* Timestamps, disabled borders */
-  
-  --color-surface: #061a10;        /* Canvas Background */
-  --color-card: rgba(13, 30, 14, 0.85); /* Premium Translucent container surface */
-  --color-border-color: rgba(255, 255, 255, 0.08); /* Subtle white-tinted border line */
-  
-  /* === STATUS === */
-  --color-success: #22C55E;
-  --color-warning: #F59E0B;
-  --color-error: #DC3545;
-  --color-turf: #2d6a4f;
+/* ==========================================================================
+   Floodlit Pro: the Arena's design system.
 
-  /* === TYPOGRAPHY === */
-  --font-sans: var(--font-dm-sans), Arial, sans-serif;
-  --font-display: var(--font-cinzel), serif;
-  --font-brand: var(--font-cinzel), serif;
-  --font-mono: var(--font-jetbrains-mono), monospace;
+   Near-black ground, one green for the pitch, one gold for the lights.
+   Gold text only ever sits on dark; gold buttons always carry dark text.
+   ========================================================================== */
+
+@theme {
+  --color-ink: #070A07;          /* page ground */
+  --color-surface: #0E140E;      /* cards, bands */
+  --color-pitch: #2D5016;        /* brand green */
+  --color-grass: #3FA34D;        /* bright green accent */
+  --color-gold: #E0C27A;         /* the lights */
+  --color-gold-light: #FFF1C9;   /* hover, shine */
+  --color-fog: #E6E9E4;          /* body text on dark */
+  --color-mute: #A8B0A4;         /* quiet labels */
+  --color-line: rgba(255, 255, 255, 0.1);
+
+  --font-display: var(--font-bebas), 'Bebas Neue', Impact, sans-serif;
+  --font-sans: var(--font-barlow), 'Barlow', Arial, sans-serif;
+  --font-label: var(--font-barlow-condensed), 'Barlow Condensed', Arial Narrow, sans-serif;
 }
 
 @layer base {
+  html {
+    color-scheme: dark;
+    background-color: var(--color-ink);
+  }
+
   body {
-    background-image: 
-      linear-gradient(
-        rgba(6, 26, 16, 0.40),
-        rgba(6, 26, 16, 0.70)
-      ),
-      url('/images/hero_turf.jpeg');
-    background-size: cover;
-    background-position: center;
-    background-attachment: fixed;
-    background-repeat: no-repeat;
-    @apply text-charcoal-light font-sans min-h-screen antialiased bg-surface;
+    background-color: var(--color-ink);
+    color: #FFFFFF;
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    overflow-x: clip;
   }
 
-  h1, h2, h3, h4, h5, h6 {
-    @apply font-display text-white tracking-normal;
-    font-weight: 700;
+  a {
+    transition: color 0.2s, background-color 0.2s, transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+  }
+
+  a:focus-visible,
+  button:focus-visible,
+  input:focus-visible,
+  textarea:focus-visible,
+  select:focus-visible {
+    outline: 3px solid var(--color-gold-light);
+    outline-offset: 3px;
+  }
+
+  button {
+    cursor: pointer;
+  }
+
+  ::selection {
+    background: var(--color-gold);
+    color: var(--color-ink);
   }
 }
 
-/* ========================================
-   GLASSMORPHISM & PREMIUM GLOWS
-   ======================================== */
+/* --------------------------------------------------------------------------
+   Shared building blocks
+   -------------------------------------------------------------------------- */
 
-.glass {
-  background: rgba(13, 30, 14, 0.85);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 0px !important;
+.wrap {
+  width: 100%;
+  max-width: 1320px;
+  margin-inline: auto;
+  padding-inline: clamp(16px, 4vw, 48px);
+  box-sizing: border-box;
 }
 
-.glass-gold {
-  background: rgba(197, 165, 90, 0.04);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(197, 165, 90, 0.2);
-  border-radius: 0px !important;
+.label {
+  font-family: var(--font-label);
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
 }
 
-.glass-light {
+.display {
+  font-family: var(--font-display);
+  font-weight: 400;
+  line-height: 0.88;
+  letter-spacing: 0.01em;
+}
+
+.h-section {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(56px, 7vw, 104px);
+  line-height: 0.88;
+  margin: 0;
+}
+
+/* Buttons. Gold carries dark text; the ghost is white on dark. */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 60px;
+  padding: 0 30px;
+  box-sizing: border-box;
+  font-family: var(--font-label);
+  font-weight: 800;
+  font-size: 21px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-decoration: none;
+  text-align: center;
+}
+
+.btn-sm {
+  min-height: 48px;
+  padding: 0 22px;
+  font-size: 17px;
+}
+
+.btn-gold,
+.shine {
+  background: linear-gradient(110deg, var(--color-gold) 40%, var(--color-gold-light) 50%, var(--color-gold) 60%);
+  background-size: 250% 100%;
+  color: var(--color-ink);
+}
+
+.shine {
+  animation: shine 3.2s linear infinite;
+}
+
+.btn-gold:hover,
+.shine:hover {
+  color: var(--color-ink);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(224, 194, 90, 0.35);
+}
+
+.btn-ghost {
+  border: 2px solid #FFFFFF;
+  color: #FFFFFF;
+}
+
+.btn-ghost:hover {
+  background: #FFFFFF;
+  color: var(--color-ink);
+}
+
+.btn-outline-gold {
+  border: 2px solid var(--color-gold);
+  color: var(--color-gold);
+}
+
+.btn-outline-gold:hover {
+  background: var(--color-gold);
+  color: var(--color-ink);
+}
+
+.text-link {
+  color: var(--color-gold);
+  font-family: var(--font-label);
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-decoration: none;
+  min-height: 44px;
+  min-width: 44px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.text-link:hover {
+  color: var(--color-gold-light);
+}
+
+.card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-line);
+}
+
+.chip {
+  min-height: 52px;
+  min-width: 88px;
+  padding: 0 18px;
+  border: 2px solid rgba(255, 255, 255, 0.25);
+  background: transparent;
+  color: #FFFFFF;
+  font-family: var(--font-display);
+  font-size: 28px;
+  letter-spacing: 0.04em;
+  transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+}
+
+.chip:hover {
+  border-color: var(--color-gold);
+}
+
+.chip[aria-pressed='true'] {
+  background: var(--color-gold);
+  border-color: var(--color-gold);
+  color: var(--color-ink);
+}
+
+.field {
+  width: 100%;
+  min-height: 52px;
+  padding: 12px 16px;
+  box-sizing: border-box;
   background: rgba(255, 255, 255, 0.04);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 0px !important;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: #FFFFFF;
+  font-family: var(--font-sans);
+  font-size: 16px;
 }
 
-.shadow-gold-sm {
-  box-shadow: 0 2px 8px rgba(197, 165, 90, 0.12);
+.field::placeholder {
+  color: rgba(230, 233, 228, 0.45);
 }
 
-.shadow-gold-md {
-  box-shadow: 0 4px 16px rgba(197, 165, 90, 0.15);
+.field:focus {
+  border-color: var(--color-gold);
 }
 
-.shadow-gold-lg {
-  box-shadow: 0 8px 32px rgba(197, 165, 90, 0.2);
+/* The two logo marks: one colour, taken from the surrounding text colour. */
+.logo-mark {
+  display: block;
+  background-color: currentColor;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
 }
 
-.shadow-pitch {
-  box-shadow: 0 8px 32px rgba(6, 26, 16, 0.6),
-              0 2px 8px rgba(6, 26, 16, 0.4);
+/* --------------------------------------------------------------------------
+   Motion
+   -------------------------------------------------------------------------- */
+
+@property --angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
 }
 
-/* ========================================
-   CALIBRATED TIERS BADGES
-   ======================================== */
-
-.tier-morning {
-  background-color: hsl(200, 85%, 96%);
-  color: hsl(198, 80%, 45%);
+@keyframes spin { to { --angle: 360deg; } }
+@keyframes shine { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+@keyframes slide { to { transform: translateX(-50%); } }
+@keyframes lightsOn {
+  0% { opacity: 0; } 8% { opacity: 0.7; } 11% { opacity: 0.1; } 16% { opacity: 0.9; }
+  19% { opacity: 0.3; } 26% { opacity: 1; } 100% { opacity: 1; }
+}
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgba(63, 220, 110, 0.7); }
+  70% { box-shadow: 0 0 0 10px rgba(63, 220, 110, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(63, 220, 110, 0); }
+}
+@keyframes rise { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
+@keyframes lamp { from { width: 30%; opacity: 0.4; } to { width: 64%; opacity: 1; } }
+@keyframes bob {
+  0%, 100% { transform: translateZ(46px) translateY(0); }
+  50% { transform: translateZ(46px) translateY(-6px); }
 }
 
-.tier-peak {
-  background-color: hsl(24, 95%, 96%);
-  color: hsl(20, 85%, 55%);
+.beam-ring {
+  padding: 2px;
+  background: conic-gradient(from var(--angle), rgba(224, 194, 90, 0.15) 0deg, rgba(224, 194, 90, 0.15) 250deg, #FFF1C9 300deg, #E0C27A 320deg, rgba(224, 194, 90, 0.15) 360deg);
+  animation: spin 4s linear infinite;
+}
+.marquee-track { animation: slide 32s linear infinite; }
+.lights { animation: lightsOn 2.4s ease-out both; }
+.status-dot.is-open { animation: pulse 1.8s infinite; }
+.rise { animation: rise 0.5s cubic-bezier(0.34, 1.4, 0.64, 1) both; }
+.lamp-bar { animation: lamp 1.4s ease-out both; }
+.pitch-marker { transform: translateZ(46px); animation: bob 2.6s ease-in-out infinite; }
+
+.photo { overflow: hidden; }
+.photo img { transition: transform 0.5s ease; }
+.photo:hover img { transform: scale(1.05); }
+
+/* Bento grid with a cursor spotlight. The tile sets --x/--y on mouse move. */
+.bento {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-auto-rows: 220px;
+  gap: 14px;
+}
+.bento-tile::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s;
+  background: radial-gradient(380px circle at var(--x, 50%) var(--y, 50%), rgba(224, 194, 90, 0.18), transparent 60%);
+}
+.bento-tile:hover::before { opacity: 1; }
+@media (max-width: 900px) {
+  .bento { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 560px) {
+  .bento { grid-template-columns: minmax(0, 1fr); grid-auto-rows: auto; }
+  .bento > * { grid-column: auto !important; grid-row: auto !important; min-height: 200px; }
 }
 
-.tier-offpeak {
-  background-color: hsl(142, 70%, 95%);
-  color: hsl(142, 60%, 40%);
+/* Everything that moves stops for anyone who has asked for less motion. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+  .photo:hover img { transform: none; }
 }
 
-/* ========================================
-   ANIMATIONS & HOVERS (TRANSITIONS TRANSFORM ONLY)
-   ======================================= */
-
-@keyframes shimmer {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
-}
-
-@keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-4px); }
-}
-
-@keyframes slide-up {
-  from { opacity: 0; transform: translateY(12px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.animate-shimmer { animation: shimmer 2s infinite; }
-.animate-float { animation: float 3s ease-in-out infinite; }
-.animate-slide-up { animation: slide-up 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
-
-.btn-premium {
-  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.2s ease, border-color 0.2s ease;
-  border-radius: 0px !important;
-}
-
-.btn-premium:active {
-  transform: scale(0.98);
-}
-
-/* Stagger delays for list items */
-.stagger-1 { animation-delay: 35ms; }
-.stagger-2 { animation-delay: 70ms; }
-.stagger-3 { animation-delay: 105ms; }
-.stagger-4 { animation-delay: 140ms; }
-.stagger-5 { animation-delay: 175ms; }
-
-/* Scrollbar Hide */
 .scrollbar-hide::-webkit-scrollbar { display: none; }
 .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
-
-.spring-bounce {
-  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-/* ========================================
-   BENTO CONTAINER (border-radius: 0px)
-   ======================================== */
-.bento-tile {
-  background: #FFFFFF;
-  border: 1px solid rgba(45, 80, 22, 0.12);
-  box-shadow: 0 4px 20px -2px rgba(45, 80, 22, 0.03);
-  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.3s ease, box-shadow 0.3s ease;
-  border-radius: 0px !important;
-}
-
-.bento-tile:hover {
-  border-color: #C5A55A;
-  box-shadow: 0 12px 30px rgba(45, 80, 22, 0.06);
-  transform: translateY(-2px);
-}

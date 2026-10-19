@@ -1,0 +1,2129 @@
+{
+  "components": {
+    "schemas": {
+      "ActivitiesData": {
+        "properties": {
+          "activities": {
+            "items": {
+              "$ref": "#/components/schemas/Activity"
+            },
+            "title": "Activities",
+            "type": "array"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "title": "Updated At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "activities",
+          "updated_at"
+        ],
+        "title": "ActivitiesData",
+        "type": "object"
+      },
+      "ActivitiesResponse": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/ActivitiesData"
+          },
+          "meta": {
+            "$ref": "#/components/schemas/ResponseMeta"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ],
+        "title": "ActivitiesResponse",
+        "type": "object"
+      },
+      "Activity": {
+        "properties": {
+          "activity_id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Activity Id",
+            "type": "string"
+          },
+          "booking_mode": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Booking Mode",
+            "type": "string"
+          },
+          "category": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Category",
+            "type": "string"
+          },
+          "name": {
+            "maxLength": 256,
+            "minLength": 1,
+            "title": "Name",
+            "type": "string"
+          },
+          "price_display": {
+            "anyOf": [
+              {
+                "maxLength": 512,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Price Display"
+          },
+          "schedule_display": {
+            "anyOf": [
+              {
+                "maxLength": 256,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Schedule Display"
+          }
+        },
+        "required": [
+          "activity_id",
+          "name",
+          "category",
+          "booking_mode"
+        ],
+        "title": "Activity",
+        "type": "object"
+      },
+      "AvailabilityData": {
+        "properties": {
+          "next_cursor": {
+            "title": "Next Cursor",
+            "type": "null"
+          },
+          "query": {
+            "$ref": "#/components/schemas/AvailabilityQuery"
+          },
+          "slots": {
+            "items": {
+              "$ref": "#/components/schemas/AvailabilitySlot"
+            },
+            "title": "Slots",
+            "type": "array"
+          }
+        },
+        "required": [
+          "query",
+          "slots"
+        ],
+        "title": "AvailabilityData",
+        "type": "object"
+      },
+      "AvailabilityLocalTime": {
+        "properties": {
+          "display": {
+            "title": "Display",
+            "type": "string"
+          },
+          "end_local": {
+            "title": "End Local",
+            "type": "string"
+          },
+          "handover_ends_local": {
+            "title": "Handover Ends Local",
+            "type": "string"
+          },
+          "start_local": {
+            "title": "Start Local",
+            "type": "string"
+          },
+          "timezone": {
+            "title": "Timezone",
+            "type": "string"
+          }
+        },
+        "required": [
+          "timezone",
+          "start_local",
+          "end_local",
+          "handover_ends_local",
+          "display"
+        ],
+        "title": "AvailabilityLocalTime",
+        "type": "object"
+      },
+      "AvailabilityPrice": {
+        "properties": {
+          "amount_minor": {
+            "title": "Amount Minor",
+            "type": "integer"
+          },
+          "currency": {
+            "title": "Currency",
+            "type": "string"
+          },
+          "display": {
+            "title": "Display",
+            "type": "string"
+          },
+          "per": {
+            "default": "booking",
+            "title": "Per",
+            "type": "string"
+          },
+          "rule_id": {
+            "title": "Rule Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "amount_minor",
+          "currency",
+          "display",
+          "rule_id"
+        ],
+        "title": "AvailabilityPrice",
+        "type": "object"
+      },
+      "AvailabilityQuery": {
+        "properties": {
+          "duration_minutes": {
+            "title": "Duration Minutes",
+            "type": "integer"
+          },
+          "from": {
+            "format": "date",
+            "title": "From",
+            "type": "string"
+          },
+          "resource_id": {
+            "title": "Resource Id",
+            "type": "string"
+          },
+          "timezone": {
+            "title": "Timezone",
+            "type": "string"
+          },
+          "to": {
+            "format": "date",
+            "title": "To",
+            "type": "string"
+          }
+        },
+        "required": [
+          "from",
+          "to",
+          "timezone",
+          "resource_id",
+          "duration_minutes"
+        ],
+        "title": "AvailabilityQuery",
+        "type": "object"
+      },
+      "AvailabilityResponse": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/AvailabilityData"
+          },
+          "meta": {
+            "$ref": "#/components/schemas/ResponseMeta"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ],
+        "title": "AvailabilityResponse",
+        "type": "object"
+      },
+      "AvailabilitySlot": {
+        "properties": {
+          "bookable": {
+            "title": "Bookable",
+            "type": "boolean"
+          },
+          "duration_minutes": {
+            "title": "Duration Minutes",
+            "type": "integer"
+          },
+          "end_at": {
+            "format": "date-time",
+            "title": "End At",
+            "type": "string"
+          },
+          "handover_minutes": {
+            "title": "Handover Minutes",
+            "type": "integer"
+          },
+          "local": {
+            "$ref": "#/components/schemas/AvailabilityLocalTime"
+          },
+          "occupied_until_at": {
+            "format": "date-time",
+            "title": "Occupied Until At",
+            "type": "string"
+          },
+          "price": {
+            "$ref": "#/components/schemas/AvailabilityPrice"
+          },
+          "resource_id": {
+            "title": "Resource Id",
+            "type": "string"
+          },
+          "resource_name": {
+            "title": "Resource Name",
+            "type": "string"
+          },
+          "slot_id": {
+            "title": "Slot Id",
+            "type": "string"
+          },
+          "start_at": {
+            "format": "date-time",
+            "title": "Start At",
+            "type": "string"
+          },
+          "unbookable_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unbookable Reason"
+          }
+        },
+        "required": [
+          "slot_id",
+          "resource_id",
+          "resource_name",
+          "start_at",
+          "end_at",
+          "occupied_until_at",
+          "duration_minutes",
+          "handover_minutes",
+          "local",
+          "price",
+          "bookable",
+          "unbookable_reason"
+        ],
+        "title": "AvailabilitySlot",
+        "type": "object"
+      },
+      "Closure": {
+        "properties": {
+          "all_day": {
+            "default": true,
+            "title": "All Day",
+            "type": "boolean"
+          },
+          "date": {
+            "format": "date",
+            "title": "Date",
+            "type": "string"
+          },
+          "reason": {
+            "maxLength": 256,
+            "minLength": 1,
+            "title": "Reason",
+            "type": "string"
+          }
+        },
+        "required": [
+          "date",
+          "reason"
+        ],
+        "title": "Closure",
+        "type": "object"
+      },
+      "ConversationMessage": {
+        "properties": {
+          "channel": {
+            "pattern": "^whatsapp$",
+            "title": "Channel",
+            "type": "string"
+          },
+          "conversation_id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Conversation Id",
+            "type": "string"
+          },
+          "direction": {
+            "$ref": "#/components/schemas/MessageDirection"
+          },
+          "from": {
+            "$ref": "#/components/schemas/MessageSender"
+          },
+          "message_id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Message Id",
+            "type": "string"
+          },
+          "provider": {
+            "maxLength": 64,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9_-]+$",
+            "title": "Provider",
+            "type": "string"
+          },
+          "provider_message_id": {
+            "maxLength": 512,
+            "minLength": 1,
+            "title": "Provider Message Id",
+            "type": "string"
+          },
+          "received_at": {
+            "format": "date-time",
+            "title": "Received At",
+            "type": "string"
+          },
+          "tenant_id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Tenant Id",
+            "type": "string"
+          },
+          "text": {
+            "anyOf": [
+              {
+                "maxLength": 65536,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Text"
+          },
+          "to": {
+            "$ref": "#/components/schemas/MessageRecipient"
+          },
+          "type": {
+            "$ref": "#/components/schemas/MessageType"
+          }
+        },
+        "required": [
+          "message_id",
+          "tenant_id",
+          "channel",
+          "direction",
+          "provider",
+          "provider_message_id",
+          "received_at",
+          "from",
+          "to",
+          "type",
+          "conversation_id"
+        ],
+        "title": "ConversationMessage",
+        "type": "object"
+      },
+      "CreateBookingRequest": {
+        "properties": {
+          "channel": {
+            "enum": [
+              "whatsapp",
+              "staff",
+              "website"
+            ],
+            "title": "Channel",
+            "type": "string"
+          },
+          "conversation_id": {
+            "anyOf": [
+              {
+                "maxLength": 128,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Conversation Id"
+          },
+          "customer_id": {
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Customer Id",
+            "type": "string"
+          },
+          "duration_minutes": {
+            "anyOf": [
+              {
+                "maximum": 600.0,
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration Minutes"
+          },
+          "hold_id": {
+            "anyOf": [
+              {
+                "maxLength": 64,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Hold Id"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "maxLength": 1000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "party_size": {
+            "default": 1,
+            "maximum": 500.0,
+            "minimum": 1.0,
+            "title": "Party Size",
+            "type": "integer"
+          },
+          "resource_id": {
+            "anyOf": [
+              {
+                "maxLength": 64,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resource Id"
+          },
+          "source": {
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Source",
+            "type": "string"
+          },
+          "start_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Start At"
+          }
+        },
+        "required": [
+          "customer_id",
+          "channel",
+          "source"
+        ],
+        "title": "CreateBookingRequest",
+        "type": "object"
+      },
+      "CreateHoldRequest": {
+        "properties": {
+          "conversation_id": {
+            "anyOf": [
+              {
+                "maxLength": 128,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Conversation Id"
+          },
+          "customer_id": {
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Customer Id",
+            "type": "string"
+          },
+          "duration_minutes": {
+            "maximum": 600.0,
+            "minimum": 1.0,
+            "title": "Duration Minutes",
+            "type": "integer"
+          },
+          "party_size": {
+            "default": 1,
+            "maximum": 500.0,
+            "minimum": 1.0,
+            "title": "Party Size",
+            "type": "integer"
+          },
+          "resource_id": {
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Resource Id",
+            "type": "string"
+          },
+          "start_at": {
+            "format": "date-time",
+            "title": "Start At",
+            "type": "string"
+          },
+          "ttl_seconds": {
+            "default": 900,
+            "maximum": 900.0,
+            "minimum": 60.0,
+            "title": "Ttl Seconds",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "resource_id",
+          "start_at",
+          "duration_minutes",
+          "customer_id"
+        ],
+        "title": "CreateHoldRequest",
+        "type": "object"
+      },
+      "CustomerResolutionData": {
+        "properties": {
+          "customer": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ResolvedCustomer"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "is_new": {
+            "title": "Is New",
+            "type": "boolean"
+          },
+          "match_type": {
+            "enum": [
+              "known_identifier",
+              "existing_record_unverified",
+              "created",
+              "none"
+            ],
+            "title": "Match Type",
+            "type": "string"
+          },
+          "needs_identity_confirmation": {
+            "title": "Needs Identity Confirmation",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "customer",
+          "match_type",
+          "is_new",
+          "needs_identity_confirmation"
+        ],
+        "title": "CustomerResolutionData",
+        "type": "object"
+      },
+      "CustomerResolveResponse": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/CustomerResolutionData"
+          },
+          "meta": {
+            "$ref": "#/components/schemas/ResponseMeta"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ],
+        "title": "CustomerResolveResponse",
+        "type": "object"
+      },
+      "CustomerStats": {
+        "properties": {
+          "total_bookings": {
+            "title": "Total Bookings",
+            "type": "integer"
+          },
+          "upcoming_bookings": {
+            "title": "Upcoming Bookings",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "total_bookings",
+          "upcoming_bookings"
+        ],
+        "title": "CustomerStats",
+        "type": "object"
+      },
+      "ErrorResponse": {
+        "properties": {
+          "error": {
+            "properties": {
+              "code": {
+                "type": "string"
+              },
+              "details": {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              "disposition": {
+                "type": "string"
+              },
+              "message": {
+                "type": "string"
+              },
+              "request_id": {
+                "type": "string"
+              },
+              "retryable": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "code",
+              "message",
+              "disposition",
+              "retryable",
+              "details",
+              "request_id"
+            ],
+            "type": "object"
+          },
+          "meta": {
+            "properties": {
+              "contract_version": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "contract_version"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "error",
+          "meta"
+        ],
+        "type": "object"
+      },
+      "FactsData": {
+        "properties": {
+          "facts": {
+            "$ref": "#/components/schemas/VenueFacts"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "title": "Updated At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "facts",
+          "updated_at"
+        ],
+        "title": "FactsData",
+        "type": "object"
+      },
+      "FactsResponse": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/FactsData"
+          },
+          "meta": {
+            "$ref": "#/components/schemas/ResponseMeta"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ],
+        "title": "FactsResponse",
+        "type": "object"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail",
+            "type": "array"
+          }
+        },
+        "title": "HTTPValidationError",
+        "type": "object"
+      },
+      "MessageDirection": {
+        "enum": [
+          "inbound",
+          "outbound"
+        ],
+        "title": "MessageDirection",
+        "type": "string"
+      },
+      "MessageRecipient": {
+        "properties": {
+          "phone_e164": {
+            "title": "Phone E164",
+            "type": "string"
+          }
+        },
+        "required": [
+          "phone_e164"
+        ],
+        "title": "MessageRecipient",
+        "type": "object"
+      },
+      "MessageResponse": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/StoredMessage"
+          },
+          "meta": {
+            "$ref": "#/components/schemas/ResponseMeta"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ],
+        "title": "MessageResponse",
+        "type": "object"
+      },
+      "MessageSender": {
+        "properties": {
+          "phone_e164": {
+            "title": "Phone E164",
+            "type": "string"
+          },
+          "profile_name": {
+            "anyOf": [
+              {
+                "maxLength": 256,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Profile Name"
+          },
+          "provider_user_id": {
+            "maxLength": 256,
+            "minLength": 1,
+            "title": "Provider User Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "phone_e164",
+          "provider_user_id"
+        ],
+        "title": "MessageSender",
+        "type": "object"
+      },
+      "MessageType": {
+        "enum": [
+          "text",
+          "interactive",
+          "image",
+          "audio",
+          "location",
+          "unsupported"
+        ],
+        "title": "MessageType",
+        "type": "string"
+      },
+      "OpeningHours": {
+        "properties": {
+          "close_local": {
+            "pattern": "^(?:(?:[01]\\d|2[0-3]):[0-5]\\d|24:00)$",
+            "title": "Close Local",
+            "type": "string"
+          },
+          "day": {
+            "enum": [
+              "mon",
+              "tue",
+              "wed",
+              "thu",
+              "fri",
+              "sat",
+              "sun"
+            ],
+            "title": "Day",
+            "type": "string"
+          },
+          "open_local": {
+            "pattern": "^(?:(?:[01]\\d|2[0-3]):[0-5]\\d|24:00)$",
+            "title": "Open Local",
+            "type": "string"
+          }
+        },
+        "required": [
+          "day",
+          "open_local",
+          "close_local"
+        ],
+        "title": "OpeningHours",
+        "type": "object"
+      },
+      "PricingSummary": {
+        "properties": {
+          "activity_id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Activity Id",
+            "type": "string"
+          },
+          "display": {
+            "maxLength": 512,
+            "minLength": 1,
+            "title": "Display",
+            "type": "string"
+          },
+          "label": {
+            "maxLength": 256,
+            "minLength": 1,
+            "title": "Label",
+            "type": "string"
+          }
+        },
+        "required": [
+          "activity_id",
+          "label",
+          "display"
+        ],
+        "title": "PricingSummary",
+        "type": "object"
+      },
+      "ResolveCustomerRequest": {
+        "properties": {
+          "channel": {
+            "const": "whatsapp",
+            "title": "Channel",
+            "type": "string"
+          },
+          "create_if_missing": {
+            "default": true,
+            "title": "Create If Missing",
+            "type": "boolean"
+          },
+          "phone_e164": {
+            "title": "Phone E164",
+            "type": "string"
+          },
+          "profile_name": {
+            "anyOf": [
+              {
+                "maxLength": 256,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Profile Name"
+          },
+          "provider": {
+            "const": "meta_cloud",
+            "title": "Provider",
+            "type": "string"
+          },
+          "provider_user_id": {
+            "maxLength": 256,
+            "minLength": 1,
+            "title": "Provider User Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "phone_e164",
+          "provider",
+          "provider_user_id",
+          "channel"
+        ],
+        "title": "ResolveCustomerRequest",
+        "type": "object"
+      },
+      "ResolvedCustomer": {
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "customer_id": {
+            "title": "Customer Id",
+            "type": "string"
+          },
+          "display_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Display Name"
+          },
+          "stats": {
+            "$ref": "#/components/schemas/CustomerStats"
+          },
+          "status": {
+            "enum": [
+              "active",
+              "blocked",
+              "archived"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "customer_id",
+          "display_name",
+          "status",
+          "created_at",
+          "stats"
+        ],
+        "title": "ResolvedCustomer",
+        "type": "object"
+      },
+      "ResponseMeta": {
+        "properties": {
+          "contract_version": {
+            "title": "Contract Version",
+            "type": "string"
+          },
+          "request_id": {
+            "title": "Request Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "request_id",
+          "contract_version"
+        ],
+        "title": "ResponseMeta",
+        "type": "object"
+      },
+      "StoredMessage": {
+        "properties": {
+          "duplicate": {
+            "title": "Duplicate",
+            "type": "boolean"
+          },
+          "message_id": {
+            "title": "Message Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "duplicate",
+          "message_id"
+        ],
+        "title": "StoredMessage",
+        "type": "object"
+      },
+      "ValidationError": {
+        "properties": {
+          "ctx": {
+            "title": "Context",
+            "type": "object"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "title": "Location",
+            "type": "array"
+          },
+          "msg": {
+            "title": "Message",
+            "type": "string"
+          },
+          "type": {
+            "title": "Error Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError",
+        "type": "object"
+      },
+      "VenueFacts": {
+        "properties": {
+          "address": {
+            "maxLength": 1024,
+            "minLength": 1,
+            "title": "Address",
+            "type": "string"
+          },
+          "closures": {
+            "items": {
+              "$ref": "#/components/schemas/Closure"
+            },
+            "title": "Closures",
+            "type": "array"
+          },
+          "hours_note": {
+            "anyOf": [
+              {
+                "maxLength": 512,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Hours Note"
+          },
+          "last_bookable_start_local": {
+            "anyOf": [
+              {
+                "pattern": "^(?:(?:[01]\\d|2[0-3]):[0-5]\\d|24:00)$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Bookable Start Local"
+          },
+          "maps_url": {
+            "maxLength": 2048,
+            "minLength": 1,
+            "title": "Maps Url",
+            "type": "string"
+          },
+          "opening_hours": {
+            "items": {
+              "$ref": "#/components/schemas/OpeningHours"
+            },
+            "title": "Opening Hours",
+            "type": "array"
+          },
+          "phone_display": {
+            "maxLength": 256,
+            "minLength": 1,
+            "title": "Phone Display",
+            "type": "string"
+          },
+          "pricing_summary": {
+            "items": {
+              "$ref": "#/components/schemas/PricingSummary"
+            },
+            "title": "Pricing Summary",
+            "type": "array"
+          },
+          "standard_open_local": {
+            "anyOf": [
+              {
+                "pattern": "^(?:(?:[01]\\d|2[0-3]):[0-5]\\d|24:00)$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Standard Open Local"
+          },
+          "timezone": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Timezone",
+            "type": "string"
+          },
+          "venue_name": {
+            "maxLength": 256,
+            "minLength": 1,
+            "title": "Venue Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "venue_name",
+          "address",
+          "maps_url",
+          "phone_display",
+          "timezone",
+          "opening_hours",
+          "closures",
+          "pricing_summary"
+        ],
+        "title": "VenueFacts",
+        "type": "object"
+      }
+    },
+    "securitySchemes": {
+      "BearerAuth": {
+        "scheme": "bearer",
+        "type": "http"
+      }
+    }
+  },
+  "info": {
+    "title": "MVSA Backend",
+    "version": "1.0.0"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/v1/activities": {
+      "get": {
+        "operationId": "activities_v1_activities_get",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Tenant-Id",
+            "required": true,
+            "schema": {
+              "example": "mvsa",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Request-Id",
+            "required": true,
+            "schema": {
+              "maxLength": 128,
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Contract-Version",
+            "required": true,
+            "schema": {
+              "example": "1.0.0",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActivitiesResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Request validation failed"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Authentication failed"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Tenant or resource access was denied"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Internal server error"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Venue facts are not configured"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Activities",
+        "tags": [
+          "knowledge"
+        ]
+      }
+    },
+    "/v1/availability": {
+      "get": {
+        "operationId": "availability_v1_availability_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "from",
+            "required": true,
+            "schema": {
+              "format": "date",
+              "title": "From",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "to",
+            "required": true,
+            "schema": {
+              "format": "date",
+              "title": "To",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "resource_id",
+            "required": false,
+            "schema": {
+              "default": "res_turf",
+              "maxLength": 64,
+              "minLength": 1,
+              "title": "Resource Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "duration_minutes",
+            "required": false,
+            "schema": {
+              "default": 60,
+              "maximum": 600,
+              "minimum": 1,
+              "title": "Duration Minutes",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "only_bookable",
+            "required": false,
+            "schema": {
+              "default": true,
+              "title": "Only Bookable",
+              "type": "boolean"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Tenant-Id",
+            "required": true,
+            "schema": {
+              "example": "mvsa",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Request-Id",
+            "required": true,
+            "schema": {
+              "maxLength": 128,
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Contract-Version",
+            "required": true,
+            "schema": {
+              "example": "1.0.0",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AvailabilityResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Request validation failed"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Authentication failed"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Tenant or resource access was denied"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Internal server error"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Availability",
+        "tags": [
+          "availability"
+        ]
+      }
+    },
+    "/v1/bookings": {
+      "post": {
+        "operationId": "create_booking_v1_bookings_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Tenant-Id",
+            "required": true,
+            "schema": {
+              "example": "mvsa",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Request-Id",
+            "required": true,
+            "schema": {
+              "maxLength": 128,
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Contract-Version",
+            "required": true,
+            "schema": {
+              "example": "1.0.0",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Canonical UUIDv4 reused for every retry of the same intent.",
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateBookingRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Request validation failed"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Authentication failed"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Tenant or resource access was denied"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Internal server error"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Create Booking",
+        "tags": [
+          "bookings"
+        ]
+      }
+    },
+    "/v1/conversations/messages": {
+      "post": {
+        "operationId": "record_message_v1_conversations_messages_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Tenant-Id",
+            "required": true,
+            "schema": {
+              "example": "mvsa",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Request-Id",
+            "required": true,
+            "schema": {
+              "maxLength": 128,
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Contract-Version",
+            "required": true,
+            "schema": {
+              "example": "1.0.0",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConversationMessage"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Request validation failed"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Authentication failed"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Tenant or resource access was denied"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Internal server error"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Record Message",
+        "tags": [
+          "conversations"
+        ]
+      }
+    },
+    "/v1/customers/resolve": {
+      "post": {
+        "operationId": "resolve_customer_v1_customers_resolve_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Tenant-Id",
+            "required": true,
+            "schema": {
+              "example": "mvsa",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Request-Id",
+            "required": true,
+            "schema": {
+              "maxLength": 128,
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Contract-Version",
+            "required": true,
+            "schema": {
+              "example": "1.0.0",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Canonical UUIDv4 reused for every retry of the same intent.",
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResolveCustomerRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomerResolveResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Request validation failed"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Authentication failed"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Tenant or resource access was denied"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Internal server error"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Resolve Customer",
+        "tags": [
+          "customers"
+        ]
+      }
+    },
+    "/v1/health": {
+      "get": {
+        "operationId": "health_v1_health_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Health",
+        "tags": [
+          "health"
+        ]
+      }
+    },
+    "/v1/holds": {
+      "post": {
+        "operationId": "create_hold_v1_holds_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Tenant-Id",
+            "required": true,
+            "schema": {
+              "example": "mvsa",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Request-Id",
+            "required": true,
+            "schema": {
+              "maxLength": 128,
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Contract-Version",
+            "required": true,
+            "schema": {
+              "example": "1.0.0",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Canonical UUIDv4 reused for every retry of the same intent.",
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateHoldRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Request validation failed"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Authentication failed"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Tenant or resource access was denied"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Internal server error"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Create Hold",
+        "tags": [
+          "bookings"
+        ]
+      }
+    },
+    "/v1/info": {
+      "get": {
+        "operationId": "service_info_v1_info_get",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Tenant-Id",
+            "required": true,
+            "schema": {
+              "example": "mvsa",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Request-Id",
+            "required": true,
+            "schema": {
+              "maxLength": 128,
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Contract-Version",
+            "required": true,
+            "schema": {
+              "example": "1.0.0",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Request validation failed"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Authentication failed"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Tenant or resource access was denied"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Internal server error"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Service Info",
+        "tags": [
+          "system"
+        ]
+      }
+    },
+    "/v1/knowledge/facts": {
+      "get": {
+        "operationId": "venue_facts_v1_knowledge_facts_get",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Tenant-Id",
+            "required": true,
+            "schema": {
+              "example": "mvsa",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Request-Id",
+            "required": true,
+            "schema": {
+              "maxLength": 128,
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Contract-Version",
+            "required": true,
+            "schema": {
+              "example": "1.0.0",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FactsResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Request validation failed"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Authentication failed"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Tenant or resource access was denied"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Internal server error"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Venue facts are not configured"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Venue Facts",
+        "tags": [
+          "knowledge"
+        ]
+      }
+    }
+  }
+}

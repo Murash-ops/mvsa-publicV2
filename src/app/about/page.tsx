@@ -1,233 +1,90 @@
 import Image from 'next/image';
-import { createClient } from '@/utils/supabase/server';
-import { 
-  Heart, 
-  Wifi, 
-  Droplets, 
-  Lock, 
-  Users,
-  MapPin,
-  Clock
-} from 'lucide-react';
+import Link from 'next/link';
+import type { Metadata } from 'next';
+import Logo from '@/components/brand/Logo';
+import PageHeader from '@/components/arena/PageHeader';
+import LampClose from '@/components/arena/LampClose';
+import { about, contact } from '@/content/site';
+import { whatsappUrl } from '@/lib/whatsapp';
 
-export const revalidate = 0; // Prevent caching to ensure site content edits propagate immediately
+export const metadata: Metadata = {
+  title: 'About | Mountain View Sports Arena',
+  description: about.intro,
+};
 
-export default async function AboutPage() {
-  const supabase = await createClient();
-  
-  // Fetch dynamic copy from database site_content table
-  const { data: contentData } = await supabase
-    .from('site_content')
-    .select('*')
-    .eq('key', 'about_page')
-    .single();
-
-  const content = contentData?.value || {
-    title: "THE HEART OF NAIROBI SPORTS",
-    subtitle: "A premium recreational sanctuary dedicated to physical mastery, elite training, and community connection.",
-    story_title: "Our Mission",
-    story_text: "Mountain View Sports Arena (MVSA) was born from a simple vision: to create a world-class sports destination in the heart of our community.\n\nWe believe that sports have the power to transform lives—building character in youth, health in adults, and unity in communities. MVSA provides more than just a pitch; we provide an ecosystem where athletes of all levels can thrive and excel.",
-    turf_spec: "100% Premium Synthetic Turf",
-    security_spec: "24/7 Monitored Facility Security"
-  };
-
-  const amenities = [
-    { icon: Wifi, title: "High-Speed WiFi", desc: "Free access for all players and visitors." },
-    { icon: Droplets, title: "Clean Washrooms", desc: "Well-maintained toilets and changing rooms." },
-    { icon: Lock, title: "Secure Lockers", desc: "Private storage for your peace of mind." },
-    { icon: Users, title: "Meeting Hall", desc: "A versatile space for team meetings and events." },
-  ];
-
+// Page copy is checked in (src/content/site.ts), so this page needs no data layer.
+export default function AboutPage() {
   return (
-    <main className="min-h-screen pt-32 pb-24 bg-transparent text-charcoal">
-      <div className="max-w-7xl mx-auto px-6 lg:px-10">
-        {/* Header */}
-        <header className="mb-20 space-y-6 text-left animate-slide-up">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 border border-white/10 rounded-none">
-            <Heart className="w-4 h-4 text-gold" />
-            <span className="text-white text-[10px] font-bold uppercase tracking-[0.2em]">Our Story & Mission</span>
-          </div>
-          <h1 className="text-5xl md:text-7xl font-display font-bold text-white tracking-tighter leading-[0.9] uppercase">
-            The Heart of <br/>
-            <span className="text-gold">Nairobi Sports</span>
-          </h1>
-          <p className="text-charcoal-light text-lg max-w-2xl font-medium mt-4">
-            {content.subtitle}
-          </p>
-        </header>
+    <main>
+      <PageHeader eyebrow={about.eyebrow} titleTop={about.titleTop} titleBottom={about.titleBottom} intro={about.intro} />
 
-        {/* Story Section - Asymmetric Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center mb-32 text-left">
-          <div className="lg:col-span-7 relative h-[400px] lg:h-[600px] rounded-none overflow-hidden shadow-sm border border-white/10">
-            <Image 
-              src="/images/hero_turf.jpeg" 
-              alt="MVSA Arena Turf Facility" 
-              fill 
-              className="object-cover" 
-              unoptimized
-            />
-            <div className="absolute inset-0 bg-gradient-to-r from-[#061a10]/60 to-transparent" />
-          </div>
-          <div className="lg:col-span-5 space-y-8">
-            <div className="space-y-4">
-              <h2 className="text-3xl font-display font-bold text-white uppercase tracking-tight">{content.story_title}</h2>
-              <p className="text-charcoal-light text-lg leading-relaxed font-medium whitespace-pre-line">
-                {content.story_text}
-              </p>
-            </div>
-            <div className="grid grid-cols-2 gap-4 pt-4">
-              <div className="p-6 glass rounded-none border border-white/10 bg-card">
-                <p className="text-2xl font-display font-bold text-gold uppercase mb-1">100%</p>
-                <p className="text-[10px] font-bold uppercase tracking-widest text-muted">{content.turf_spec}</p>
-              </div>
-              <div className="p-6 glass rounded-none border border-white/10 bg-card">
-                <p className="text-2xl font-display font-bold text-gold uppercase mb-1">24/7</p>
-                <p className="text-[10px] font-bold uppercase tracking-widest text-muted">{content.security_spec}</p>
-              </div>
-            </div>
-          </div>
+      <section className="wrap grid grid-cols-1 items-center gap-12 pb-[clamp(72px,9vw,112px)] lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)]">
+        <div className="flex justify-center border border-white/10 bg-surface p-[clamp(24px,5vw,56px)] text-gold">
+          <Logo variant="emblem" width={480} />
         </div>
+        <div className="flex flex-col gap-5">
+          <h2 className="h-section">
+            Our <span className="text-gold">story</span>
+          </h2>
+          {about.story.map((paragraph) => (
+            <p key={paragraph.slice(0, 24)} className="m-0 text-lg leading-[1.6] text-fog">
+              {paragraph}
+            </p>
+          ))}
+        </div>
+      </section>
 
-        {/* Amenities Section */}
-        <div className="mb-32">
-          <div className="text-center max-w-2xl mx-auto mb-16 space-y-4">
-            <h2 className="text-4xl font-display font-bold text-white uppercase tracking-tight">The Premium Experience</h2>
-            <p className="text-charcoal-light font-medium">We&apos;ve thought of every detail so you can focus on the game.</p>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {amenities.map((item, i) => (
-              <div key={i} className="group p-8 glass rounded-none border border-white/10 hover:border-gold hover:shadow-gold-sm transition-all duration-300 hover:-translate-y-1 text-center spring-bounce bg-card">
-                <div className="w-16 h-16 bg-white/10 text-white rounded-none flex items-center justify-center mx-auto mb-6 group-hover:bg-gold group-hover:text-forest-dark transition-colors duration-300 border border-white/10">
-                  <item.icon className="w-8 h-8" />
-                </div>
-                <h3 className="text-xl font-display font-bold text-white uppercase mb-3">{item.title}</h3>
-                <p className="text-charcoal-light/80 text-sm leading-relaxed font-medium">{item.desc}</p>
-              </div>
+      <section className="border-y border-white/[0.08] bg-surface">
+        <div className="wrap flex flex-col gap-10 py-[clamp(72px,9vw,104px)]">
+          <h2 className="h-section">
+            Built for
+            <br />
+            <span className="text-gold">match night</span>
+          </h2>
+          <div className="grid gap-3.5 [grid-template-columns:repeat(auto-fit,minmax(230px,1fr))]">
+            {about.amenities.map((item, i) => (
+              <article
+                key={item.title}
+                className="rise flex flex-col gap-3 border border-t-4 border-white/10 border-t-grass bg-ink px-6 py-7"
+                style={{ animationDelay: `${(i * 0.07).toFixed(2)}s` }}
+              >
+                <h3 className="display m-0 text-4xl leading-[0.92]">{item.title}</h3>
+                <p className="m-0 text-base leading-normal text-fog">{item.body}</p>
+              </article>
             ))}
           </div>
         </div>
+      </section>
 
-        {/* Facility Showcase Gallery */}
-        <div className="space-y-12 text-left">
-          <div className="flex items-center gap-6">
-            <h2 className="text-3xl font-display font-bold text-white uppercase tracking-tight">Facility Tour & Showcase</h2>
-            <div className="flex-1 h-px bg-white/10" />
+      <section aria-label="The Arena" className="grid gap-1 [grid-template-columns:repeat(auto-fit,minmax(240px,1fr))]">
+        {about.photos.map((photo) => (
+          <div key={photo.src} className="photo relative h-[clamp(300px,40vw,400px)]">
+            <Image src={photo.src} alt={photo.alt} fill sizes="(max-width: 560px) 100vw, 25vw" className="object-cover" />
           </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {/* 1. Turf recreational */}
-            <div className="relative rounded-none overflow-hidden border border-white/10 group h-[320px]">
-              <Image 
-                src="/images/hero_turf.jpeg" 
-                alt="Main Arena Turf - Recreational Play" 
-                fill 
-                className="object-cover transition-transform duration-500 group-hover:scale-105" 
-                unoptimized
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-forest-dark/70 via-transparent to-transparent" />
-              <div className="absolute bottom-6 left-6 text-white z-10">
-                <p className="font-display font-bold text-lg uppercase tracking-wider text-gold">Main Arena Turf</p>
-                <p className="text-[9px] font-mono uppercase tracking-widest text-white/80">Recreational & Tournament Play</p>
-              </div>
-            </div>
+        ))}
+      </section>
 
-            {/* 2. Turf academy */}
-            <div className="relative rounded-none overflow-hidden border border-white/10 group h-[320px]">
-              <Image 
-                src="/images/academy.jpeg" 
-                alt="Main Arena - Youth Training (Conducted on Main Turf)" 
-                fill 
-                className="object-cover transition-transform duration-500 group-hover:scale-105" 
-                unoptimized
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-forest-dark/70 via-transparent to-transparent" />
-              <div className="absolute bottom-6 left-6 text-white z-10">
-                <p className="font-display font-bold text-lg uppercase tracking-wider text-gold">Main Arena - Youth Training</p>
-                <p className="text-[9px] font-mono uppercase tracking-widest text-white/80">Academy Training (Held on Main Turf)</p>
-              </div>
-            </div>
-
-            {/* 3. Meeting Hall */}
-            <div className="relative rounded-none overflow-hidden border border-white/10 group h-[320px]">
-              <Image 
-                src="/images/meeting_hall.jpeg" 
-                alt="Meeting Hall strategist rooms" 
-                fill 
-                className="object-cover transition-transform duration-500 group-hover:scale-105" 
-                unoptimized
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-forest-dark/70 via-transparent to-transparent" />
-              <div className="absolute bottom-6 left-6 text-white z-10">
-                <p className="font-display font-bold text-lg uppercase tracking-wider text-gold">The Meeting Hall</p>
-                <p className="text-[9px] font-mono uppercase tracking-widest text-white/80">Strategy & Team Gatherings</p>
-              </div>
-            </div>
-
-            {/* 4. Washrooms / Changing Rooms Placeholder */}
-            <div className="flex flex-col justify-between p-8 rounded-none border border-dashed border-gold/40 bg-gold/5 h-[320px] text-left hover:border-gold transition-all duration-300">
-              <div className="w-12 h-12 bg-gold/10 border border-gold/20 text-gold flex items-center justify-center">
-                <Lock className="w-6 h-6" />
-              </div>
-              <div className="space-y-2">
-                <h3 className="text-lg font-display font-bold text-white uppercase tracking-tight">Changing Rooms</h3>
-                <p className="text-charcoal-light text-xs leading-relaxed font-medium">
-                  Modern changing chambers, secure locker vaults, and fresh shower facilities.
-                </p>
-                <span className="inline-block text-[9px] font-mono font-bold uppercase tracking-widest text-gold bg-gold/10 px-2 py-0.5 border border-gold/20">
-                  Photo Placeholder
-                </span>
-              </div>
-            </div>
-          </div>
+      <section className="wrap flex flex-wrap items-end justify-between gap-8 py-[clamp(72px,9vw,112px)]">
+        <div className="flex max-w-[620px] flex-col gap-4">
+          <h2 className="h-section">{about.partner.title}</h2>
+          <p className="m-0 text-lg leading-[1.55] text-fog">{about.partner.body}</p>
         </div>
+        <a
+          href={whatsappUrl(contact.whatsappNumber, about.partner.message)}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="btn btn-outline-gold"
+        >
+          Talk to us
+        </a>
+      </section>
 
-        {/* SPONSORS & PARTNERSHIPS SECTION */}
-        <div className="mt-24 border-t border-white/5 pt-16 text-center max-w-4xl mx-auto px-6">
-          <span className="text-[10px] font-mono font-bold uppercase tracking-[0.3em] text-gold">Cooperation Registry</span>
-          <h2 className="text-3xl md:text-4xl font-display font-black text-white italic uppercase tracking-tight mt-2 mb-4">
-            Partnerships & Sponsorships
-          </h2>
-          <p className="text-charcoal-light text-sm md:text-base leading-relaxed font-medium mb-12 max-w-2xl mx-auto">
-            Align your brand with elite athletic development, youth empowerment, and community sports advocacy in the heart of Nairobi. Join our network of corporate partners.
-          </p>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-left mb-12">
-            <div className="p-6 bg-white/[0.01] border border-white/5 rounded-none hover:border-gold/30 transition-all duration-300">
-              <span className="text-gold text-xs font-mono font-bold block uppercase mb-2">01 / Visibility</span>
-              <h3 className="text-white font-display font-bold text-sm uppercase tracking-wider mb-2">Elite Pitchside Brand Exposure</h3>
-              <p className="text-charcoal-light/70 text-xs font-medium leading-relaxed">
-                Feature premium brand signage on our main turf sidelines, indoor arenas, or digital streaming broadcasts during tournaments.
-              </p>
-            </div>
-            
-            <div className="p-6 bg-white/[0.01] border border-white/5 rounded-none hover:border-gold/30 transition-all duration-300">
-              <span className="text-gold text-xs font-mono font-bold block uppercase mb-2">02 / Academy</span>
-              <h3 className="text-white font-display font-bold text-sm uppercase tracking-wider mb-2">Youth Academy Sponsorships</h3>
-              <p className="text-charcoal-light/70 text-xs font-medium leading-relaxed">
-                Fund underprivileged youth cohorts, supply official branded jerseys, or support academy training gear to drive local talent.
-              </p>
-            </div>
-
-            <div className="p-6 bg-white/[0.01] border border-white/5 rounded-none hover:border-gold/30 transition-all duration-300">
-              <span className="text-gold text-xs font-mono font-bold block uppercase mb-2">03 / Corporate</span>
-              <h3 className="text-white font-display font-bold text-sm uppercase tracking-wider mb-2">Corporate Naming Rights</h3>
-              <p className="text-charcoal-light/70 text-xs font-medium leading-relaxed">
-                Secure naming rights for key facilities, tournaments, or VIP strategist lounges with exclusive executive board access.
-              </p>
-            </div>
-          </div>
-
-          <a 
-            href="https://wa.me/254798258950?text=Hello%2C%20I%20am%20interested%20in%20discussing%20a%20corporate%20partnership%20with%20MVSA%20Sports%20Arena."
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-block px-8 py-4 bg-gradient-to-r from-gold to-gold-deep hover:from-white hover:to-white text-forest font-black uppercase text-xs tracking-[0.2em] transition-all duration-300 shadow-gold-sm hover:scale-[1.02]"
-          >
-            Become a Partner
-          </a>
-        </div>
-      </div>
+      <LampClose>
+        <Link href="/book" className="btn shine">Book the Arena</Link>
+        <a href={contact.bookingsPhoneHref} className="btn btn-ghost">
+          Call {contact.bookingsPhone}
+        </a>
+      </LampClose>
     </main>
   );
 }

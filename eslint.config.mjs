@@ -9,6 +9,8 @@ const eslintConfig = defineConfig([
   globalIgnores([
     // Default ignores of eslint-config-next:
     ".next/**",
+    // The booking-writes Playwright project builds into its own distDir (see playwright.config.ts).
+    ".next_public*/**",
     "out/**",
     "build/**",
     "next-env.d.ts",
