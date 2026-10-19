@@ -26,7 +26,7 @@ test.describe('booking page', () => {
 
     // An unbookable slot is shown as taken, not hidden.
     await expect(page.getByTestId('slot-grid')).toContainText('Taken');
-    await expect(page.getByTestId('backend-unreachable')).toHaveCount(0);
+    await expect(page.getByTestId('booking-offline')).toHaveCount(0);
   });
 
   test('both bookable venues are offered', async ({ page }) => {
@@ -37,11 +37,11 @@ test.describe('booking page', () => {
     await page.goto('/book');
 
     const venues = page.getByTestId('venue-grid');
-    await expect(venues).toContainText('Main Arena Turf');
+    await expect(venues).toContainText('The Arena');
     await expect(venues).toContainText('Meeting Room / Conference Hall');
   });
 
-  test('an unreachable backend is reported, never shown as fully booked', async ({ page }) => {
+  test('an unreachable backend shows one calm block, never a dead picker or a full diary', async ({ page }) => {
     await page.route('**/api/availability*', async (route) => {
       await route.fulfill({
         status: 502,
@@ -51,18 +51,21 @@ test.describe('booking page', () => {
 
     await page.goto('/book');
 
-    const notice = page.getByTestId('backend-unreachable');
-    await expect(notice).toBeVisible();
-    await expect(notice).toContainText('cannot reach the arena booking system');
-    await expect(notice).toContainText('does not mean the arena is full');
+    const calm = page.getByTestId('booking-offline');
+    await expect(calm).toBeVisible();
+    await expect(calm).toContainText('Book on WhatsApp or by phone');
+    await expect(calm).toContainText('Online booking is coming');
 
-    // The honest failure replaces the slot grid and the empty-diary message.
+    // No alarm, no dead date picker, and nothing that reads as "fully booked".
+    await expect(page.getByText(/cannot reach/i)).toHaveCount(0);
+    await expect(page.getByTestId('date-strip')).toHaveCount(0);
     await expect(page.getByTestId('slot-grid')).toHaveCount(0);
     await expect(page.getByTestId('slots-empty')).toHaveCount(0);
 
-    // ...and the phone and WhatsApp route is offered instead.
-    await expect(notice.getByTestId('whatsapp-route')).toBeVisible();
-    await expect(notice.getByTestId('phone-route')).toBeVisible();
+    // ...and the WhatsApp and phone routes are offered, with the kick-off picker.
+    await expect(calm.getByTestId('kickoff-picker')).toBeVisible();
+    await expect(calm.getByTestId('kickoff-cta')).toHaveAttribute('href', /wa\.me\/254798258950/);
+    await expect(calm.getByTestId('phone-route')).toBeVisible();
   });
 
   test('retrying after an outage shows the slots', async ({ page }) => {
@@ -80,12 +83,12 @@ test.describe('booking page', () => {
     });
 
     await page.goto('/book');
-    await expect(page.getByTestId('backend-unreachable')).toBeVisible();
+    await expect(page.getByTestId('booking-offline')).toBeVisible();
 
     await page.getByTestId('retry-availability').click();
 
     await expect(page.getByTestId('slot-grid')).toBeVisible();
-    await expect(page.getByTestId('backend-unreachable')).toHaveCount(0);
+    await expect(page.getByTestId('booking-offline')).toHaveCount(0);
   });
 
   test('a genuinely empty diary is distinguished from an outage', async ({ page }) => {
@@ -98,7 +101,7 @@ test.describe('booking page', () => {
     const empty = page.getByTestId('slots-empty');
     await expect(empty).toBeVisible();
     await expect(empty).toContainText('Nothing of that length is left on this date');
-    await expect(page.getByTestId('backend-unreachable')).toHaveCount(0);
+    await expect(page.getByTestId('booking-offline')).toHaveCount(0);
   });
 
   test('with writes off the handover says plainly that nothing is reserved', async ({ page }) => {
@@ -136,7 +139,7 @@ test.describe('contact page', () => {
     await page.getByPlaceholder('Jane Wanjiku').fill('Jane Wanjiku');
     await page.getByPlaceholder('07xxxxxxxx').fill('0798258950');
     await page.getByPlaceholder('Enter details about your inquiry...').fill(
-      'Is the turf free on Saturday morning?'
+      'Is the Arena free on Saturday morning?'
     );
 
     // The submit opens WhatsApp in a new tab; stop it from actually navigating.

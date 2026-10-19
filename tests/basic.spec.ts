@@ -9,5 +9,5 @@ test('booking page offers both bookable venues', async ({ page }) => {
   await page.goto('/book');
 
   await expect(page.getByTestId('venue-grid')).toBeVisible();
-  await expect(page.getByTestId('venue-grid')).toContainText('Main Arena Turf');
+  await expect(page.getByTestId('venue-grid')).toContainText('The Arena');
 });
