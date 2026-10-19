@@ -70,6 +70,18 @@ export const home = {
         'Shadow-free matches under high-intensity lighting, right up to the midnight close.',
     },
   ],
+  /**
+   * The headline turf price, set by the owner as marketing copy. The morning
+   * rate is offered by reception case by case, so the home page leads with
+   * KES 1,500 and never lists the bands.
+   */
+  pricing: {
+    eyebrow: 'Turf hire',
+    headline: 'From KES 1,500',
+    unit: 'per hour',
+    pitch: 'Floodlit 5-aside on premium synthetic turf, open until midnight. Book by the hour, bring your squad.',
+    note: 'Full-day hire, meeting room and events: call or WhatsApp reception for a quote.',
+  },
 } as const;
 
 export const about = {

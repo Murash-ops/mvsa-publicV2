@@ -1,8 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { getVenueFacts, isMvsaApiError, type PricingSummaryItem } from '@/lib/mvsa-api';
 import { getAcademyPrograms } from '@/lib/academy-programs';
-import { booking, contact, home, social } from '@/content/site';
+import { home, social } from '@/content/site';
 import { featured, heroPhoto } from '@/content/photos';
 import { 
   ArrowRight, 
@@ -12,37 +11,11 @@ import {
   ChevronRight
 } from 'lucide-react';
 
-export const revalidate = 0; // Venue facts come from the backend on every request
-
 /* The home page shows the curated set from content/photos.ts - twelve frames,
    chosen for variety. Showing all 35 made the page 7,900px tall on a desktop
    and nearly 30,000px on a phone, and most of them were the same empty pitch. */
 
-/**
- * Prices are venue facts, so they come from GET /v1/knowledge/facts and are
- * never hard-coded or recalculated here. If the backend cannot be reached we
- * say so and point at reception rather than printing a number we cannot stand
- * behind.
- */
-async function loadPricingSummary(): Promise<{
-  rows: PricingSummaryItem[];
-  unreachable: boolean;
-}> {
-  try {
-    const facts = await getVenueFacts();
-    return { rows: facts.facts.pricing_summary, unreachable: false };
-  } catch (error) {
-    if (!isMvsaApiError(error)) throw error;
-    return { rows: [], unreachable: true };
-  }
-}
-
 export default async function Home() {
-  const { rows: pricingRows, unreachable: pricingUnreachable } = await loadPricingSummary();
-
-  const turfPricing = pricingRows.filter((row) => row.activity_id.startsWith('turf'));
-  const meetingPricing = pricingRows.find((row) => row.activity_id === 'meeting_room');
-
   const programs = getAcademyPrograms().slice(0, 4);
 
   const heroHeadline = home.heroHeadline;
@@ -163,7 +136,7 @@ export default async function Home() {
       </section>
 
       {/* ============================================
-          3. PRICING TEASER (LIVE VENUE FACTS)
+          3. PRICING TEASER (OWNER'S HEADLINE PRICE)
           ============================================ */}
       <section className="py-24 bg-transparent relative z-20">
         <div className="max-w-5xl mx-auto px-6 text-center space-y-12">
@@ -174,38 +147,23 @@ export default async function Home() {
             <div className="w-12 h-1 bg-gold mx-auto rounded-none" />
           </div>
 
-          {pricingUnreachable ? (
-            <div className="max-w-2xl mx-auto p-8 border border-amber-500/30 bg-amber-500/5 text-left space-y-2" data-testid="pricing-unreachable">
-              <p className="text-amber-300 text-xs font-bold uppercase tracking-widest">Live rates unavailable</p>
-              <p className="text-charcoal-light text-sm font-medium leading-relaxed">
-                {booking.unreachableNotice} For today&apos;s turf and meeting room rates, call reception on{' '}
-                <a href={contact.bookingsPhoneHref} className="text-gold font-bold">{contact.bookingsPhone}</a>.
-              </p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto text-left" data-testid="pricing-grid">
-              {turfPricing.map((row) => (
-                <div
-                  key={`${row.activity_id}-${row.label}`}
-                  className="p-6 border border-white/10 bg-card hover:border-gold transition-all duration-300 space-y-2"
-                >
-                  <span className="px-2.5 py-0.5 bg-white/5 text-[9px] font-mono font-bold uppercase text-white/80 border border-white/10 inline-block">
-                    Turf hire
-                  </span>
-                  <h4 className="font-display font-bold text-base text-white uppercase tracking-wide">{row.label}</h4>
-                  <p className="text-gold font-mono font-bold text-lg">{row.display}</p>
-                </div>
-              ))}
-            </div>
-          )}
+          <div className="max-w-2xl mx-auto p-10 border border-white/10 bg-card space-y-4" data-testid="pricing-headline">
+            <span className="px-2.5 py-0.5 bg-white/5 text-[9px] font-mono font-bold uppercase text-white/80 border border-white/10 inline-block">
+              {home.pricing.eyebrow}
+            </span>
+            <p className="font-display font-extrabold text-4xl sm:text-5xl text-gold uppercase tracking-tight">
+              {home.pricing.headline}
+              <span className="block sm:inline sm:ml-3 text-base sm:text-lg font-sans font-semibold normal-case tracking-normal text-white/80">
+                {home.pricing.unit}
+              </span>
+            </p>
+            <p className="text-charcoal-light text-sm font-medium leading-relaxed">{home.pricing.pitch}</p>
+          </div>
 
           <div className="space-y-8">
-            {/* Secondary Option line below cards */}
-            {meetingPricing && (
-              <p className="text-charcoal-light font-sans text-sm font-semibold tracking-wide">
-                {meetingPricing.label}: {meetingPricing.display}
-              </p>
-            )}
+            <p className="text-charcoal-light font-sans text-sm font-semibold tracking-wide">
+              {home.pricing.note}
+            </p>
             
             {/* Single CTA button pointing to booking page */}
             <div className="flex justify-center">
