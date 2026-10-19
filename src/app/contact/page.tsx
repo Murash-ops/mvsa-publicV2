@@ -132,10 +132,10 @@ export default function ContactPage() {
               <div className="space-y-3">
                 <div className="flex justify-between items-center border-b border-white/5 pb-2">
                   <span className="text-sm font-semibold text-charcoal-light">Monday — Sunday</span>
-                  <span className="text-sm font-bold text-gold font-mono">06:00 AM — 11:00 PM</span>
+                  <span className="text-sm font-bold text-gold font-mono">08:00 AM — Midnight</span>
                 </div>
                 <p className="text-xs text-charcoal-light/75 leading-relaxed font-medium">
-                  Pitch lights engage automatically at dusk. Facilities close strictly at 11:00 PM.
+                  Pitch lights engage automatically at dusk. Earlier starts can be arranged with reception.
                 </p>
               </div>
             </div>

@@ -9,7 +9,7 @@ const eslintConfig = defineConfig([
   globalIgnores([
     // Default ignores of eslint-config-next:
     ".next/**",
-    // This project builds into a custom distDir (see next.config.ts).
+    // The booking-writes Playwright project builds into its own distDir (see playwright.config.ts).
     ".next_public*/**",
     "out/**",
     "build/**",

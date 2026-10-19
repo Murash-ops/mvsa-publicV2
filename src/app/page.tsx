@@ -1,7 +1,8 @@
+import Image from 'next/image';
 import Link from 'next/link';
-import { getVenueFacts, isMvsaApiError, type PricingSummaryItem } from '@/lib/mvsa-api';
 import { getAcademyPrograms } from '@/lib/academy-programs';
-import { booking, contact, home, social } from '@/content/site';
+import { home, social } from '@/content/site';
+import { featured, heroPhoto } from '@/content/photos';
 import { 
   ArrowRight, 
   Lock, 
@@ -10,40 +11,17 @@ import {
   ChevronRight
 } from 'lucide-react';
 
-export const revalidate = 0; // Venue facts come from the backend on every request
-
-/**
- * Prices are venue facts, so they come from GET /v1/knowledge/facts and are
- * never hard-coded or recalculated here. If the backend cannot be reached we
- * say so and point at reception rather than printing a number we cannot stand
- * behind.
- */
-async function loadPricingSummary(): Promise<{
-  rows: PricingSummaryItem[];
-  unreachable: boolean;
-}> {
-  try {
-    const facts = await getVenueFacts();
-    return { rows: facts.facts.pricing_summary, unreachable: false };
-  } catch (error) {
-    if (!isMvsaApiError(error)) throw error;
-    return { rows: [], unreachable: true };
-  }
-}
+/* The home page shows the curated set from content/photos.ts - twelve frames,
+   chosen for variety. Showing all 35 made the page 7,900px tall on a desktop
+   and nearly 30,000px on a phone, and most of them were the same empty pitch. */
 
 export default async function Home() {
-  const { rows: pricingRows, unreachable: pricingUnreachable } = await loadPricingSummary();
-
-  const turfPricing = pricingRows.filter((row) => row.activity_id.startsWith('turf'));
-  const meetingPricing = pricingRows.find((row) => row.activity_id === 'meeting_room');
-
   const programs = getAcademyPrograms().slice(0, 4);
 
   const heroHeadline = home.heroHeadline;
   const heroSubheading = home.heroSubheading;
   const heroTextAboveCta = home.heroTextAboveCta;
   const closingCtaHeadline = home.closingCtaHeadline;
-  const heroImgUrl = home.heroImageUrl;
   const instagramHandle = social.instagram;
   const tiktokHandle = social.tiktok;
   const [trustCard1, trustCard2, trustCard3] = home.trustCards;
@@ -60,40 +38,51 @@ export default async function Home() {
   return (
     <main className="min-h-screen text-charcoal selection:bg-gold selection:text-forest-dark overflow-x-hidden">
       {/* ============================================
-          1. HERO SECTION (FULL BLEED OVERLAY)
-          ============================================ */}
-      <section 
-        className="relative h-screen flex items-center justify-center pt-20 z-10 overflow-hidden bg-cover bg-center bg-no-repeat"
-        style={{ backgroundImage: `url('${heroImgUrl}')` }}
-      >
-        {/* Lighter atmospheric overlay letting background show through */}
-        <div className="absolute inset-0 bg-gradient-to-b from-[#061a10]/40 via-[#061a10]/20 to-[#061a10]/80 z-0" />
+          1. HERO - FULL BLEED, TEXT OVER THE PHOTOGRAPH
 
-        <div className="max-w-7xl mx-auto px-6 lg:px-10 w-full relative z-20 pt-10 text-center space-y-8 animate-slide-up">
-          {/* Headline - Cinzel, large, white, sharp */}
-          <h1 className="font-display text-5xl sm:text-7xl md:text-8xl font-black uppercase tracking-tight text-white leading-[0.95] drop-shadow-lg">
-            {renderHeadline(heroHeadline)}
-          </h1>
-          
-          {/* Subheading - DM Sans, muted white, one line */}
-          <p className="font-sans text-sm sm:text-base md:text-lg text-white/80 max-w-3xl mx-auto font-medium tracking-wide">
-            {heroSubheading}
-          </p>
-          
-          {/* Double CTAs - Stacked on Mobile, Side-by-Side on Desktop */}
-          <div className="pt-4 flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Link 
-              href="/book" 
-              className="relative h-16 w-64 bg-gold text-forest-dark hover:bg-gold-muted border border-gold font-display text-sm font-extrabold uppercase tracking-[0.2em] flex items-center justify-center rounded-none shadow-gold-sm transition-all duration-300 hover:scale-[1.03] active:scale-[0.97]"
-            >
-              Book Now
-            </Link>
-            <Link 
-              href="/programs" 
-              className="relative h-16 w-64 bg-transparent text-white hover:bg-gold/10 border border-gold font-display text-sm font-extrabold uppercase tracking-[0.2em] flex items-center justify-center rounded-none transition-all duration-300 hover:scale-[1.03] active:scale-[0.97]"
-            >
-              Explore Programs
-            </Link>
+          The photograph is portrait, so this shows a band cut from its
+          middle, held in place by objectPosition. The scrim is a left-to-
+          right gradient rather than a flat wash, so the headline has
+          something solid behind it while the right of the frame stays
+          legible as a photograph.
+          ============================================ */}
+      <section className="relative z-10 min-h-[78vh] lg:min-h-[86vh] flex items-end overflow-hidden">
+        <Image
+          src={heroPhoto.src}
+          alt="The pitch at Mountain View Sports Arena, goals and centre circle in frame"
+          fill
+          priority
+          sizes="100vw"
+          style={{ objectPosition: heroPhoto.objectPosition }}
+          className="object-cover -z-10"
+        />
+        <div className="absolute inset-0 -z-10 bg-gradient-to-r from-[#061a10] via-[#061a10]/75 to-[#061a10]/25" />
+        <div className="absolute inset-x-0 bottom-0 h-40 -z-10 bg-gradient-to-t from-[#061a10] to-transparent" />
+
+        <div className="max-w-7xl mx-auto px-6 lg:px-10 w-full pb-16 lg:pb-24 pt-32">
+          <div className="max-w-2xl space-y-7 animate-slide-up">
+            <h1 className="font-display text-5xl sm:text-7xl xl:text-8xl font-black uppercase tracking-tight text-white leading-[0.92] text-balance">
+              {renderHeadline(heroHeadline)}
+            </h1>
+
+            <p className="font-sans text-sm sm:text-base md:text-lg text-white/80 max-w-lg font-medium tracking-wide">
+              {heroSubheading}
+            </p>
+
+            <div className="pt-2 flex flex-col sm:flex-row gap-4">
+              <Link
+                href="/book"
+                className="relative h-16 w-full sm:w-60 bg-gold text-forest-dark hover:bg-gold-muted border border-gold font-display text-sm font-extrabold uppercase tracking-[0.2em] flex items-center justify-center rounded-none shadow-gold-sm transition-all duration-300 hover:scale-[1.03] active:scale-[0.97]"
+              >
+                Book Now
+              </Link>
+              <Link
+                href="/programs"
+                className="relative h-16 w-full sm:w-60 bg-white/5 text-white hover:bg-gold/10 border border-white/25 hover:border-gold font-display text-sm font-extrabold uppercase tracking-[0.2em] flex items-center justify-center rounded-none transition-all duration-300 hover:scale-[1.03] active:scale-[0.97]"
+              >
+                Explore Programs
+              </Link>
+            </div>
           </div>
         </div>
       </section>
@@ -147,7 +136,7 @@ export default async function Home() {
       </section>
 
       {/* ============================================
-          3. PRICING TEASER (LIVE VENUE FACTS)
+          3. PRICING TEASER (OWNER'S HEADLINE PRICE)
           ============================================ */}
       <section className="py-24 bg-transparent relative z-20">
         <div className="max-w-5xl mx-auto px-6 text-center space-y-12">
@@ -158,38 +147,23 @@ export default async function Home() {
             <div className="w-12 h-1 bg-gold mx-auto rounded-none" />
           </div>
 
-          {pricingUnreachable ? (
-            <div className="max-w-2xl mx-auto p-8 border border-amber-500/30 bg-amber-500/5 text-left space-y-2" data-testid="pricing-unreachable">
-              <p className="text-amber-300 text-xs font-bold uppercase tracking-widest">Live rates unavailable</p>
-              <p className="text-charcoal-light text-sm font-medium leading-relaxed">
-                {booking.unreachableNotice} For today&apos;s turf and meeting room rates, call reception on{' '}
-                <a href={contact.bookingsPhoneHref} className="text-gold font-bold">{contact.bookingsPhone}</a>.
-              </p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto text-left" data-testid="pricing-grid">
-              {turfPricing.map((row) => (
-                <div
-                  key={`${row.activity_id}-${row.label}`}
-                  className="p-6 border border-white/10 bg-card hover:border-gold transition-all duration-300 space-y-2"
-                >
-                  <span className="px-2.5 py-0.5 bg-white/5 text-[9px] font-mono font-bold uppercase text-white/80 border border-white/10 inline-block">
-                    Turf hire
-                  </span>
-                  <h4 className="font-display font-bold text-base text-white uppercase tracking-wide">{row.label}</h4>
-                  <p className="text-gold font-mono font-bold text-lg">{row.display}</p>
-                </div>
-              ))}
-            </div>
-          )}
+          <div className="max-w-2xl mx-auto p-10 border border-white/10 bg-card space-y-4" data-testid="pricing-headline">
+            <span className="px-2.5 py-0.5 bg-white/5 text-[9px] font-mono font-bold uppercase text-white/80 border border-white/10 inline-block">
+              {home.pricing.eyebrow}
+            </span>
+            <p className="font-display font-extrabold text-4xl sm:text-5xl text-gold uppercase tracking-tight">
+              {home.pricing.headline}
+              <span className="block sm:inline sm:ml-3 text-base sm:text-lg font-sans font-semibold normal-case tracking-normal text-white/80">
+                {home.pricing.unit}
+              </span>
+            </p>
+            <p className="text-charcoal-light text-sm font-medium leading-relaxed">{home.pricing.pitch}</p>
+          </div>
 
           <div className="space-y-8">
-            {/* Secondary Option line below cards */}
-            {meetingPricing && (
-              <p className="text-charcoal-light font-sans text-sm font-semibold tracking-wide">
-                {meetingPricing.label}: {meetingPricing.display}
-              </p>
-            )}
+            <p className="text-charcoal-light font-sans text-sm font-semibold tracking-wide">
+              {home.pricing.note}
+            </p>
             
             {/* Single CTA button pointing to booking page */}
             <div className="flex justify-center">
@@ -258,7 +232,44 @@ export default async function Home() {
       </section>
 
       {/* ============================================
-          5. CLOSING CTA (DOMINANT GOLD BOOK NOW)
+          5. THE ARENA, PHOTOGRAPHED
+          ============================================ */}
+      <section className="py-24 relative z-20 border-t border-white/5">
+        <div className="max-w-7xl mx-auto px-6 lg:px-10">
+          <div className="mb-12 max-w-2xl">
+            <h2 className="font-display text-3xl sm:text-4xl font-extrabold uppercase tracking-tight text-white">
+              The Arena
+            </h2>
+            <p className="mt-3 font-sans text-sm sm:text-base text-white/70">
+              Every photograph here was taken at Mountain View. Nothing is stock.
+            </p>
+          </div>
+
+          {/* Columns rather than a grid: portrait and landscape frames sit
+              together without cropping either into the wrong shape. */}
+          <div className="columns-2 md:columns-3 lg:columns-4 gap-3 [column-fill:_balance]">
+            {featured.map((photo, i) => (
+              <figure
+                key={photo.src}
+                className="mb-3 break-inside-avoid overflow-hidden border border-white/10 bg-forest-light/20"
+              >
+                <Image
+                  src={photo.src}
+                  alt="At Mountain View Sports Arena"
+                  width={photo.w}
+                  height={photo.h}
+                  loading={i < 4 ? 'eager' : 'lazy'}
+                  sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                  className="w-full h-auto object-cover transition-transform duration-500 hover:scale-[1.03]"
+                />
+              </figure>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ============================================
+          6. CLOSING CTA (DOMINANT GOLD BOOK NOW)
           ============================================ */}
       <section className="py-28 bg-transparent relative z-20 text-center text-white overflow-hidden">
         {/* Subtle grid-blur patterns */}

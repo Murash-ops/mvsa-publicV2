@@ -30,7 +30,7 @@ export default function Footer() {
             <Link href="/" className="flex items-center gap-3 group">
               <div className="relative w-12 h-12 bg-white rounded-none p-1 border border-white/20 transition-all duration-300 group-hover:scale-105 spring-bounce flex items-center justify-center shrink-0 shadow-sm">
                 <div className="relative w-full h-full">
-                  <Image src="/images/logo.png" alt="MVSA Logo" fill className="object-contain" unoptimized />
+                  <Image src="/images/logo.png" alt="Mountain View Sports Arena" fill sizes="72px" className="object-contain" />
                 </div>
               </div>
               <div>

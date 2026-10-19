@@ -5,6 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Menu, X, CalendarDays } from 'lucide-react';
+import { shopIsListed } from '@/content/shop';
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -19,9 +20,12 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // The shop is listed only once its catalogue is real, so a draft or empty
+  // shop can never be linked from the navigation by accident.
   const navLinks = [
     { name: 'Home', href: '/' },
     { name: 'Programs', href: '/programs' },
+    ...(shopIsListed ? [{ name: 'Shop', href: '/shop' }] : []),
     { name: 'About', href: '/about' },
     { name: 'Contact', href: '/contact' },
   ];
@@ -38,7 +42,7 @@ export default function Navbar() {
         <Link href="/" className="flex items-center gap-3 group">
           <div className="relative w-12 h-12 bg-white rounded-none p-1 border border-white/20 transition-all duration-300 group-hover:scale-105 spring-bounce flex items-center justify-center shadow-sm">
             <div className="relative w-full h-full">
-              <Image src="/images/logo.png" alt="MVSA Logo" fill className="object-contain" priority unoptimized />
+              <Image src="/images/logo.png" alt="Mountain View Sports Arena" fill sizes="56px" className="object-contain" priority />
             </div>
           </div>
           <div>

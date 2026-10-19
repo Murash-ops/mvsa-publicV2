@@ -1,9 +1,12 @@
 'use client';
 
+import { contact } from '@/content/site';
+
 export default function WhatsAppButton() {
-  const whatsappNumber = "254798258950";
+  // The number lives in content/site.ts. It was written out again here, which
+  // is one place too many for a number the venue can change.
   const defaultMessage = "Hi MVSA! I'd like to inquire about booking a pitch.";
-  const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(defaultMessage)}`;
+  const whatsappUrl = `https://wa.me/${contact.whatsappNumber}?text=${encodeURIComponent(defaultMessage)}`;
 
   return (
     <a 
