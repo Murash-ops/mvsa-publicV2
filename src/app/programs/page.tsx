@@ -37,7 +37,7 @@ export default function ProgramsPage() {
       </PageHeader>
 
       <section className="wrap pb-[clamp(72px,9vw,112px)]">
-        <div className="grid gap-3.5 [grid-template-columns:repeat(auto-fit,minmax(260px,1fr))]">
+        <div className="grid gap-3.5 [grid-template-columns:repeat(auto-fit,minmax(220px,1fr))]">
           {programs.map((program, i) => (
             <article
               key={program.id}

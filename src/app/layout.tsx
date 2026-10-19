@@ -61,10 +61,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body
-        className={`${bebas.variable} ${barlow.variable} ${barlowCondensed.variable} min-h-screen flex flex-col`}
-      >
+    // The font variables sit on <html> so the theme tokens on :root can see them.
+    <html lang="en" className={`${bebas.variable} ${barlow.variable} ${barlowCondensed.variable}`}>
+      <body className="min-h-screen flex flex-col">
         <Navbar />
         <div className="flex-1">{children}</div>
         <Footer />

@@ -30,7 +30,7 @@ export default function Pitch3D({ caption }: { caption: string }) {
       className="flex h-[clamp(300px,60vw,460px)] min-w-0 flex-[1_1_520px] items-center justify-center [perspective:1100px] bg-[radial-gradient(ellipse_60%_55%_at_50%_55%,rgba(63,163,77,0.22),transparent_70%)]"
     >
       <div
-        className="relative aspect-[520/340] w-[86%] max-w-[540px] [transform-style:preserve-3d] transition-transform duration-[350ms] ease-out"
+        className="relative aspect-[520/340] w-[76%] sm:w-[86%] max-w-[540px] [transform-style:preserve-3d] transition-transform duration-[350ms] ease-out"
         style={{ transform: `rotateX(${tilt.rx}deg) rotateZ(${tilt.rz}deg)` }}
       >
         <div

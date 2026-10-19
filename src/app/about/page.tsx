@@ -18,7 +18,7 @@ export default function AboutPage() {
     <main>
       <PageHeader eyebrow={about.eyebrow} titleTop={about.titleTop} titleBottom={about.titleBottom} intro={about.intro} />
 
-      <section className="wrap grid items-center gap-12 pb-[clamp(72px,9vw,112px)] lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)]">
+      <section className="wrap grid grid-cols-1 items-center gap-12 pb-[clamp(72px,9vw,112px)] lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)]">
         <div className="flex justify-center border border-white/10 bg-surface p-[clamp(24px,5vw,56px)] text-gold">
           <Logo variant="emblem" width={480} />
         </div>

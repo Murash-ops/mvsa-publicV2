@@ -39,7 +39,7 @@ export default function ShopPage() {
               </p>
             ) : null}
 
-            <p className="label mt-8 mb-0 text-[15px] text-gold">{shop.orderNote}</p>
+            <p className="mt-8 mb-0 text-base text-gold">{shop.orderNote}</p>
 
             <div className="mt-6 grid gap-3.5 [grid-template-columns:repeat(auto-fit,minmax(260px,1fr))]">
               {inStock.map((item) => (

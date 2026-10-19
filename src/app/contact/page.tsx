@@ -66,7 +66,13 @@ export default function ContactPage() {
               className="group flex flex-col gap-1 border border-white/10 bg-surface px-6 py-5 hover:border-gold"
             >
               <span className="label text-sm text-mute">{channel.name}</span>
-              <span className="display text-[clamp(30px,4vw,40px)] leading-none break-all text-white group-hover:text-gold">
+              <span
+                className={`text-white group-hover:text-gold ${
+                  channel.href.startsWith('mailto:')
+                    ? 'text-lg font-semibold break-words'
+                    : 'display text-[clamp(30px,4vw,40px)] leading-none'
+                }`}
+              >
                 {channel.value}
               </span>
             </a>
