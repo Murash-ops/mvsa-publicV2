@@ -36,11 +36,11 @@ function siteUrl(): URL {
 
 export const metadata: Metadata = {
   metadataBase: siteUrl(),
-  title: "Mountain View Sports Arena | Let's meet at the Arena",
+  title: 'Mountain View Sports Arena | Your home of football and fitness',
   description:
     'Floodlit 5-aside at the Arena, behind Mountain View Mall on Waiyaki Way. Open every day, 08:00 to midnight. Book on WhatsApp.',
   openGraph: {
-    title: "Let's meet at the Arena",
+    title: 'Your home of football and fitness',
     description:
       'Floodlit 5-aside behind Mountain View Mall, Waiyaki Way. Open every day, 08:00 to midnight.',
     siteName: 'Mountain View Sports Arena',

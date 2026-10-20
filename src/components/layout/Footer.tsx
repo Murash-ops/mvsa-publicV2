@@ -73,7 +73,7 @@ export default function Footer() {
         </div>
 
         <div className="flex flex-wrap items-center justify-between gap-4 border-t border-white/[0.08] pt-6">
-          <span className="label text-[15px] tracking-[0.2em] text-mute">Play · Compete · Connect</span>
+          <span className="label text-[13px] tracking-[0.2em] text-mute">Play · Compete · Connect</span>
           <span className="text-sm text-mute">© {new Date().getFullYear()} Mountain View Sports Arena</span>
         </div>
       </div>

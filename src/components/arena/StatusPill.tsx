@@ -33,7 +33,7 @@ export default function StatusPill() {
 
   return (
     <span
-      className="label inline-flex items-center gap-2.5 self-start rounded-full border border-white/[0.16] bg-white/[0.08] px-3.5 py-2 text-[15px] tracking-[0.14em]"
+      className="label inline-flex items-center gap-2.5 self-start rounded-full border border-white/[0.16] bg-white/[0.08] px-3.5 py-2 text-[13px] tracking-[0.14em]"
       data-testid="status-pill"
     >
       <span

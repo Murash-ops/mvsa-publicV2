@@ -59,7 +59,7 @@ export const social = {
 } as const;
 
 /** The owner's own words, used to close pages. */
-export const signature = "Let's meet at the Arena.";
+export const signature = 'Bring your squad.';
 
 /** Kick-off times offered by the picker. Reception confirms the slot. */
 export const kickoffTimes = ['17:00', '18:00', '19:00', '20:00', '21:00', '22:00'] as const;
@@ -67,8 +67,8 @@ export const defaultKickoff = '20:00';
 
 export const home = {
   hero: {
-    titleTop: 'Lights on.',
-    titleBottom: 'Game on.',
+    titleTop: 'Your home of',
+    titleBottom: 'football and fitness',
     body:
       'Floodlit 5-aside on synthetic turf, behind Mountain View Mall on Waiyaki Way. Book an hour, bring your squad, play until midnight.',
     imageAlt: 'The synthetic pitch at Mountain View Sports Arena, lines running toward the goal',
@@ -134,8 +134,8 @@ export const home = {
     { src: '/images/gallery/shot-02.webp', alt: 'Floodlights and seating beside the pitch' },
   ],
   closing: {
-    titleTop: 'Let’s meet at',
-    titleBottom: 'the Arena',
+    titleTop: 'Bring your',
+    titleBottom: 'squad',
   },
 } as const;
 

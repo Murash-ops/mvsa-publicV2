@@ -18,12 +18,12 @@ export default function ShopPage() {
     <main>
       <PageHeader eyebrow="Arena shop" titleTop={shop.title} intro={shop.intro} />
 
-      <div className="wrap pb-[clamp(72px,9vw,112px)]">
+      <div className="wrap pb-[clamp(56px,7vw,88px)]">
         {catalogue.length === 0 ? (
           /* An empty catalogue says so. It never pretends to be a shop with
              nothing in it today. */
           <section className="flex max-w-2xl flex-col gap-4 border border-white/10 bg-surface p-8">
-            <h2 className="display m-0 text-5xl leading-none">{shop.emptyHeading}</h2>
+            <h2 className="display m-0 text-3xl leading-none">{shop.emptyHeading}</h2>
             <p className="m-0 text-base leading-relaxed text-fog">{shop.emptyBody}</p>
             <a href={reception} target="_blank" rel="noopener noreferrer" className="btn btn-gold self-start">
               Message reception
@@ -61,11 +61,11 @@ export default function ShopPage() {
 
                   <div className="flex flex-1 flex-col gap-3 px-6 py-6">
                     <div className="flex items-baseline justify-between gap-3">
-                      <h2 className="display m-0 text-[36px] leading-[0.95]">{item.name}</h2>
+                      <h2 className="display m-0 text-[24px] leading-[0.95]">{item.name}</h2>
                       {item.priceKes === undefined ? (
-                        <span className="label text-[15px] whitespace-nowrap text-mute">Ask</span>
+                        <span className="label text-[13px] whitespace-nowrap text-mute">Ask</span>
                       ) : (
-                        <span className="display text-3xl whitespace-nowrap text-gold">{formatKes(item.priceKes)}</span>
+                        <span className="display text-xl whitespace-nowrap text-gold">{formatKes(item.priceKes)}</span>
                       )}
                     </div>
 
@@ -97,7 +97,7 @@ export default function ShopPage() {
             {/* The grid is short, so the page closes on the one thing a
                 customer does next: ask a person. */}
             <section className="mt-16 flex flex-col gap-6 border-t border-white/10 pt-10 sm:flex-row sm:items-center sm:justify-between">
-              <p className="m-0 max-w-md text-lg leading-relaxed text-fog">
+              <p className="m-0 max-w-md text-base leading-relaxed text-fog">
                 Not sure of your size, or after something that is not listed? Ask reception on{' '}
                 <span className="text-white">{contact.whatsappDisplay}</span> and we will tell you what is in.
               </p>

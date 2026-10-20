@@ -27,7 +27,7 @@ export default function Pitch3D({ caption }: { caption: string }) {
     <div
       onMouseMove={onMove}
       onMouseLeave={() => setTilt(REST)}
-      className="flex h-[clamp(300px,60vw,460px)] min-w-0 flex-[1_1_520px] items-center justify-center [perspective:1100px] bg-[radial-gradient(ellipse_60%_55%_at_50%_55%,rgba(63,163,77,0.22),transparent_70%)]"
+      className="flex h-[clamp(260px,46vw,380px)] min-w-0 flex-[1_1_520px] items-center justify-center [perspective:1100px] bg-[radial-gradient(ellipse_60%_55%_at_50%_55%,rgba(63,163,77,0.22),transparent_70%)]"
     >
       <div
         className="relative aspect-[520/340] w-[76%] sm:w-[86%] max-w-[540px] [transform-style:preserve-3d] transition-transform duration-[350ms] ease-out"
@@ -54,7 +54,7 @@ export default function Pitch3D({ caption }: { caption: string }) {
         <div aria-hidden="true" className={`${lamp} -bottom-2 -left-2`} />
         <div aria-hidden="true" className={`${lamp} -bottom-2 -right-2`} />
         <div className="pitch-marker absolute top-1/2 left-1/2 -mt-[34px] -ml-[92px] flex w-[184px] flex-col items-center gap-0.5 border-2 border-gold bg-ink px-3.5 py-2.5 shadow-[0_16px_30px_rgba(0,0,0,0.5)]">
-          <span className="display text-[40px] leading-none text-gold">
+          <span className="display text-[28px] leading-none text-gold">
             <PickedTime />
           </span>
           <span className="label text-sm tracking-[0.14em]">{caption}</span>

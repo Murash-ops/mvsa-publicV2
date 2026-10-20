@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { home } from '@/content/site';
 
-/** The closing section: one lamp over "Let's meet at the Arena". */
+/** The closing section: one lamp over "Bring your squad". */
 export default function LampClose({ children }: { children: ReactNode }) {
   return (
     <section className="relative overflow-hidden bg-ink" aria-labelledby="closing-title">
@@ -14,7 +14,7 @@ export default function LampClose({ children }: { children: ReactNode }) {
         className="lamp-bar absolute top-0 left-1/2 h-[3px] w-[64%] -translate-x-1/2 bg-gold shadow-[0_0_60px_18px_rgba(224,194,90,0.45)]"
       />
       <div className="wrap relative flex flex-col items-center gap-7 pt-[clamp(96px,12vw,150px)] pb-[clamp(80px,10vw,120px)] text-center">
-        <h2 id="closing-title" className="display m-0 text-[clamp(64px,11vw,168px)] leading-[0.84]">
+        <h2 id="closing-title" className="display m-0 text-[clamp(44px,6vw,88px)] leading-[0.84]">
           {home.closing.titleTop}
           <br />
           <span className="text-gold">{home.closing.titleBottom}</span>

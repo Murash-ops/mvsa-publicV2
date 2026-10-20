@@ -14,7 +14,7 @@ interface PageHeaderProps {
 /** The top of every inner page: gold label, big Bebas title, a line of copy. */
 export default function PageHeader({ eyebrow, titleTop, titleBottom, intro, image, children }: PageHeaderProps) {
   return (
-    <section className={`relative overflow-hidden ${image ? 'flex min-h-[460px] items-end' : ''}`}>
+    <section className={`relative overflow-hidden ${image ? 'flex min-h-[360px] items-end' : ''}`}>
       {image ? (
         <>
           <Image
@@ -36,8 +36,8 @@ export default function PageHeader({ eyebrow, titleTop, titleBottom, intro, imag
         />
       )}
       <div className="wrap rise relative flex flex-col gap-6 pt-[clamp(56px,8vw,96px)] pb-[clamp(40px,6vw,64px)]">
-        <span className="label text-[15px] text-gold">{eyebrow}</span>
-        <h1 className="display m-0 text-[clamp(64px,10vw,152px)] leading-[0.84]">
+        <span className="label text-[13px] text-gold">{eyebrow}</span>
+        <h1 className="display m-0 text-[clamp(44px,6vw,84px)] leading-[0.84]">
           {titleTop}
           {titleBottom ? (
             <>
@@ -46,7 +46,7 @@ export default function PageHeader({ eyebrow, titleTop, titleBottom, intro, imag
             </>
           ) : null}
         </h1>
-        {intro ? <p className="m-0 max-w-[600px] text-[clamp(18px,1.6vw,21px)] leading-[1.55] text-fog">{intro}</p> : null}
+        {intro ? <p className="m-0 max-w-[600px] text-[clamp(16px,1.25vw,18px)] leading-[1.55] text-fog">{intro}</p> : null}
         {children}
       </div>
     </section>
