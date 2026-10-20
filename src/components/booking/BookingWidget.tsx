@@ -489,7 +489,7 @@ export default function BookingWidget({
                       className="object-cover opacity-30"
                       sizes="(max-width: 640px) 100vw, 400px"
                     />
-                    <div className="absolute inset-0 bg-[linear-gradient(to_top,#070A07,rgba(7,10,7,0.4))]" />
+                    <div className="absolute inset-0 bg-[linear-gradient(to_top,var(--color-ink),transparent)]" />
                     <span className="relative label text-sm text-gold">{choice.badge}</span>
                     <span className="relative display text-2xl leading-none text-white">{choice.displayName}</span>
                     <span className="relative text-sm text-fog">{choice.blurb}</span>

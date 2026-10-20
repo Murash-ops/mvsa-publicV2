@@ -26,15 +26,10 @@ export default function PageHeader({ eyebrow, titleTop, titleBottom, intro, imag
             className="object-cover"
             style={{ objectPosition: image.position ?? 'center 60%' }}
           />
-          <div aria-hidden="true" className="absolute inset-0 bg-[rgba(3,6,3,0.66)]" />
-          <div aria-hidden="true" className="absolute inset-x-0 bottom-0 h-3/5 bg-[linear-gradient(to_top,#070A07_6%,rgba(7,10,7,0)_100%)]" />
+          <div aria-hidden="true" className="absolute inset-0 bg-[rgba(10,22,15,0.55)]" />
+          <div aria-hidden="true" className="absolute inset-x-0 bottom-0 h-3/5 bg-[linear-gradient(to_top,var(--color-ink)_6%,transparent_100%)]" />
         </>
-      ) : (
-        <div
-          aria-hidden="true"
-          className="absolute inset-x-0 top-0 h-[360px] bg-[radial-gradient(ellipse_50%_70%_at_20%_0%,rgba(224,194,90,0.14),transparent_70%)]"
-        />
-      )}
+      ) : null}
       <div className="wrap rise relative flex flex-col gap-6 pt-[clamp(56px,8vw,96px)] pb-[clamp(40px,6vw,64px)]">
         <span className="label text-[13px] text-gold">{eyebrow}</span>
         <h1 className="display m-0 text-[clamp(44px,6vw,84px)] leading-[0.84]">

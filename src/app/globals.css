@@ -3,19 +3,21 @@
 /* ==========================================================================
    Floodlit Pro: the Arena's design system.
 
-   Near-black ground, one green for the pitch, one gold for the lights.
-   Gold text only ever sits on dark; gold buttons always carry dark text.
+   Deep pitch green and warm paper, taking turns down the page. Brass is an
+   accent, not a light source: no glows, no shimmer. Sections marked
+   .theme-light swap the tokens, so every component reads on either ground.
    ========================================================================== */
 
 @theme {
-  --color-ink: #070A07;          /* page ground */
-  --color-surface: #0E140E;      /* cards, bands */
+  --color-ink: #0E1C14;          /* page ground: pitch at night */
+  --color-surface: #15291D;      /* cards, bands */
   --color-pitch: #2D5016;        /* brand green */
-  --color-grass: #3FA34D;        /* bright green accent */
-  --color-gold: #E0C27A;         /* the lights */
-  --color-gold-light: #FFF1C9;   /* hover, shine */
-  --color-fog: #E6E9E4;          /* body text on dark */
-  --color-mute: #A8B0A4;         /* quiet labels */
+  --color-grass: #3F8F4A;        /* green accent */
+  --color-gold: #C2A15B;         /* brass accent */
+  --color-gold-light: #D8BF85;   /* brass hover */
+  --color-fog: #E3E8E1;          /* body text on dark */
+  --color-mute: #9FAE9F;         /* quiet labels */
+  --color-paper: #F5F2EA;        /* light sections */
   --color-line: rgba(255, 255, 255, 0.1);
 
   --font-display: var(--font-bebas), 'Bebas Neue', Impact, sans-serif;
@@ -31,7 +33,7 @@
 
   body {
     background-color: var(--color-ink);
-    color: #FFFFFF;
+    color: var(--color-white);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
     overflow-x: clip;
@@ -63,6 +65,33 @@
 /* --------------------------------------------------------------------------
    Shared building blocks
    -------------------------------------------------------------------------- */
+
+/* A light section: paper ground, ink text, darker brass so it still reads. */
+.theme-light {
+  --color-ink: #F5F2EA;
+  --color-surface: #FFFFFF;
+  --color-white: #15241B;
+  --color-fog: #3A4A40;
+  --color-mute: #5F6E64;
+  --color-gold: #7A5D22;
+  --color-gold-light: #5F4718;
+  --color-grass: #2D7A3A;
+  background-color: var(--color-ink);
+  color: var(--color-white);
+}
+
+/* A photo tile inside a light section keeps the dark tokens, so its words
+   stay light over the picture. */
+.theme-dark {
+  --color-ink: #0E1C14;
+  --color-surface: #0E1C14;
+  --color-white: #FFFFFF;
+  --color-fog: #E3E8E1;
+  --color-mute: #9FAE9F;
+  --color-gold: #C2A15B;
+  --color-gold-light: #D8BF85;
+  color: var(--color-white);
+}
 
 .wrap {
   width: 100%;
@@ -124,31 +153,38 @@
   font-size: 14px;
 }
 
+/* The primary button: brass on dark, pitch green on paper. Flat, no shine. */
 .btn-gold,
 .shine {
-  background: linear-gradient(110deg, var(--color-gold) 40%, var(--color-gold-light) 50%, var(--color-gold) 60%);
-  background-size: 250% 100%;
+  background: var(--color-gold);
   color: var(--color-ink);
-}
-
-.shine {
-  animation: shine 3.2s linear infinite;
 }
 
 .btn-gold:hover,
 .shine:hover {
+  background: var(--color-gold-light);
   color: var(--color-ink);
-  transform: translateY(-2px);
-  box-shadow: 0 10px 30px rgba(224, 194, 90, 0.35);
 }
 
-.btn-ghost {
-  border: 2px solid #FFFFFF;
+.theme-light .btn-gold,
+.theme-light .shine {
+  background: var(--color-pitch);
   color: #FFFFFF;
 }
 
+.theme-light .btn-gold:hover,
+.theme-light .shine:hover {
+  background: #23400F;
+  color: #FFFFFF;
+}
+
+.btn-ghost {
+  border: 2px solid var(--color-white);
+  color: var(--color-white);
+}
+
 .btn-ghost:hover {
-  background: #FFFFFF;
+  background: var(--color-white);
   color: var(--color-ink);
 }
 
@@ -188,9 +224,9 @@
   min-height: 44px;
   min-width: 72px;
   padding: 0 14px;
-  border: 2px solid rgba(255, 255, 255, 0.25);
+  border: 2px solid color-mix(in srgb, var(--color-white) 25%, transparent);
   background: transparent;
-  color: #FFFFFF;
+  color: var(--color-white);
   font-family: var(--font-display);
   font-size: 22px;
   letter-spacing: 0.04em;
@@ -212,15 +248,15 @@
   min-height: 52px;
   padding: 12px 16px;
   box-sizing: border-box;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  color: #FFFFFF;
+  background: color-mix(in srgb, var(--color-white) 4%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-white) 20%, transparent);
+  color: var(--color-white);
   font-family: var(--font-sans);
   font-size: 16px;
 }
 
 .field::placeholder {
-  color: rgba(230, 233, 228, 0.45);
+  color: color-mix(in srgb, var(--color-fog) 55%, transparent);
 }
 
 .field:focus {
@@ -269,9 +305,7 @@
 }
 
 .beam-ring {
-  padding: 2px;
-  background: conic-gradient(from var(--angle), rgba(224, 194, 90, 0.15) 0deg, rgba(224, 194, 90, 0.15) 250deg, #FFF1C9 300deg, #E0C27A 320deg, rgba(224, 194, 90, 0.15) 360deg);
-  animation: spin 4s linear infinite;
+  border: 1px solid color-mix(in srgb, var(--color-gold) 55%, transparent);
 }
 .marquee-track { animation: slide 32s linear infinite; }
 .lights { animation: lightsOn 2.4s ease-out both; }
@@ -299,7 +333,7 @@
   pointer-events: none;
   opacity: 0;
   transition: opacity 0.3s;
-  background: radial-gradient(380px circle at var(--x, 50%) var(--y, 50%), rgba(224, 194, 90, 0.18), transparent 60%);
+  background: radial-gradient(380px circle at var(--x, 50%) var(--y, 50%), color-mix(in srgb, var(--color-white) 7%, transparent), transparent 60%);
 }
 .bento-tile:hover::before { opacity: 1; }
 @media (max-width: 900px) {

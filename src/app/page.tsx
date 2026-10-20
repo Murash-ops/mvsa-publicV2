@@ -23,7 +23,7 @@ export default function Home() {
   return (
     <KickoffProvider>
       <main>
-        {/* Hero: the floodlights flicker on over the pitch */}
+        {/* Hero: the pitch, with the line over it */}
         <section id="top" className="relative flex min-h-[clamp(540px,86svh,740px)] items-end overflow-hidden">
           <Image
             src={heroPhoto.src}
@@ -34,14 +34,8 @@ export default function Home() {
             className="object-cover"
             style={{ objectPosition: heroPhoto.objectPosition }}
           />
-          <div aria-hidden="true" className="absolute inset-0 bg-[rgba(3,6,3,0.34)]" />
-          <div aria-hidden="true" className="lights pointer-events-none absolute inset-0 mix-blend-screen">
-            <div className="absolute inset-0 bg-[conic-gradient(from_128deg_at_0%_0%,transparent_0deg,rgba(255,240,205,0.30)_12deg,rgba(255,240,205,0.06)_26deg,transparent_34deg)]" />
-            <div className="absolute inset-0 bg-[conic-gradient(from_198deg_at_100%_0%,transparent_0deg,rgba(255,240,205,0.06)_8deg,rgba(255,240,205,0.30)_22deg,transparent_34deg)]" />
-            <div className="absolute -top-10 left-[2%] h-[90px] w-[90px] rounded-full bg-[radial-gradient(circle,rgba(255,246,220,0.95),rgba(255,246,220,0)_70%)]" />
-            <div className="absolute -top-10 right-[2%] h-[90px] w-[90px] rounded-full bg-[radial-gradient(circle,rgba(255,246,220,0.95),rgba(255,246,220,0)_70%)]" />
-          </div>
-          <div aria-hidden="true" className="absolute inset-x-0 bottom-0 h-[78%] sm:h-1/2 bg-[linear-gradient(to_top,#070A07_4%,rgba(7,10,7,0.55)_40%,rgba(7,10,7,0)_100%)]" />
+          <div aria-hidden="true" className="absolute inset-0 bg-[rgba(10,22,15,0.48)] sm:bg-[rgba(10,22,15,0.30)]" />
+          <div aria-hidden="true" className="absolute inset-x-0 bottom-0 h-[78%] sm:h-1/2 bg-[linear-gradient(to_top,#0E1C14_4%,rgba(14,28,20,0.55)_40%,rgba(14,28,20,0)_100%)]" />
 
           <div className="wrap relative flex flex-wrap items-end justify-between gap-8 pb-12">
             <div className="rise flex min-w-0 flex-[1_1_520px] flex-col gap-5">
@@ -66,6 +60,7 @@ export default function Home() {
         <Marquee />
 
         {/* Interactive 3D pitch + kick-off picker */}
+        <div className="theme-light">
         <section id="pitch" className="wrap flex flex-wrap items-center gap-10 py-[clamp(56px,7vw,88px)]">
           <div className="flex min-w-0 flex-[1_1_420px] flex-col gap-6">
             <span className="label text-[13px] text-gold">{home.pricing.eyebrow}</span>
@@ -91,6 +86,7 @@ export default function Home() {
           </h2>
           <Bento tiles={home.bento.tiles} />
         </section>
+        </div>
 
         {/* This week */}
         <section id="week" className="scroll-mt-20 border-y border-white/[0.08] bg-surface">
@@ -129,6 +125,7 @@ export default function Home() {
         </section>
 
         {/* Programs */}
+        <div className="theme-light">
         <section id="programs" className="wrap flex flex-col gap-10 py-[clamp(56px,7vw,88px)]">
           <h2 className="h-section">
             {home.programs.titleTop}
@@ -158,6 +155,7 @@ export default function Home() {
             ))}
           </div>
         </section>
+        </div>
 
         {/* Photo strip with hover zoom */}
         <section aria-label="The Arena" className="grid gap-1 [grid-template-columns:repeat(auto-fit,minmax(240px,1fr))]">

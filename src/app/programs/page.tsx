@@ -19,7 +19,7 @@ export default function ProgramsPage() {
   const programs = getAcademyPrograms();
 
   return (
-    <main>
+    <main className="theme-light">
       <PageHeader
         eyebrow="Programs"
         titleTop="More than"

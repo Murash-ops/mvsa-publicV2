@@ -49,7 +49,7 @@ export default function ContactPage() {
   const labelClass = 'label mb-2 block text-[13px] text-white';
 
   return (
-    <main>
+    <main className="theme-light">
       <PageHeader
         eyebrow="Contact"
         titleTop="Bring your"
