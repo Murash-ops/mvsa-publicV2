@@ -46,18 +46,18 @@ export default async function ProgramDetailsPage({ params }: { params: Promise<{
         </Link>
       </PageHeader>
 
-      <section className="wrap grid gap-3.5 pb-[clamp(72px,9vw,112px)] md:grid-cols-2">
+      <section className="wrap grid gap-3.5 pb-[clamp(56px,7vw,88px)] md:grid-cols-2">
         <div className="flex flex-col gap-4 border border-t-4 border-white/10 border-t-grass bg-surface px-7 py-8">
-          <span className="label text-[15px] text-gold">When</span>
-          <p className="display m-0 text-[clamp(40px,5vw,56px)] leading-[0.92]">{program.schedule}</p>
-          <span className="label mt-2 text-[15px] text-gold">Who</span>
-          <p className="display m-0 text-[clamp(40px,5vw,56px)] leading-[0.92]">{program.age_group}</p>
+          <span className="label text-[13px] text-gold">When</span>
+          <p className="display m-0 text-[clamp(28px,3vw,36px)] leading-[0.92]">{program.schedule}</p>
+          <span className="label mt-2 text-[13px] text-gold">Who</span>
+          <p className="display m-0 text-[clamp(28px,3vw,36px)] leading-[0.92]">{program.age_group}</p>
         </div>
         <div className="flex flex-col gap-5 border border-white/10 bg-surface px-7 py-8">
-          <h2 className="display m-0 text-[48px] leading-[0.92]">
+          <h2 className="display m-0 text-[32px] leading-[0.92]">
             Ask to <span className="text-gold">join</span>
           </h2>
-          <p className="m-0 text-lg leading-[1.55] text-fog">
+          <p className="m-0 text-base leading-[1.55] text-fog">
             Joining is arranged with the academy on WhatsApp or by phone. Nothing on this page reserves a place or takes payment.
           </p>
           <div className="mt-auto flex flex-wrap gap-3">

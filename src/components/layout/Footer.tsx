@@ -21,7 +21,7 @@ export default function Footer() {
         <div className="grid gap-8 text-base leading-relaxed text-fog [grid-template-columns:repeat(auto-fit,minmax(200px,1fr))]">
           <div className="flex flex-col gap-3">
             <Link href="/" aria-label="Mountain View Sports Arena, home" className="self-start text-gold hover:text-gold-light">
-              <Logo variant="emblem" width={236} decorative />
+              <Logo variant="helmets" width={150} decorative />
             </Link>
             <span>{contact.addressLine}</span>
           </div>
@@ -73,7 +73,7 @@ export default function Footer() {
         </div>
 
         <div className="flex flex-wrap items-center justify-between gap-4 border-t border-white/[0.08] pt-6">
-          <span className="label text-[15px] tracking-[0.2em] text-mute">Play · Compete · Connect</span>
+          <span className="label text-[13px] tracking-[0.2em] text-mute">Play · Compete · Connect</span>
           <span className="text-sm text-mute">© {new Date().getFullYear()} Mountain View Sports Arena</span>
         </div>
       </div>

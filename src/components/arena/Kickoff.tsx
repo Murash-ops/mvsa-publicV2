@@ -1,7 +1,7 @@
 'use client';
 
 import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react';
-import { defaultKickoff, kickoffTimes } from '@/content/site';
+import { defaultKickoff, kickoffGroups } from '@/content/site';
 import { arenaBookingUrl } from '@/lib/whatsapp';
 
 /**
@@ -52,21 +52,28 @@ export function BookArenaLink({
   );
 }
 
-/** The kick-off chips, 17:00 to 22:00. */
+/** The kick-off chips, every hour from 06:00 to 23:00, by part of the day. */
 export function KickoffChips() {
   const { picked, setPicked } = useKickoff();
   return (
-    <div role="group" aria-label="Kick-off time" className="flex flex-wrap gap-2.5" data-testid="kickoff-picker">
-      {kickoffTimes.map((time) => (
-        <button
-          key={time}
-          type="button"
-          className="chip"
-          aria-pressed={time === picked}
-          onClick={() => setPicked(time)}
-        >
-          {time}
-        </button>
+    <div role="group" aria-label="Kick-off time" className="flex flex-col gap-3" data-testid="kickoff-picker">
+      {kickoffGroups.map((group) => (
+        <div key={group.label} role="group" aria-label={`${group.label} kick-off times`} className="flex flex-col gap-1.5">
+          <span className="label text-[12px] text-mute">{group.label}</span>
+          <div className="flex flex-wrap gap-2">
+            {group.times.map((time) => (
+              <button
+                key={time}
+                type="button"
+                className="chip"
+                aria-pressed={time === picked}
+                onClick={() => setPicked(time)}
+              >
+                {time}
+              </button>
+            ))}
+          </div>
+        </div>
       ))}
     </div>
   );

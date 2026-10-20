@@ -46,18 +46,18 @@ export default function ContactPage() {
     setHandoverUrl(url);
   };
 
-  const labelClass = 'label mb-2 block text-[15px] text-white';
+  const labelClass = 'label mb-2 block text-[13px] text-white';
 
   return (
     <main>
       <PageHeader
         eyebrow="Contact"
-        titleTop="Let’s meet at"
-        titleBottom="the Arena"
-        intro={`${venueContact.addressLine}. Open every day, 08:00 to midnight.`}
+        titleTop="Bring your"
+        titleBottom="squad"
+        intro={`${venueContact.addressLine}. Open every day, 06:00 to midnight.`}
       />
 
-      <section className="wrap grid gap-10 pb-[clamp(72px,9vw,112px)] lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
+      <section className="wrap grid gap-10 pb-[clamp(56px,7vw,88px)] lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
         <div className="flex flex-col gap-3.5">
           {venueContact.channels.map((channel) => (
             <a
@@ -69,8 +69,8 @@ export default function ContactPage() {
               <span
                 className={`text-white group-hover:text-gold ${
                   channel.href.startsWith('mailto:')
-                    ? 'text-lg font-semibold break-words'
-                    : 'display text-[clamp(30px,4vw,40px)] leading-none'
+                    ? 'text-base font-semibold break-words'
+                    : 'display text-[clamp(22px,2.4vw,28px)] leading-none'
                 }`}
               >
                 {channel.value}
@@ -80,7 +80,7 @@ export default function ContactPage() {
 
           <div className="flex flex-col gap-2 border border-t-4 border-white/10 border-t-grass bg-surface px-6 py-5">
             <span className="label text-sm text-gold">Opening hours</span>
-            <span className="display text-[40px] leading-none">Every day · 08:00 – midnight</span>
+            <span className="display text-[28px] leading-none">Every day · 06:00 – midnight</span>
           </div>
 
           <ul className="m-0 flex list-none flex-wrap gap-2 p-0">
@@ -90,7 +90,7 @@ export default function ContactPage() {
                   href={link.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="label inline-flex min-h-12 items-center border border-white/15 px-4 text-[15px] text-fog hover:border-gold hover:text-gold"
+                  className="label inline-flex min-h-12 items-center border border-white/15 px-4 text-[13px] text-fog hover:border-gold hover:text-gold"
                   aria-label={`${link.name}: ${link.handle}`}
                 >
                   {link.name}
@@ -102,7 +102,7 @@ export default function ContactPage() {
 
         <div className="flex flex-col gap-6">
           <div className="flex flex-col gap-5 border border-white/10 bg-surface p-[clamp(20px,4vw,40px)]">
-            <h2 className="display m-0 text-[clamp(44px,5vw,64px)] leading-[0.9]">
+            <h2 className="display m-0 text-[clamp(30px,3.2vw,40px)] leading-[0.9]">
               Send us a <span className="text-gold">message</span>
             </h2>
 
@@ -113,7 +113,7 @@ export default function ContactPage() {
 
             {handoverUrl ? (
               <div className="flex flex-col items-start gap-4 py-4" data-testid="inquiry-handover" role="status">
-                <h3 className="display m-0 text-4xl leading-none">Your message is ready in WhatsApp</h3>
+                <h3 className="display m-0 text-2xl leading-none">Your message is ready in WhatsApp</h3>
                 <p className="m-0 max-w-md text-base text-fog">
                   Send it in WhatsApp and reception will reply there. Nothing was stored on this site, so the message only
                   reaches us once you send it.

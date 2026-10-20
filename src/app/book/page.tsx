@@ -42,7 +42,7 @@ export default async function BookPage() {
         {hoursNote && <p className="m-0 max-w-[600px] text-base text-mute">{hoursNote}</p>}
       </PageHeader>
 
-      <div className="wrap pb-[clamp(72px,9vw,112px)]">
+      <div className="wrap pb-[clamp(56px,7vw,88px)]">
         <BookingWidget
           venues={venues}
           bookingWritesEnabled={bookingWritesEnabled()}

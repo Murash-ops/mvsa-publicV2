@@ -4,7 +4,7 @@ import Image from 'next/image';
 import type { MouseEvent } from 'react';
 import type { BentoTile } from '@/content/site';
 
-const TITLE_SIZE = { lg: 'text-[clamp(44px,5vw,64px)]', md: 'text-[40px]', sm: 'text-4xl' } as const;
+const TITLE_SIZE = { lg: 'text-[clamp(30px,3.2vw,40px)]', md: 'text-[28px]', sm: 'text-2xl' } as const;
 
 /** Moves the tile's spotlight to the cursor without re-rendering anything. */
 function spotlight(event: MouseEvent<HTMLElement>) {
@@ -37,7 +37,7 @@ export default function Bento({ tiles }: { tiles: readonly BentoTile[] }) {
               className="object-cover opacity-45"
             />
           ) : null}
-          <span className="label relative z-[2] text-[15px] text-gold">{tile.tag}</span>
+          <span className="label relative z-[2] text-[13px] text-gold">{tile.tag}</span>
           <h3 className={`display relative z-[2] m-0 leading-[0.92] ${TITLE_SIZE[tile.size]}`}>{tile.title}</h3>
           <p className="relative z-[2] m-0 max-w-[420px] text-base leading-normal text-fog">{tile.body}</p>
         </article>

@@ -394,10 +394,10 @@ export default function BookingWidget({
           data-testid="booking-offline"
           aria-labelledby="booking-offline-title"
         >
-          <h2 id="booking-offline-title" className="display m-0 text-[clamp(44px,6vw,72px)] leading-[0.9]">
+          <h2 id="booking-offline-title" className="display m-0 text-[clamp(32px,3.6vw,44px)] leading-[0.9]">
             {bookingCopy.offline.title}
           </h2>
-          <p className="m-0 max-w-[620px] text-lg leading-[1.55] text-fog">{bookingCopy.offline.body}</p>
+          <p className="m-0 max-w-[620px] text-base leading-[1.55] text-fog">{bookingCopy.offline.body}</p>
           <KickoffChips />
           <div className="flex flex-wrap gap-3">
             <AskForKickoff />
@@ -411,7 +411,7 @@ export default function BookingWidget({
               type="button"
               onClick={() => void loadSlots()}
               disabled={isLoadingSlots}
-              className="text-link text-[15px] disabled:opacity-60"
+              className="text-link text-[13px] disabled:opacity-60"
               data-testid="retry-availability"
             >
               {isLoadingSlots ? 'Checking…' : bookingCopy.offline.retry}
@@ -430,14 +430,14 @@ export default function BookingWidget({
         className="mx-auto flex max-w-xl flex-col items-center gap-6 border border-t-4 border-white/10 border-t-grass bg-surface px-6 py-12 text-center"
         data-testid="booking-confirmed"
       >
-        <h2 className="display m-0 text-6xl leading-[0.9]">
+        <h2 className="display m-0 text-4xl leading-[0.9]">
           Your slot is <span className="text-gold">booked</span>
         </h2>
-        <p className="m-0 text-lg text-fog">
+        <p className="m-0 text-base text-fog">
           {booking.resource_name}, {localTime(booking.start_local)}–{localTime(booking.end_local)} on{' '}
           {format(new Date(booking.start_local), 'EEEE d MMM yyyy')}.
         </p>
-        <p className="display m-0 text-4xl text-gold">Reference {booking.reference}</p>
+        <p className="display m-0 text-2xl text-gold">Reference {booking.reference}</p>
         <p className="m-0 text-base text-fog">
           {booking.amount_due_display} is due at reception. Keep the reference — reception can find your booking with it.
         </p>
@@ -450,15 +450,15 @@ export default function BookingWidget({
 
   /* ------------------------------- main form ------------------------------ */
 
-  const stepTitle = 'display m-0 text-[clamp(36px,4vw,48px)] leading-[0.9]';
-  const fieldLabel = 'label mb-2 block text-[15px] text-white';
+  const stepTitle = 'display m-0 text-[clamp(26px,2.8vw,32px)] leading-[0.9]';
+  const fieldLabel = 'label mb-2 block text-[13px] text-white';
   const option = (selected: boolean) =>
     `border-2 transition-colors ${selected ? 'border-gold bg-gold text-ink' : 'border-white/20 bg-transparent text-white hover:border-gold'}`;
 
   return (
     <div className="w-full">
       <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-3">
-        <div className="flex flex-col gap-12 lg:col-span-2">
+        <div className="flex flex-col gap-8 lg:col-span-2">
           {/* VENUE */}
           <section className="flex flex-col gap-5">
             <h2 className={stepTitle}>
@@ -491,7 +491,7 @@ export default function BookingWidget({
                     />
                     <div className="absolute inset-0 bg-[linear-gradient(to_top,#070A07,rgba(7,10,7,0.4))]" />
                     <span className="relative label text-sm text-gold">{choice.badge}</span>
-                    <span className="relative display text-4xl leading-none text-white">{choice.displayName}</span>
+                    <span className="relative display text-2xl leading-none text-white">{choice.displayName}</span>
                     <span className="relative text-sm text-fog">{choice.blurb}</span>
                   </button>
                 );
@@ -528,7 +528,7 @@ export default function BookingWidget({
                       aria-label={`Select date ${format(date, 'EEEE, MMMM d')}`}
                     >
                       <span className="label text-xs">{format(date, 'EEE')}</span>
-                      <span className="display text-3xl leading-none">{format(date, 'd')}</span>
+                      <span className="display text-xl leading-none">{format(date, 'd')}</span>
                       <span className="label text-xs">{format(date, 'MMM')}</span>
                     </button>
                   );
@@ -599,7 +599,7 @@ export default function BookingWidget({
                         }`}
                         aria-label={`Start at ${localTime(slot.local.start_local)} — ${slot.price.display}`}
                       >
-                        <span className="display text-3xl leading-none">{localTime(slot.local.start_local)}</span>
+                        <span className="display text-xl leading-none">{localTime(slot.local.start_local)}</span>
                         <span className="label mt-1 text-xs">{slot.price.display}</span>
                         {slot.handover_minutes > 0 && (
                           <span className="mt-0.5 text-[11px] opacity-70">+{slot.handover_minutes}m handover</span>
@@ -619,7 +619,7 @@ export default function BookingWidget({
         {/* SUMMARY PANEL */}
         <div className="lg:sticky lg:top-28 lg:col-span-1">
           <div className="flex flex-col gap-6 border border-t-4 border-white/10 border-t-gold bg-surface p-7">
-            <h3 className="display m-0 text-4xl leading-none">Your booking</h3>
+            <h3 className="display m-0 text-2xl leading-none">Your booking</h3>
 
             <dl className="m-0 flex flex-col gap-3 text-base">
               <div className="flex justify-between gap-4">
@@ -646,7 +646,7 @@ export default function BookingWidget({
               )}
               <div className="flex items-center justify-between gap-4 border-t-2 border-white/15 pt-4">
                 <dt className="label text-white">Price</dt>
-                <dd className="display m-0 text-4xl leading-none text-gold" data-testid="price-total">
+                <dd className="display m-0 text-2xl leading-none text-gold" data-testid="price-total">
                   {selectedSlot ? selectedSlot.price.display : '—'}
                 </dd>
               </div>

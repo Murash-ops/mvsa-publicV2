@@ -18,7 +18,7 @@ export default function AboutPage() {
     <main>
       <PageHeader eyebrow={about.eyebrow} titleTop={about.titleTop} titleBottom={about.titleBottom} intro={about.intro} />
 
-      <section className="wrap grid grid-cols-1 items-center gap-12 pb-[clamp(72px,9vw,112px)] lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)]">
+      <section className="wrap grid grid-cols-1 items-center gap-8 pb-[clamp(56px,7vw,88px)] lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)]">
         <div className="flex justify-center border border-white/10 bg-surface p-[clamp(24px,5vw,56px)] text-gold">
           <Logo variant="emblem" width={480} />
         </div>
@@ -27,7 +27,7 @@ export default function AboutPage() {
             Our <span className="text-gold">story</span>
           </h2>
           {about.story.map((paragraph) => (
-            <p key={paragraph.slice(0, 24)} className="m-0 text-lg leading-[1.6] text-fog">
+            <p key={paragraph.slice(0, 24)} className="m-0 text-base leading-[1.6] text-fog">
               {paragraph}
             </p>
           ))}
@@ -35,7 +35,7 @@ export default function AboutPage() {
       </section>
 
       <section className="border-y border-white/[0.08] bg-surface">
-        <div className="wrap flex flex-col gap-10 py-[clamp(72px,9vw,104px)]">
+        <div className="wrap flex flex-col gap-10 py-[clamp(56px,7vw,84px)]">
           <h2 className="h-section">
             Built for
             <br />
@@ -48,7 +48,7 @@ export default function AboutPage() {
                 className="rise flex flex-col gap-3 border border-t-4 border-white/10 border-t-grass bg-ink px-6 py-7"
                 style={{ animationDelay: `${(i * 0.07).toFixed(2)}s` }}
               >
-                <h3 className="display m-0 text-4xl leading-[0.92]">{item.title}</h3>
+                <h3 className="display m-0 text-2xl leading-[0.92]">{item.title}</h3>
                 <p className="m-0 text-base leading-normal text-fog">{item.body}</p>
               </article>
             ))}
@@ -64,10 +64,10 @@ export default function AboutPage() {
         ))}
       </section>
 
-      <section className="wrap flex flex-wrap items-end justify-between gap-8 py-[clamp(72px,9vw,112px)]">
+      <section className="wrap flex flex-wrap items-end justify-between gap-8 py-[clamp(56px,7vw,88px)]">
         <div className="flex max-w-[620px] flex-col gap-4">
           <h2 className="h-section">{about.partner.title}</h2>
-          <p className="m-0 text-lg leading-[1.55] text-fog">{about.partner.body}</p>
+          <p className="m-0 text-base leading-[1.55] text-fog">{about.partner.body}</p>
         </div>
         <a
           href={whatsappUrl(contact.whatsappNumber, about.partner.message)}

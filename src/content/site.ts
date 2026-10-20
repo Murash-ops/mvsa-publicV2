@@ -10,7 +10,7 @@
  * Naming: the thing people book is "the Arena". Never "the turf" or "turf
  * hire". The surface may be described once as synthetic turf.
  *
- * Only facts the owner has approved appear here: open every day 08:00 to
+ * Only facts the owner has approved appear here: open every day 06:00 to
  * midnight; the Arena from KES 1,500 an hour, whole hours, one hour minimum;
  * the two booking lines, the academy line, the email and the handle. No other
  * price band is ever shown.
@@ -37,7 +37,7 @@ export const contact = {
   academyPhoneHref: 'tel:+254116619476',
   email: 'mtviewsportsarena@gmail.com',
   addressLine: 'Behind Mountain View Mall, Waiyaki Way, Nairobi',
-  hours: 'Every day, 08:00 to midnight',
+  hours: 'Every day, 06:00 to midnight',
   channels: [
     { name: 'Arena bookings', value: '0798 258 950', href: 'tel:+254798258950' },
     { name: 'Arena bookings, second line', value: '0783 209 442', href: 'tel:+254783209442' },
@@ -59,16 +59,23 @@ export const social = {
 } as const;
 
 /** The owner's own words, used to close pages. */
-export const signature = "Let's meet at the Arena.";
+export const signature = 'Bring your squad.';
 
-/** Kick-off times offered by the picker. Reception confirms the slot. */
-export const kickoffTimes = ['17:00', '18:00', '19:00', '20:00', '21:00', '22:00'] as const;
+/**
+ * Kick-off times offered by the picker: every hour from opening at 06:00 to
+ * 23:00, the last hour that ends by midnight. Reception confirms the slot.
+ */
+export const kickoffGroups = [
+  { label: 'Morning', times: ['06:00', '07:00', '08:00', '09:00', '10:00', '11:00'] },
+  { label: 'Afternoon', times: ['12:00', '13:00', '14:00', '15:00', '16:00'] },
+  { label: 'Evening', times: ['17:00', '18:00', '19:00', '20:00', '21:00', '22:00', '23:00'] },
+] as const;
 export const defaultKickoff = '20:00';
 
 export const home = {
   hero: {
-    titleTop: 'Lights on.',
-    titleBottom: 'Game on.',
+    titleTop: 'Your home of',
+    titleBottom: 'football and fitness',
     body:
       'Floodlit 5-aside on synthetic turf, behind Mountain View Mall on Waiyaki Way. Book an hour, bring your squad, play until midnight.',
     imageAlt: 'The synthetic pitch at Mountain View Sports Arena, lines running toward the goal',
@@ -107,7 +114,7 @@ export const home = {
       },
       { tag: 'Kit', title: 'Changing rooms & lockers', body: 'Change on site and lock your gear away.', cols: 2, rows: 1, size: 'md' },
       { tag: 'Between games', title: 'Free Wi-Fi & water', body: 'Stay connected and refill whenever you need.', cols: 1, rows: 1, size: 'sm' },
-      { tag: 'Flexible', title: '1 hour minimum', body: 'Whole hours, 08:00 to midnight.', cols: 1, rows: 1, size: 'sm' },
+      { tag: 'Flexible', title: '1 hour minimum', body: 'Whole hours, 06:00 to midnight.', cols: 1, rows: 1, size: 'sm' },
       { tag: 'Teams & events', title: 'Meeting room', body: 'Team talks, training sessions and small events. Ask reception.', cols: 2, rows: 1, size: 'md' },
       { tag: 'Arena shop', title: 'Kit & balls', body: 'Tees, jerseys, trainers, yoga kit and balls. Ask what’s in today.', cols: 2, rows: 1, size: 'md' },
     ],
@@ -117,7 +124,7 @@ export const home = {
     titleBottom: 'at the Arena',
     body: 'The Arena is open every day. Regular sessions run on Saturdays.',
     fixtures: [
-      { day: 'Daily', time: '08:00 – 00:00', what: 'The Arena is open for bookings', cta: 'Book', line: 'bookings' },
+      { day: 'Daily', time: '06:00 – 00:00', what: 'The Arena is open for bookings', cta: 'Book', line: 'bookings' },
       { day: 'Sat', time: '10:00', what: 'Chess Club', cta: 'Join', line: 'academy' },
       { day: 'Sat', time: '14:00 – 16:00', what: 'Football Academy', cta: 'Join', line: 'academy' },
       { day: 'Any day', time: 'On request', what: 'Full-day hire & events', cta: 'Ask', line: 'bookings' },
@@ -134,8 +141,8 @@ export const home = {
     { src: '/images/gallery/shot-02.webp', alt: 'Floodlights and seating beside the pitch' },
   ],
   closing: {
-    titleTop: 'Let’s meet at',
-    titleBottom: 'the Arena',
+    titleTop: 'Bring your',
+    titleBottom: 'squad',
   },
 } as const;
 
@@ -146,7 +153,7 @@ export const about = {
   titleTop: 'Play. Compete.',
   titleBottom: 'Connect.',
   intro:
-    'Mountain View Sports Arena is a floodlit 5-aside pitch behind Mountain View Mall on Waiyaki Way, open every day from 08:00 to midnight.',
+    'Mountain View Sports Arena is a floodlit 5-aside pitch behind Mountain View Mall on Waiyaki Way, open every day from 06:00 to midnight.',
   story: [
     'We built the Arena so the neighbourhood has a proper place to play: a synthetic pitch under floodlights, somewhere to change, and a reception team to sort out your booking.',
     'Book an hour for your five-a-side, bring the children to the academy on a Saturday, or use the meeting room for a team talk. Whatever brings you, the lights stay on until midnight.',
@@ -174,7 +181,7 @@ export const booking = {
   eyebrow: 'Book the Arena',
   titleTop: 'Book',
   titleBottom: 'the Arena',
-  intro: 'The Arena from KES 1,500 an hour. Whole hours, one hour minimum, every day 08:00 to midnight.',
+  intro: 'The Arena from KES 1,500 an hour. Whole hours, one hour minimum, every day 06:00 to midnight.',
   /** The one calm block shown while online booking is not available. */
   offline: {
     title: 'Book on WhatsApp or by phone',

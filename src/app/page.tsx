@@ -24,7 +24,7 @@ export default function Home() {
     <KickoffProvider>
       <main>
         {/* Hero: the floodlights flicker on over the pitch */}
-        <section id="top" className="relative flex min-h-[clamp(640px,100svh,800px)] items-end overflow-hidden">
+        <section id="top" className="relative flex min-h-[clamp(540px,86svh,740px)] items-end overflow-hidden">
           <Image
             src={heroPhoto.src}
             alt={home.hero.imageAlt}
@@ -34,24 +34,24 @@ export default function Home() {
             className="object-cover"
             style={{ objectPosition: heroPhoto.objectPosition }}
           />
-          <div aria-hidden="true" className="absolute inset-0 bg-[rgba(3,6,3,0.62)]" />
+          <div aria-hidden="true" className="absolute inset-0 bg-[rgba(3,6,3,0.34)]" />
           <div aria-hidden="true" className="lights pointer-events-none absolute inset-0 mix-blend-screen">
             <div className="absolute inset-0 bg-[conic-gradient(from_128deg_at_0%_0%,transparent_0deg,rgba(255,240,205,0.30)_12deg,rgba(255,240,205,0.06)_26deg,transparent_34deg)]" />
             <div className="absolute inset-0 bg-[conic-gradient(from_198deg_at_100%_0%,transparent_0deg,rgba(255,240,205,0.06)_8deg,rgba(255,240,205,0.30)_22deg,transparent_34deg)]" />
             <div className="absolute -top-10 left-[2%] h-[90px] w-[90px] rounded-full bg-[radial-gradient(circle,rgba(255,246,220,0.95),rgba(255,246,220,0)_70%)]" />
             <div className="absolute -top-10 right-[2%] h-[90px] w-[90px] rounded-full bg-[radial-gradient(circle,rgba(255,246,220,0.95),rgba(255,246,220,0)_70%)]" />
           </div>
-          <div aria-hidden="true" className="absolute inset-x-0 bottom-0 h-3/5 bg-[linear-gradient(to_top,#070A07_6%,rgba(7,10,7,0)_100%)]" />
+          <div aria-hidden="true" className="absolute inset-x-0 bottom-0 h-[78%] sm:h-1/2 bg-[linear-gradient(to_top,#070A07_4%,rgba(7,10,7,0.55)_40%,rgba(7,10,7,0)_100%)]" />
 
-          <div className="wrap relative flex flex-wrap items-end justify-between gap-10 pb-16">
-            <div className="rise flex min-w-0 flex-[1_1_560px] flex-col gap-6">
+          <div className="wrap relative flex flex-wrap items-end justify-between gap-8 pb-12">
+            <div className="rise flex min-w-0 flex-[1_1_520px] flex-col gap-5">
               <StatusPill />
-              <h1 className="display m-0 text-[clamp(84px,13.5vw,212px)] leading-[0.82]">
+              <h1 className="display m-0 text-[clamp(44px,6vw,92px)] leading-[0.9]">
                 {home.hero.titleTop}
                 <br />
                 <span className="text-gold">{home.hero.titleBottom}</span>
               </h1>
-              <p className="m-0 max-w-[540px] text-[clamp(18px,1.6vw,21px)] leading-[1.55] text-fog">{home.hero.body}</p>
+              <p className="m-0 max-w-[540px] text-[clamp(16px,1.25vw,18px)] leading-[1.55] text-fog">{home.hero.body}</p>
               <div className="flex flex-wrap gap-3">
                 <BookArenaLink className="btn shine">Book on WhatsApp</BookArenaLink>
                 <a href={contact.bookingsPhoneHref} className="btn btn-ghost">
@@ -59,22 +59,22 @@ export default function Home() {
                 </a>
               </div>
             </div>
-            <PricePlate className="flex-[0_1_330px]" />
+            <PricePlate className="flex-[0_1_260px]" />
           </div>
         </section>
 
         <Marquee />
 
         {/* Interactive 3D pitch + kick-off picker */}
-        <section id="pitch" className="wrap flex flex-wrap items-center gap-14 py-[clamp(72px,9vw,112px)]">
+        <section id="pitch" className="wrap flex flex-wrap items-center gap-10 py-[clamp(56px,7vw,88px)]">
           <div className="flex min-w-0 flex-[1_1_420px] flex-col gap-6">
-            <span className="label text-[15px] text-gold">{home.pricing.eyebrow}</span>
+            <span className="label text-[13px] text-gold">{home.pricing.eyebrow}</span>
             <h2 className="h-section">
               {home.kickoff.titleTop}
               <br />
               <span className="text-gold">{home.kickoff.titleBottom}</span>
             </h2>
-            <p className="m-0 max-w-[460px] text-lg leading-[1.55] text-fog">{home.kickoff.body}</p>
+            <p className="m-0 max-w-[460px] text-base leading-[1.55] text-fog">{home.kickoff.body}</p>
             <KickoffChips />
             <AskForKickoff />
             <p className="m-0 max-w-[460px] text-base text-mute">{home.pricing.note}</p>
@@ -83,7 +83,7 @@ export default function Home() {
         </section>
 
         {/* Bento grid with cursor spotlight */}
-        <section className="wrap flex flex-col gap-10 pb-[clamp(72px,9vw,112px)]">
+        <section className="wrap flex flex-col gap-10 pb-[clamp(56px,7vw,88px)]">
           <h2 className="h-section">
             {home.bento.titleTop}
             <br />
@@ -94,14 +94,14 @@ export default function Home() {
 
         {/* This week */}
         <section id="week" className="scroll-mt-20 border-y border-white/[0.08] bg-surface">
-          <div className="wrap flex flex-col gap-9 py-[clamp(72px,9vw,104px)]">
+          <div className="wrap flex flex-col gap-9 py-[clamp(56px,7vw,84px)]">
             <div className="flex flex-wrap items-end justify-between gap-4">
               <h2 className="h-section">
                 {home.week.titleTop}
                 <br />
                 {home.week.titleBottom}
               </h2>
-              <p className="m-0 max-w-[380px] text-lg leading-[1.55] text-fog">{home.week.body}</p>
+              <p className="m-0 max-w-[380px] text-base leading-[1.55] text-fog">{home.week.body}</p>
             </div>
             <ul className="m-0 flex list-none flex-col border-t-2 border-gold p-0">
               {home.week.fixtures.map((fixture, i) => (
@@ -110,14 +110,14 @@ export default function Home() {
                   className="rise flex flex-wrap items-center gap-x-8 gap-y-3 border-b border-white/10 px-3 py-[22px]"
                   style={{ animationDelay: delay(i) }}
                 >
-                  <span className="display flex-[0_0_140px] text-[44px] leading-none text-gold">{fixture.day}</span>
-                  <span className="label flex-[0_0_180px] text-2xl tracking-[0.04em] text-white">{fixture.time}</span>
-                  <span className="display min-w-0 flex-[1_1_240px] text-4xl leading-none">{fixture.what}</span>
+                  <span className="display flex-[0_0_140px] text-[28px] leading-none text-gold">{fixture.day}</span>
+                  <span className="label flex-[0_0_180px] text-lg tracking-[0.04em] text-white">{fixture.time}</span>
+                  <span className="display min-w-0 flex-[1_1_240px] text-2xl leading-none">{fixture.what}</span>
                   <a
                     href={lineUrl[fixture.line]}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-link text-[17px]"
+                    className="text-link text-[15px]"
                     aria-label={`${fixture.cta}: ${fixture.what}`}
                   >
                     {fixture.cta}
@@ -129,7 +129,7 @@ export default function Home() {
         </section>
 
         {/* Programs */}
-        <section id="programs" className="wrap flex flex-col gap-10 py-[clamp(72px,9vw,112px)]">
+        <section id="programs" className="wrap flex flex-col gap-10 py-[clamp(56px,7vw,88px)]">
           <h2 className="h-section">
             {home.programs.titleTop}
             <br />
@@ -139,11 +139,11 @@ export default function Home() {
             {programs.map((program, i) => (
               <article
                 key={program.id}
-                className="rise flex min-h-[210px] flex-col gap-3 border border-t-4 border-white/10 border-t-grass bg-surface px-6 py-7"
+                className="rise flex min-h-[170px] flex-col gap-3 border border-t-4 border-white/10 border-t-grass bg-surface px-6 py-7"
                 style={{ animationDelay: delay(i) }}
               >
-                <span className="label text-[15px] text-gold">{program.age_group}</span>
-                <h3 className="display m-0 text-[44px] leading-[0.92]">{program.name}</h3>
+                <span className="label text-[13px] text-gold">{program.age_group}</span>
+                <h3 className="display m-0 text-[28px] leading-[0.92]">{program.name}</h3>
                 <p className="m-0 grow text-base leading-normal text-fog">{program.schedule}.</p>
                 <a
                   href={lineUrl.academy}

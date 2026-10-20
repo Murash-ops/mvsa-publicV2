@@ -36,17 +36,17 @@ export default function ProgramsPage() {
         </a>
       </PageHeader>
 
-      <section className="wrap pb-[clamp(72px,9vw,112px)]">
+      <section className="wrap pb-[clamp(56px,7vw,88px)]">
         <div className="grid gap-3.5 [grid-template-columns:repeat(auto-fit,minmax(220px,1fr))]">
           {programs.map((program, i) => (
             <article
               key={program.id}
-              className="rise flex min-h-[260px] flex-col gap-3 border border-t-4 border-white/10 border-t-grass bg-surface px-6 py-7"
+              className="rise flex min-h-[200px] flex-col gap-3 border border-t-4 border-white/10 border-t-grass bg-surface px-6 py-7"
               style={{ animationDelay: `${(i * 0.07).toFixed(2)}s` }}
             >
-              <span className="label text-[15px] text-gold">{program.age_group}</span>
-              <h2 className="display m-0 text-[48px] leading-[0.92]">{program.name}</h2>
-              <p className="label m-0 text-lg tracking-[0.06em] text-white">{program.schedule}</p>
+              <span className="label text-[13px] text-gold">{program.age_group}</span>
+              <h2 className="display m-0 text-[32px] leading-[0.92]">{program.name}</h2>
+              <p className="label m-0 text-base tracking-[0.06em] text-white">{program.schedule}</p>
               <p className="m-0 grow text-base leading-normal text-fog">{program.description}</p>
               <Link href={`/programs/${program.id}`} className="text-link text-base" aria-label={`More about ${program.name}`}>
                 More about it
