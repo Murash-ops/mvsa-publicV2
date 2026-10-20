@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import type { Metadata } from 'next';
 import PageHeader from '@/components/arena/PageHeader';
 import Marquee from '@/components/arena/Marquee';
@@ -16,7 +17,13 @@ export default function ShopPage() {
   const reception = whatsappUrl(contact.whatsappNumber);
 
   return (
-    <main className="theme-light">
+    <main className="theme-light relative isolate">
+      {/* The pitch behind the whole shop, under a cream wash light enough for
+          the photo to show and strong enough for the words to read. */}
+      <div aria-hidden="true" className="absolute inset-0 -z-10 overflow-hidden">
+        <Image src="/images/gallery/shot-01.webp" alt="" fill sizes="100vw" className="object-cover" />
+        <div className="absolute inset-0 bg-[rgba(245,242,234,0.8)]" />
+      </div>
       <PageHeader eyebrow={shop.eyebrow} titleTop={shop.titleTop} titleBottom={shop.titleBottom} intro={shop.intro} />
 
       {catalogue.length > 0 ? <Marquee items={['Wear the Arena', 'Bring your squad', 'Arena Kit', 'Drop 01']} /> : null}
