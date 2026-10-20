@@ -51,7 +51,7 @@ export const categories: { id: ShopCategory | 'all'; label: string }[] = [
  * navigation link and puts a notice on the page, so a half-filled catalogue
  * can never go out as if it were finished.
  */
-export const draft = true;
+export const draft = false;
 
 /**
  * Arena Kit, drop 01: the merchandise, each piece carrying one of the two
@@ -142,7 +142,7 @@ export const shop = {
   emptyBody:
     'There is nothing listed yet. Ask at reception for kit and match essentials, or send us a message and we will tell you what is in.',
   /** Said once, near the ordering buttons, so nobody expects a checkout. */
-  orderNote: 'Nothing is bought on this page. The button opens WhatsApp with your item filled in.',
+  orderNote: 'Prices on WhatsApp: pick your size, tap Order, and reception confirms the price and stock. Nothing is bought on this page.',
   /** Shown while `draft` is true, in place of the ordering note. */
   draftNote:
     'Draft. Arena Kit is new: prices and stock are being confirmed, so ask on WhatsApp for what is in today.',
