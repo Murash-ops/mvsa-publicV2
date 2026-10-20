@@ -9,7 +9,7 @@ export default function NotFound() {
         eyebrow="Page not found"
         titleTop="Out of"
         titleBottom="bounds"
-        intro="That page isn’t here. The Arena is, every day from 08:00 to midnight."
+        intro="That page isn’t here. The Arena is, every day from 06:00 to midnight."
       />
       <LampClose>
         <Link href="/" className="btn shine">Back to the home page</Link>

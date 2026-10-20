@@ -54,7 +54,7 @@ export default function ContactPage() {
         eyebrow="Contact"
         titleTop="Bring your"
         titleBottom="squad"
-        intro={`${venueContact.addressLine}. Open every day, 08:00 to midnight.`}
+        intro={`${venueContact.addressLine}. Open every day, 06:00 to midnight.`}
       />
 
       <section className="wrap grid gap-10 pb-[clamp(56px,7vw,88px)] lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
@@ -80,7 +80,7 @@ export default function ContactPage() {
 
           <div className="flex flex-col gap-2 border border-t-4 border-white/10 border-t-grass bg-surface px-6 py-5">
             <span className="label text-sm text-gold">Opening hours</span>
-            <span className="display text-[28px] leading-none">Every day · 08:00 – midnight</span>
+            <span className="display text-[28px] leading-none">Every day · 06:00 – midnight</span>
           </div>
 
           <ul className="m-0 flex list-none flex-wrap gap-2 p-0">

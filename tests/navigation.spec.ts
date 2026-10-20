@@ -35,3 +35,18 @@ test('the hero names the Arena as the home of football and fitness', async ({ pa
   await expect(page.locator('body')).toContainText(/bring your\s*squad/i);
   await expect(page.locator('body')).not.toContainText(/let.s meet/i);
 });
+
+test('the kick-off picker covers the whole day, 06:00 to 23:00', async ({ page }) => {
+  await page.goto('/');
+  const picker = page.getByTestId('kickoff-picker');
+  await expect(picker.getByRole('button')).toHaveCount(18);
+  await picker.getByRole('button', { name: '06:00' }).click();
+  await expect(page.getByTestId('kickoff-cta')).toHaveAttribute('href', /book%20the%20Arena%20at%2006%3A00/);
+  await expect(picker.getByRole('button', { name: '23:00' })).toBeVisible();
+});
+
+test('the Arena is described as open from 06:00', async ({ page }) => {
+  await page.goto('/contact');
+  await expect(page.locator('main')).toContainText('06:00');
+  await expect(page.locator('main')).not.toContainText('08:00');
+});

@@ -21,15 +21,15 @@ function subscribe(onChange: () => void) {
   return () => clearInterval(timer);
 }
 
-/** Open from 08:00 until midnight, every day. */
-const getOpen = () => nairobiHour() >= 8;
+/** Open from 06:00 until midnight, every day. */
+const getOpen = () => nairobiHour() >= 6;
 /** The server cannot know the visitor's moment, so it renders the neutral line. */
 const getServerOpen = () => null;
 
 export default function StatusPill() {
   const open = useSyncExternalStore(subscribe, getOpen, getServerOpen);
 
-  const text = open === null ? 'Open every day · 08:00 to midnight' : open ? 'Open now · until midnight' : 'Opens 08:00';
+  const text = open === null ? 'Open every day · 06:00 to midnight' : open ? 'Open now · until midnight' : 'Opens 06:00';
 
   return (
     <span

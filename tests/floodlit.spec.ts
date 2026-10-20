@@ -53,7 +53,7 @@ test('the logo carries the arena name for screen readers', async ({ page }) => {
 
 test('the status pill says whether the Arena is open', async ({ page }) => {
   await page.goto('/');
-  await expect(page.getByTestId('status-pill')).toHaveText(/Open now · until midnight|Opens 08:00/);
+  await expect(page.getByTestId('status-pill')).toHaveText(/Open now · until midnight|Opens 06:00/);
 });
 
 function filesUnder(dir: string): string[] {

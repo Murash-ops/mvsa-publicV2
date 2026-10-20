@@ -13,7 +13,7 @@ import { shopIsListed } from '@/content/shop';
  *
  * The drawer is rendered beside the header, not inside it: the header's
  * backdrop-filter makes it the containing block for fixed children, so a
- * drawer inside it is clipped to the header's own 72px and never shows.
+ * drawer inside it is clipped to the header's own height and never shows.
  */
 export default function Navbar() {
   const [open, setOpen] = useState(false);
@@ -51,14 +51,14 @@ export default function Navbar() {
     <header
       className="sticky top-0 z-50 border-b border-white/[0.08] bg-[rgba(7,10,7,0.72)] backdrop-blur-[14px]"
     >
-      <div className="wrap flex items-center justify-between gap-3.5 py-3">
+      <div className="wrap flex h-20 items-center justify-between gap-3.5">
         <Link
           href="/"
           aria-label="Mountain View Sports Arena, home"
           className="flex min-h-11 items-center text-white hover:text-gold-light"
           onClick={() => setOpen(false)}
         >
-          <Logo variant="helmets" width={72} decorative />
+          <Logo variant="emblem" width={96} decorative />
         </Link>
 
         <nav aria-label="Main" className="hidden items-center gap-[clamp(10px,2.2vw,30px)] lg:flex">
@@ -100,7 +100,7 @@ export default function Navbar() {
       {open && (
         <div
           id="mobile-menu"
-          className="lg:hidden fixed inset-x-0 top-[72px] bottom-0 z-40 overflow-y-auto border-t border-white/[0.08] bg-ink/[0.97]"
+          className="lg:hidden fixed inset-x-0 top-20 bottom-0 z-40 overflow-y-auto border-t border-white/[0.08] bg-ink"
         >
           <nav aria-label="Mobile" className="wrap flex flex-col gap-1 py-6">
             <Link
