@@ -314,6 +314,28 @@
 .lamp-bar { animation: lamp 1.4s ease-out both; }
 .pitch-marker { transform: translateZ(46px); animation: bob 2.6s ease-in-out infinite; }
 
+/* Arena Kit cards: the photo leans in on hover, like kit on a hanger. */
+.kit-card { transition: border-color 0.25s, transform 0.25s; }
+.kit-card:hover { border-color: var(--color-gold); transform: translateY(-4px); }
+.kit-photo { transition: transform 0.5s cubic-bezier(0.34, 1.4, 0.64, 1); }
+.kit-card:hover .kit-photo { transform: scale(1.06) rotate(-1.5deg); }
+
+.size-chip {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0 10px;
+  border: 1px solid color-mix(in srgb, var(--color-white) 25%, transparent);
+  background: transparent;
+  color: var(--color-white);
+  font-family: var(--font-label);
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 0.06em;
+  transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+}
+.size-chip:hover { border-color: var(--color-gold); }
+.size-chip[aria-pressed='true'] { background: var(--color-gold); border-color: var(--color-gold); color: var(--color-ink); }
+
 .photo { overflow: hidden; }
 .photo img { transition: transform 0.5s ease; }
 .photo:hover img { transform: scale(1.05); }
@@ -354,6 +376,7 @@
     scroll-behavior: auto !important;
   }
   .photo:hover img { transform: none; }
+  .kit-card:hover, .kit-card:hover .kit-photo { transform: none; }
 }
 
 .scrollbar-hide::-webkit-scrollbar { display: none; }

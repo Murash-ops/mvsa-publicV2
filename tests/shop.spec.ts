@@ -80,3 +80,40 @@ test('a draft item carries no price, so nothing is advertised early', () => {
     expect(item.priceKes, `${item.name} has a price while the list is a draft`).toBeUndefined();
   }
 });
+
+test('picking a size puts it in the WhatsApp order', async ({ page }) => {
+  const item = catalogue.find((i) => i.options?.includes('L'));
+  test.skip(!item, 'no sized item in the catalogue');
+
+  await page.goto('/shop');
+  const card = page.getByTestId('kit-card').filter({ hasText: item!.name });
+  await card.getByRole('button', { name: 'L', exact: true }).click();
+  await expect(card.getByRole('link', { name: /order on whatsapp/i })).toHaveAttribute(
+    'href',
+    orderUrl('254798258950', item!, 'L')
+  );
+  expect(orderMessage(item!, 'L')).toContain(`${item!.name}, size L`);
+});
+
+test('an option the item does not offer never reaches the message', () => {
+  const item = catalogue.find((i) => !i.options?.length) ?? catalogue[0];
+  expect(orderMessage(item, 'XXXL')).toBe(orderMessage(item));
+});
+
+test('the filter shows one kind of kit at a time', async ({ page }) => {
+  test.skip(!catalogue.some((i) => i.category === 'gear'), 'no gear listed');
+
+  await page.goto('/shop');
+  await page.getByTestId('shop-filter').getByRole('button', { name: 'Gear' }).click();
+  const gear = catalogue.filter((i) => i.category === 'gear' && i.available !== false);
+  await expect(page.getByTestId('kit-card')).toHaveCount(gear.length);
+  await page.getByTestId('shop-filter').getByRole('button', { name: 'All kit' }).click();
+  await expect(page.getByTestId('kit-card')).toHaveCount(catalogue.filter((i) => i.available !== false).length);
+});
+
+test('every kit photo is a real file', async ({ page }) => {
+  for (const item of catalogue.filter((i) => i.image)) {
+    const response = await page.request.get(item.image!.src);
+    expect(response.status(), item.image!.src).toBe(200);
+  }
+});
