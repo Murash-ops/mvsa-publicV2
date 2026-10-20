@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 // Page copy is checked in (src/content/site.ts), so this page needs no data layer.
 export default function AboutPage() {
   return (
-    <main>
+    <main className="theme-light">
       <PageHeader eyebrow={about.eyebrow} titleTop={about.titleTop} titleBottom={about.titleBottom} intro={about.intro} />
 
       <section className="wrap grid grid-cols-1 items-center gap-8 pb-[clamp(56px,7vw,88px)] lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)]">

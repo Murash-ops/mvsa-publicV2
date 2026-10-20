@@ -4,7 +4,7 @@ import PageHeader from '@/components/arena/PageHeader';
 
 export default function NotFound() {
   return (
-    <main>
+    <main className="theme-light">
       <PageHeader
         eyebrow="Page not found"
         titleTop="Out of"

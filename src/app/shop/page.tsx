@@ -15,7 +15,7 @@ export default function ShopPage() {
   const reception = whatsappUrl(contact.whatsappNumber);
 
   return (
-    <main>
+    <main className="theme-light">
       <PageHeader eyebrow="Arena shop" titleTop={shop.title} intro={shop.intro} />
 
       <div className="wrap pb-[clamp(56px,7vw,88px)]">

@@ -24,15 +24,13 @@ test('the kick-off picker builds a WhatsApp request to book the Arena at that ti
   expect(message).toContain('book the Arena at');
 });
 
-test('reduced motion stops the marquee and the floodlights', async ({ page }) => {
+test('reduced motion stops the marquee', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto('/');
 
   const marquee = page.getByTestId('marquee-track');
   await expect(marquee).toBeAttached();
   expect(await marquee.evaluate((el) => getComputedStyle(el).animationName)).toBe('none');
-  const lights = page.locator('.lights');
-  expect(await lights.evaluate((el) => getComputedStyle(el).animationName)).toBe('none');
 });
 
 test('with motion allowed the marquee runs', async ({ page }) => {
@@ -103,4 +101,13 @@ test('an unknown page is answered in the Arena style', async ({ page }) => {
   const response = await page.goto('/no-such-page');
   expect(response?.status()).toBe(404);
   await expect(page.getByRole('heading', { level: 1 })).toContainText('Out of');
+});
+
+test('nothing on the page shimmers or glows: buttons are flat and still', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  await page.goto('/');
+  const cta = page.getByRole('link', { name: 'Book on WhatsApp' }).first();
+  expect(await cta.evaluate((el) => getComputedStyle(el).animationName)).toBe('none');
+  expect(await cta.evaluate((el) => getComputedStyle(el).backgroundImage)).toBe('none');
+  await expect(page.locator('.lights, .lamp-bar')).toHaveCount(0);
 });

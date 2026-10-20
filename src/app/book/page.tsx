@@ -32,7 +32,7 @@ export default async function BookPage() {
   }
 
   return (
-    <main>
+    <main className="theme-light">
       <PageHeader
         eyebrow={bookingCopy.eyebrow}
         titleTop={bookingCopy.titleTop}

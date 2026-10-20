@@ -34,7 +34,7 @@ export default async function ProgramDetailsPage({ params }: { params: Promise<{
   );
 
   return (
-    <main>
+    <main className="theme-light">
       <PageHeader
         eyebrow={program.age_group}
         titleTop={program.name}

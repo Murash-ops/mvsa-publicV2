@@ -49,7 +49,7 @@ export default function Navbar() {
   return (
     <>
     <header
-      className="sticky top-0 z-50 border-b border-white/[0.08] bg-[rgba(7,10,7,0.72)] backdrop-blur-[14px]"
+      className="sticky top-0 z-50 border-b border-white/[0.08] bg-[rgba(14,28,20,0.92)] backdrop-blur-[14px]"
     >
       <div className="wrap flex h-20 items-center justify-between gap-3.5">
         <Link
