@@ -17,10 +17,12 @@ export default function ShopPage() {
   const reception = whatsappUrl(contact.whatsappNumber);
 
   return (
-    <main className="theme-light relative isolate">
+    <main className="theme-light relative isolate [clip-path:inset(0)]">
       {/* The pitch behind the whole shop, under a cream wash light enough for
-          the photo to show and strong enough for the words to read. */}
-      <div aria-hidden="true" className="absolute inset-0 -z-10 overflow-hidden">
+          the photo to show and strong enough for the words to read. It is
+          fixed to the screen (and clipped to the shop) so a long page on a
+          phone doesn't stretch the photo into a blur. */}
+      <div aria-hidden="true" className="fixed inset-0 -z-10 overflow-hidden">
         <Image src="/images/gallery/shot-01.webp" alt="" fill sizes="100vw" className="object-cover" />
         <div className="absolute inset-0 bg-[rgba(245,242,234,0.8)]" />
       </div>

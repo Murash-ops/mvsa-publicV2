@@ -30,7 +30,7 @@ export default function ShopGrid({ items, whatsappNumber }: { items: ShopItem[];
         ))}
       </div>
 
-      <div className="grid gap-4 [grid-template-columns:repeat(auto-fill,minmax(260px,1fr))]">
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 sm:[grid-template-columns:repeat(auto-fill,minmax(260px,1fr))]">
         {shown.map((item, i) => (
           <KitCard key={item.id} item={item} whatsappNumber={whatsappNumber} index={i} />
         ))}
@@ -59,15 +59,15 @@ function KitCard({ item, whatsappNumber, index }: { item: ShopItem; whatsappNumb
           />
         ) : null}
         {item.mark ? (
-          <span className="label absolute top-3 left-3 bg-gold px-2.5 py-1 text-[11px] tracking-[0.16em] text-ink">
+          <span className="label absolute top-2 left-2 bg-gold px-2 py-0.5 text-[10px] tracking-[0.14em] text-ink sm:top-3 sm:left-3 sm:px-2.5 sm:py-1 sm:text-[11px]">
             {item.mark === 'classic' ? 'Classic' : 'Helmets'}
           </span>
         ) : null}
       </div>
 
-      <div className="flex flex-1 flex-col gap-3 px-5 pt-5 pb-6">
-        <div className="flex items-baseline justify-between gap-3">
-          <h2 className="display m-0 text-[24px] leading-[0.95]">{item.name}</h2>
+      <div className="flex flex-1 flex-col gap-2.5 px-3 pt-3 pb-4 sm:gap-3 sm:px-5 sm:pt-5 sm:pb-6">
+        <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+          <h2 className="display m-0 text-[19px] leading-[0.95] sm:text-[24px]">{item.name}</h2>
           {item.priceKes === undefined ? (
             <span className="label text-[13px] whitespace-nowrap text-mute">Ask</span>
           ) : (
@@ -75,10 +75,10 @@ function KitCard({ item, whatsappNumber, index }: { item: ShopItem; whatsappNumb
           )}
         </div>
 
-        <p className="m-0 text-[15px] leading-normal text-fog">{item.description}</p>
+        <p className="m-0 line-clamp-3 text-[13px] leading-snug text-fog sm:line-clamp-none sm:text-[15px] sm:leading-normal">{item.description}</p>
 
         {item.options?.length ? (
-          <div role="group" aria-label={`${item.name} size`} className="flex flex-wrap gap-1.5">
+          <div role="group" aria-label={`${item.name} size`} className="flex flex-wrap gap-1 sm:gap-1.5">
             {item.options.map((o) => (
               <button
                 key={o}
@@ -100,7 +100,8 @@ function KitCard({ item, whatsappNumber, index }: { item: ShopItem; whatsappNumb
           className="btn btn-sm shine mt-auto"
           aria-label={`Order on WhatsApp: ${item.name}${option ? `, ${option}` : ''}`}
         >
-          Order on WhatsApp
+          <span className="sm:hidden">Order</span>
+          <span className="hidden sm:inline">Order on WhatsApp</span>
         </a>
       </div>
     </article>

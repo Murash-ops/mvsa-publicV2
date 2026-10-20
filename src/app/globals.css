@@ -333,6 +333,9 @@
   letter-spacing: 0.06em;
   transition: background-color 0.2s, border-color 0.2s, color 0.2s;
 }
+@media (max-width: 639px) {
+  .size-chip { min-width: 36px; min-height: 40px; padding: 0 6px; font-size: 13px; }
+}
 .size-chip:hover { border-color: var(--color-gold); }
 .size-chip[aria-pressed='true'] { background: var(--color-gold); border-color: var(--color-gold); color: var(--color-ink); }
 
