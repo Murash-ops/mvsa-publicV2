@@ -57,10 +57,12 @@ export default function Home() {
           </div>
         </section>
 
-        <Marquee />
+        <Marquee tone="night" />
 
-        {/* Interactive 3D pitch + kick-off picker */}
-        <div className="theme-light">
+        {/* Interactive 3D pitch + kick-off picker. The light section opens as a
+            rounded sheet over the dark, starting in sand and warming to paper,
+            so the page steps down from the hero instead of switching on. */}
+        <div className="theme-light sheet-in">
         <section id="pitch" className="wrap flex flex-wrap items-center gap-10 py-[clamp(56px,7vw,88px)]">
           <div className="flex min-w-0 flex-[1_1_420px] flex-col gap-6">
             <span className="label text-[13px] text-gold">{home.pricing.eyebrow}</span>

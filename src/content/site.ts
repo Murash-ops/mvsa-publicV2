@@ -97,7 +97,7 @@ export const home = {
     titleTop: 'Pick your',
     titleBottom: 'kick-off',
     body: 'Choose a time and we’ll open WhatsApp with your request ready to send. Reception confirms the slot.',
-    markerCaption: 'Your squad’s hour',
+    markerCaption: 'Your squad’s time',
   },
   bento: {
     titleTop: 'Built for',
