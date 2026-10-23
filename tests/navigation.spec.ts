@@ -37,11 +37,13 @@ test('the hero names the Arena as the home of football and fitness', async ({ pa
 });
 
 test('the kick-off picker covers the whole day, 06:00 to 23:00', async ({ page }) => {
+  await page.clock.setFixedTime(new Date('2026-10-23T02:00:00Z')); // 05:00 in Nairobi
+  await page.route('**/public/slots**', (route) => route.abort());
   await page.goto('/');
   const picker = page.getByTestId('kickoff-picker');
   await expect(picker.getByRole('button')).toHaveCount(18);
   await picker.getByRole('button', { name: '06:00' }).click();
-  await expect(page.getByTestId('kickoff-cta')).toHaveAttribute('href', /book%20the%20Arena%20at%2006%3A00/);
+  await expect(page.getByTestId('kickoff-cta')).toHaveAttribute('href', /book%20the%20Arena%20today%20at%2006%3A00/);
   await expect(picker.getByRole('button', { name: '23:00' })).toBeVisible();
 });
 

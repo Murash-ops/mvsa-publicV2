@@ -9,6 +9,8 @@ import { test, expect } from '@playwright/test';
  */
 
 test('the kick-off picker builds a WhatsApp request to book the Arena at that time', async ({ page }) => {
+  await page.clock.setFixedTime(new Date('2026-10-23T05:00:00Z')); // 08:00 in Nairobi
+  await page.route('**/public/slots**', (route) => route.abort());
   await page.goto('/');
 
   const picker = page.getByTestId('kickoff-picker');
@@ -20,8 +22,7 @@ test('the kick-off picker builds a WhatsApp request to book the Arena at that ti
   const href = (await cta.getAttribute('href')) ?? '';
   expect(href.startsWith('https://wa.me/254798258950?text=')).toBe(true);
   const message = decodeURIComponent(href.split('?text=')[1]);
-  expect(message).toBe('Hi MVSA, I would like to book the Arena at 18:00. Is it free?');
-  expect(message).toContain('book the Arena at');
+  expect(message).toBe('Hi MVSA, I would like to book the Arena today at 18:00. Is it free?');
 });
 
 test('reduced motion stops the marquee', async ({ page }) => {

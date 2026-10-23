@@ -80,6 +80,14 @@
   color: var(--color-white);
 }
 
+/* The first light section after the hero: rounded top corners over the dark
+   page, and a sand wash that fades into paper. */
+.sheet-in {
+  position: relative;
+  border-radius: clamp(20px, 3vw, 36px) clamp(20px, 3vw, 36px) 0 0;
+  background: linear-gradient(to bottom, #E2D9C6 0, #ECE6D8 90px, var(--color-ink) 260px);
+}
+
 /* A photo tile inside a light section keeps the dark tokens, so its words
    stay light over the picture. */
 .theme-dark {
@@ -242,6 +250,39 @@
   border-color: var(--color-gold);
   color: var(--color-ink);
 }
+
+/* Live hours: booked is struck through, past just fades. Neither can be picked. */
+.chip:disabled {
+  cursor: not-allowed;
+  border-style: dashed;
+  border-color: color-mix(in srgb, var(--color-white) 15%, transparent);
+  color: color-mix(in srgb, var(--color-white) 35%, transparent);
+}
+.chip[data-state='booked'] {
+  text-decoration: line-through;
+  text-decoration-thickness: 2px;
+}
+.chip[data-state='free'] { border-color: color-mix(in srgb, var(--color-grass) 70%, transparent); }
+
+/* The day pills above the hours. */
+.day-chip {
+  flex: 0 0 auto;
+  min-height: 40px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--color-white) 22%, transparent);
+  background: transparent;
+  color: var(--color-white);
+  font-family: var(--font-label);
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+}
+.day-chip:hover { border-color: var(--color-gold); }
+.day-chip[aria-pressed='true'] { background: var(--color-white); border-color: var(--color-white); color: var(--color-ink); }
 
 .field {
   width: 100%;
