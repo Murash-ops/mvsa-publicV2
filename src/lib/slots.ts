@@ -54,6 +54,17 @@ export function dayPhrase(offset: number, date: string): string {
   return `on ${words.replace(',', '')}`;
 }
 
+/** When a booking that starts at `start` and runs `hours` whole hours ends: "22:00", or "midnight". */
+export function endTime(start: string, hours: number): string {
+  const end = Number(start.slice(0, 2)) + hours;
+  return end % 24 === 0 ? 'midnight' : `${String(end % 24).padStart(2, '0')}:00`;
+}
+
+/** The picked hours as one label: "20:00", or "20:00–22:00". */
+export function rangeLabel(start: string, hours: number): string {
+  return hours > 1 ? `${start}–${endTime(start, hours)}` : start;
+}
+
 /** True when the hour has already started today. */
 export function isPast(time: string, offset: number, now = new Date()): boolean {
   return offset === 0 && Number(time.slice(0, 2)) <= nairobiHour(now);

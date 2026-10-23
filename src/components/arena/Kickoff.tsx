@@ -12,13 +12,14 @@ import {
 } from 'react';
 import { defaultKickoff, kickoffGroups } from '@/content/site';
 import { arenaBookingUrl } from '@/lib/whatsapp';
-import { dayLabel, dayPhrase, fetchSlotHours, isPast, nairobiDate, type SlotHours } from '@/lib/slots';
+import { dayLabel, dayPhrase, fetchSlotHours, isPast, nairobiDate, rangeLabel, type SlotHours } from '@/lib/slots';
 
 /**
  * The kick-off the visitor has picked, day and hour, shared by every "Book on
  * WhatsApp" link on the page, so the hero, the picker and the closing call all
  * send the same request: "Hi MVSA, I would like to book the Arena today at
- * 20:00."
+ * 20:00." Neighbouring hours can be added, so a squad can ask for 20:00 to
+ * 22:00 in one message.
  *
  * Days and live hours are worked out in the browser after it loads: the page
  * itself is built ahead of time, so "today" on the server could be days old.
@@ -40,8 +41,15 @@ interface Day {
 type Live = { date: string; hours: SlotHours } | null;
 
 interface KickoffState {
+  /** The first picked hour. */
   picked: string;
+  /** How many whole hours from it, 1 or more. */
+  span: number;
+  /** Pick just this hour. */
   setPicked: (time: string) => void;
+  /** A tap on an hour: grow or shrink the range at its ends, or start again. */
+  tapHour: (time: string) => void;
+  label: string;
   days: Day[];
   day: Day | null;
   setDayOffset: (offset: number) => void;
@@ -70,6 +78,7 @@ const getServerMinute = () => null;
 
 export function KickoffProvider({ children }: { children: ReactNode }) {
   const [picked, setPickedState] = useState<string>(defaultKickoff);
+  const [span, setSpan] = useState(1);
   const minute = useSyncExternalStore(subscribeMinute, getMinute, getServerMinute);
   const now = useMemo(() => (minute === null ? null : new Date(minute * REFRESH_MS)), [minute]);
   // Until the visitor picks a day: today, or tomorrow once the default hour
@@ -91,19 +100,46 @@ export function KickoffProvider({ children }: { children: ReactNode }) {
     return () => controller.abort();
   }, [date, minute]);
 
-  const setPicked = useCallback((time: string) => setPickedState(time), []);
+  const setPicked = useCallback((time: string) => {
+    setPickedState(time);
+    setSpan(1);
+  }, []);
+
+  const tapHour = useCallback(
+    (time: string) => {
+      const start = ALL_TIMES.indexOf(picked);
+      const end = start + span - 1;
+      const at = ALL_TIMES.indexOf(time);
+      if (at === end + 1) return setSpan(span + 1);
+      if (at === start - 1) {
+        setPickedState(time);
+        return setSpan(span + 1);
+      }
+      if (span > 1 && at === end) return setSpan(span - 1);
+      if (span > 1 && at === start) {
+        setPickedState(ALL_TIMES[start + 1]);
+        return setSpan(span - 1);
+      }
+      setPicked(time);
+    },
+    [picked, span, setPicked]
+  );
+
   const value = useMemo(
     () => ({
       picked,
+      span,
       setPicked,
+      tapHour,
+      label: rangeLabel(picked, span),
       days,
       day,
       setDayOffset,
       live: live && live.date === date ? live : null,
       now,
-      href: arenaBookingUrl(picked, day?.phrase),
+      href: arenaBookingUrl(picked, day?.phrase, span),
     }),
-    [picked, setPicked, days, day, live, date, now]
+    [picked, span, setPicked, tapHour, days, day, live, date, now]
   );
   return <KickoffContext.Provider value={value}>{children}</KickoffContext.Provider>;
 }
@@ -113,7 +149,10 @@ export function useKickoff(): KickoffState {
   if (context) return context;
   return {
     picked: defaultKickoff,
+    span: 1,
     setPicked: () => {},
+    tapHour: () => {},
+    label: defaultKickoff,
     days: [],
     day: null,
     setDayOffset: () => {},
@@ -149,7 +188,12 @@ type ChipState = 'past' | 'booked' | 'free' | 'open';
  * service says nothing about stay open.
  */
 export function KickoffChips() {
-  const { picked, setPicked, days, day, setDayOffset, live, now } = useKickoff();
+  const { picked, span, setPicked, tapHour, days, day, setDayOffset, live, now } = useKickoff();
+  const startIndex = ALL_TIMES.indexOf(picked);
+  const inRange = (time: string) => {
+    const at = ALL_TIMES.indexOf(time);
+    return at >= startIndex && at < startIndex + span;
+  };
 
   const stateOf = useCallback(
     (time: string): ChipState => {
@@ -159,13 +203,14 @@ export function KickoffChips() {
     [day, now, live]
   );
 
-  // If the picked hour is taken or gone, move to the next one that isn't.
+  // If a picked hour is taken or gone, move to the next hour that isn't.
   useEffect(() => {
     const blocked = (time: string) => ['past', 'booked'].includes(stateOf(time));
-    if (!blocked(picked)) return;
+    const picks = ALL_TIMES.slice(ALL_TIMES.indexOf(picked), ALL_TIMES.indexOf(picked) + span);
+    if (!picks.some(blocked)) return;
     const next = ALL_TIMES.find((time) => time > picked && !blocked(time)) ?? ALL_TIMES.find((time) => !blocked(time));
     if (next) setPicked(next);
-  }, [stateOf, picked, setPicked]);
+  }, [stateOf, picked, span, setPicked]);
 
   const freeCount = live ? ALL_TIMES.filter((time) => stateOf(time) === 'free').length : 0;
 
@@ -213,10 +258,10 @@ export function KickoffChips() {
                     type="button"
                     className="chip"
                     data-state={state}
-                    aria-pressed={time === picked}
+                    aria-pressed={inRange(time)}
                     disabled={unavailable}
                     title={state === 'booked' ? 'Booked' : undefined}
-                    onClick={() => setPicked(time)}
+                    onClick={() => tapHour(time)}
                   >
                     {time}
                   </button>
@@ -226,13 +271,18 @@ export function KickoffChips() {
           </div>
         ))}
       </div>
+      <p className="m-0 text-sm text-mute" data-testid="kickoff-hint">
+        {span > 1
+          ? `${span} hours picked. Tap either end to drop an hour.`
+          : 'More than an hour? Tap the next hour to add it.'}
+      </p>
     </div>
   );
 }
 
 /** "Ask for 20:00": the gold call under the chips, naming the day after today. */
 export function AskForKickoff({ className }: { className?: string }) {
-  const { picked, href, day } = useKickoff();
+  const { label, href, day } = useKickoff();
   return (
     <a
       href={href}
@@ -243,12 +293,12 @@ export function AskForKickoff({ className }: { className?: string }) {
       data-route="whatsapp"
     >
       Ask for {day && day.offset > 0 ? `${day.label} ` : ''}
-      {picked}
+      {label}
     </a>
   );
 }
 
 export function PickedTime() {
-  const { picked } = useKickoff();
-  return <>{picked}</>;
+  const { label } = useKickoff();
+  return <>{label}</>;
 }

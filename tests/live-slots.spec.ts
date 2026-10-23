@@ -77,3 +77,46 @@ test('after the default hour has gone, the picker starts on tomorrow', async ({ 
   await expect(page.getByTestId('kickoff-days').getByRole('button', { name: 'Tomorrow' })).toHaveAttribute('aria-pressed', 'true');
   await expect(page.getByTestId('kickoff-cta')).toHaveText(/Ask for Tomorrow 20:00/);
 });
+
+test('more than one hour: tap the next hour to add it, tap an end to drop it', async ({ page }) => {
+  await page.clock.setFixedTime(NOW);
+  await fakeSlots(page, { '2026-10-23': { '19:00': 'free', '20:00': 'free', '21:00': 'free', '22:00': 'booked' } });
+  await page.goto('/');
+
+  const picker = page.getByTestId('kickoff-picker');
+  const cta = page.getByTestId('kickoff-cta');
+  const message = async () => decodeURIComponent(((await cta.getAttribute('href')) ?? '').split('?text=')[1]);
+
+  await expect(picker.getByRole('button', { name: '20:00' })).toHaveAttribute('aria-pressed', 'true');
+  await picker.getByRole('button', { name: '21:00' }).click();
+  await picker.getByRole('button', { name: '19:00' }).click();
+  for (const time of ['19:00', '20:00', '21:00']) {
+    await expect(picker.getByRole('button', { name: time })).toHaveAttribute('aria-pressed', 'true');
+  }
+  await expect(cta).toHaveText(/Ask for 19:00–22:00/);
+  expect(await message()).toBe('Hi MVSA, I would like to book the Arena today from 19:00 to 22:00 (3 hours). Is it free?');
+
+  // 22:00 is booked, so the range can't grow into it.
+  await expect(picker.getByRole('button', { name: '22:00' })).toBeDisabled();
+
+  // Tapping an end drops that hour; tapping elsewhere starts again.
+  await picker.getByRole('button', { name: '19:00' }).click();
+  await expect(cta).toHaveText(/Ask for 20:00–22:00/);
+  await picker.getByRole('button', { name: '15:00' }).click();
+  await expect(cta).toHaveText(/Ask for 15:00$/);
+  await expect(picker.getByRole('button', { name: '20:00' })).toHaveAttribute('aria-pressed', 'false');
+});
+
+test('a range that runs to closing ends at midnight', async ({ page }) => {
+  await page.clock.setFixedTime(NOW);
+  await page.route('**/public/slots**', (route) => route.abort());
+  await page.goto('/');
+
+  const picker = page.getByTestId('kickoff-picker');
+  await picker.getByRole('button', { name: '22:00' }).click();
+  await picker.getByRole('button', { name: '23:00' }).click();
+  const href = (await page.getByTestId('kickoff-cta').getAttribute('href')) ?? '';
+  expect(decodeURIComponent(href.split('?text=')[1])).toBe(
+    'Hi MVSA, I would like to book the Arena today from 22:00 to midnight (2 hours). Is it free?'
+  );
+});
