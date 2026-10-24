@@ -44,6 +44,8 @@ export default defineConfig({
       url: 'http://localhost:3000',
       reuseExistingServer: true,
       timeout: 180_000,
+      // The live-hours specs fake the slots service, so the picker asks it.
+      env: { NEXT_PUBLIC_LIVE_SLOTS: 'on' },
     },
     {
       command: 'npx next dev -p 3001',
