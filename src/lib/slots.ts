@@ -10,6 +10,14 @@
 
 export const SLOTS_URL = process.env.NEXT_PUBLIC_SLOTS_URL ?? 'https://bot.mvsa.co.ke/public/slots';
 
+/**
+ * Off until the booking system holds the venue's real future bookings. Today
+ * reception records a booking in its sheet after the game, so the booking
+ * system sees none and would call every hour free: a claim the page must not
+ * make. Set NEXT_PUBLIC_LIVE_SLOTS=on once bookings are entered when made.
+ */
+export const LIVE_SLOTS_ENABLED = process.env.NEXT_PUBLIC_LIVE_SLOTS === 'on';
+
 export type HourState = 'free' | 'booked';
 export type SlotHours = Record<string, HourState>;
 
@@ -72,6 +80,7 @@ export function isPast(time: string, offset: number, now = new Date()): boolean 
 
 /** One day's hours from the slots service, or null when it can't say. */
 export async function fetchSlotHours(date: string, signal?: AbortSignal): Promise<SlotHours | null> {
+  if (!LIVE_SLOTS_ENABLED) return null;
   try {
     const response = await fetch(`${SLOTS_URL}?date=${date}`, { signal, cache: 'no-store' });
     if (!response.ok) return null;
