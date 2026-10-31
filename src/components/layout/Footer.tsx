@@ -74,7 +74,11 @@ export default function Footer() {
 
         <div className="flex flex-wrap items-center justify-between gap-4 border-t border-white/[0.08] pt-6">
           <span className="label text-[13px] tracking-[0.2em] text-mute">Play · Compete · Connect</span>
-          <span className="text-sm text-mute">© {new Date().getFullYear()} Mountain View Sports Arena</span>
+          <div className="flex flex-wrap items-center gap-x-5 gap-y-1 text-sm text-mute">
+            <Link href="/privacy" className="inline-flex min-h-11 items-center hover:text-fog">Privacy</Link>
+            <Link href="/data-deletion" className="inline-flex min-h-11 items-center hover:text-fog">Delete your data</Link>
+            <span>© {new Date().getFullYear()} Mountain View Sports Arena</span>
+          </div>
         </div>
       </div>
     </footer>
