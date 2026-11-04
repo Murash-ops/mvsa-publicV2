@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import BookingWidget from '@/components/booking/BookingWidget';
 import PageHeader from '@/components/arena/PageHeader';
+import MeetingRoom from '@/components/booking/MeetingRoom';
 import { bookingWritesEnabled, getVenueFacts, isMvsaApiError } from '@/lib/mvsa-api';
 import { venues } from '@/content/venues';
 import { booking as bookingCopy, contact } from '@/content/site';
@@ -8,7 +9,7 @@ import { booking as bookingCopy, contact } from '@/content/site';
 export const revalidate = 0; // Availability and venue facts are never cached
 
 export const metadata: Metadata = {
-  title: 'Book the Arena | Mountain View Sports Arena',
+  title: 'Book the Arena or the meeting room | Mountain View Sports Arena',
   description: bookingCopy.intro,
 };
 
@@ -40,9 +41,17 @@ export default async function BookPage() {
         intro={bookingCopy.intro}
       >
         {hoursNote && <p className="m-0 max-w-[600px] text-base text-mute">{hoursNote}</p>}
+        <nav aria-label="What would you like to book?" className="flex flex-wrap gap-3">
+          <a href="#arena" className="btn btn-gold">
+            The Arena
+          </a>
+          <a href="#meeting-room" className="btn btn-outline-gold">
+            The meeting room
+          </a>
+        </nav>
       </PageHeader>
 
-      <div className="wrap pb-[clamp(56px,7vw,88px)]">
+      <div id="arena" className="wrap scroll-mt-24 pb-[clamp(56px,7vw,88px)]">
         <BookingWidget
           venues={venues}
           bookingWritesEnabled={bookingWritesEnabled()}
@@ -52,6 +61,12 @@ export default async function BookPage() {
           initiallyOffline={backendUnreachable}
         />
       </div>
+
+      <MeetingRoom
+        whatsappNumber={contact.whatsappNumber}
+        phone={contact.bookingsPhone}
+        phoneHref={contact.bookingsPhoneHref}
+      />
     </main>
   );
 }
