@@ -32,6 +32,9 @@ const devicesConfig = [
 const testPages = [
   { name: 'Home', path: '/' },
   { name: 'Book', path: '/book' },
+  { name: "What's on", path: '/whats-on' },
+  { name: 'Holiday Training', path: '/programs/holiday-training' },
+  { name: 'Chess Club', path: '/programs/chess-club' },
   { name: 'Programs', path: '/programs' },
   { name: 'About', path: '/about' },
   { name: 'Contact', path: '/contact' }

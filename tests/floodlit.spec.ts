@@ -8,10 +8,10 @@ import { test, expect } from '@playwright/test';
  * and nothing calls the bookable thing "the turf".
  */
 
-test('the kick-off picker builds a WhatsApp request to book the Arena at that time', async ({ page }) => {
+test('the kick-off picker on /book builds a WhatsApp request to book the Arena at that time', async ({ page }) => {
   await page.clock.setFixedTime(new Date('2026-10-23T05:00:00Z')); // 08:00 in Nairobi
   await page.route('**/public/slots**', (route) => route.abort());
-  await page.goto('/');
+  await page.goto('/book');
 
   const picker = page.getByTestId('kickoff-picker');
   await picker.getByRole('button', { name: '18:00' }).click();
@@ -69,7 +69,19 @@ test('no source file refers to the photographs of children (shots 24 to 35)', ()
   expect(offenders).toEqual([]);
 });
 
-const PAGES = ['/', '/book', '/programs', '/programs/football_academy', '/about', '/contact', '/shop'];
+const PAGES = [
+  '/',
+  '/book',
+  '/whats-on',
+  '/programs',
+  '/programs/football-academy',
+  '/programs/holiday-training',
+  '/programs/chess-club',
+  '/programs/events',
+  '/about',
+  '/contact',
+  '/shop',
+];
 
 for (const path of PAGES) {
   test(`${path} never calls the Arena "the turf"`, async ({ page }) => {
@@ -81,19 +93,19 @@ for (const path of PAGES) {
   });
 }
 
-test('every page shows no price but KES 1,500', async ({ page }) => {
+test('every page shows no price but KSH 1,500', async ({ page }) => {
   for (const path of PAGES.filter((p) => p !== '/book')) {
     await page.goto(path);
     const text = await page.locator('body').innerText();
-    const prices = text.match(/KES\s?[\d,]+/gi) ?? [];
-    for (const price of prices) expect(price.replace(/\s/g, ' ')).toMatch(/KES 1,500/i);
+    const prices = text.match(/K(?:ES|SH)\s?[\d,]+/gi) ?? [];
+    for (const price of prices) expect(price.replace(/\s/g, ' '), path).toMatch(/KSH 1,500/i);
   }
 });
 
-test('the footer lists the five programmes', async ({ page }) => {
+test('the footer lists every programme', async ({ page }) => {
   await page.goto('/');
   const footer = page.locator('footer');
-  for (const name of ['Football Academy', 'Chess Club', 'Boxing', 'Community Yoga', 'Dance & Rhythm']) {
+  for (const name of ['Football Academy', 'Holiday Training', 'Chess Club', 'Community Yoga', 'Boxing', 'Dance & Rhythm', 'Individual Training', 'Events']) {
     await expect(footer.getByRole('link', { name, exact: true })).toBeVisible();
   }
 });
@@ -107,7 +119,7 @@ test('an unknown page is answered in the Arena style', async ({ page }) => {
 test('nothing on the page shimmers or glows: buttons are flat and still', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'no-preference' });
   await page.goto('/');
-  const cta = page.getByRole('link', { name: 'Book on WhatsApp' }).first();
+  const cta = page.getByTestId('nav-book').filter({ visible: true });
   expect(await cta.evaluate((el) => getComputedStyle(el).animationName)).toBe('none');
   expect(await cta.evaluate((el) => getComputedStyle(el).backgroundImage)).toBe('none');
   await expect(page.locator('.lights, .lamp-bar')).toHaveCount(0);
