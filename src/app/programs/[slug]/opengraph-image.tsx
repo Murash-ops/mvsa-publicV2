@@ -154,7 +154,7 @@ export default async function Image({ params }: { params: Promise<{ slug: string
                   height: `${h}%`,
                   background: '#C2A15B',
                   opacity: story.theme === 'beat' ? 0.75 : 0.85,
-                  transform: story.theme === 'beat' ? 'none' : 'skewX(-24deg)',
+                  ...(story.theme === 'beat' ? {} : { transform: 'skewX(-24deg)' }),
                 }}
               />
             ))}
