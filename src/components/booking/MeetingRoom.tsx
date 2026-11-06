@@ -23,7 +23,7 @@ export function meetingRoomMessage(use?: Use, day?: string, people?: string): st
   const what = label ? ` for ${/^[aeiou]/.test(label) ? 'an' : 'a'} ${label}` : '';
   const when = day ? ` on ${dayPhrase(day)}` : '';
   const count = people && /^\d{1,3}$/.test(people) && Number(people) > 0 ? `, for about ${Number(people)} people` : '';
-  return `Hi MVSA, I'd like to book the meeting room${what}${when}${count}. Is it free?`;
+  return `Hi MVSA, I'd like to book the meeting room${what}${when}${count}. Is it available?`;
 }
 
 export default function MeetingRoom({ whatsappNumber, phone, phoneHref }: { whatsappNumber: string; phone: string; phoneHref: string }) {
@@ -64,7 +64,17 @@ export default function MeetingRoom({ whatsappNumber, phone, phoneHref }: { what
             <br />
             <span className="text-gold">{meetingRoom.titleBottom}</span>
           </h2>
+          <p className="m-0 flex items-baseline gap-3" data-testid="meeting-room-price">
+            <span className="display text-[clamp(36px,4vw,48px)] leading-none text-gold">{meetingRoom.price}</span>
+          </p>
           <p className="m-0 max-w-[540px] text-[17px] leading-[1.55] text-fog">{meetingRoom.lede}</p>
+          <ul className="m-0 flex list-none flex-wrap gap-x-4 gap-y-1 p-0" aria-label="Who books it">
+            {meetingRoom.audience.map((who) => (
+              <li key={who} className="display text-[22px] leading-tight text-white">
+                {who}
+              </li>
+            ))}
+          </ul>
 
           <fieldset className="m-0 flex flex-col gap-3 border-0 p-0">
             <legend id={ids.uses} className="label mb-3 text-[14px] tracking-[0.12em] text-white">

@@ -251,13 +251,33 @@
   color: var(--color-ink);
 }
 
-/* Live hours: booked is struck through, past just fades. Neither can be picked. */
+/* Live hours: booked is struck through, past is dashed. Neither can be picked.
+   The text stays at 65% so it still reads (WCAG AA, 4.5:1 or better on both
+   grounds); the dashed border and the strike-through carry "unavailable". */
 .chip:disabled {
   cursor: not-allowed;
   border-style: dashed;
-  border-color: color-mix(in srgb, var(--color-white) 15%, transparent);
-  color: color-mix(in srgb, var(--color-white) 35%, transparent);
+  border-color: color-mix(in srgb, var(--color-white) 40%, transparent);
+  color: color-mix(in srgb, var(--color-white) 65%, var(--color-surface));
 }
+
+/* Extra Time hours: a brass dot in the corner, explained by the legend. */
+.chip[data-extra-time='true'] { position: relative; border-color: color-mix(in srgb, var(--color-gold) 75%, transparent); }
+.chip[data-extra-time='true']::after,
+.extra-dot {
+  content: '';
+  background: #C2A15B;
+  box-shadow: 0 0 0 2px var(--color-surface);
+}
+.chip[data-extra-time='true']::after {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+}
+.chip[data-extra-time='true'][aria-pressed='true']::after { box-shadow: 0 0 0 2px var(--color-ink); }
 .chip[data-state='booked'] {
   text-decoration: line-through;
   text-decoration-thickness: 2px;

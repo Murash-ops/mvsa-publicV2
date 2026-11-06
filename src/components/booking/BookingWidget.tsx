@@ -411,7 +411,7 @@ export default function BookingWidget({
               type="button"
               onClick={() => void loadSlots()}
               disabled={isLoadingSlots}
-              className="text-link text-[13px] disabled:opacity-60"
+              className="text-link text-[15px]"
               data-testid="retry-availability"
             >
               {isLoadingSlots ? 'Checking…' : bookingCopy.offline.retry}
