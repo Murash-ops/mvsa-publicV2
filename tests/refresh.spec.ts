@@ -41,12 +41,13 @@ test.describe('one Book button', () => {
     for (const id of ['kickoff-picker', 'kickoff-cta', 'booking-offline', 'venue-grid', 'date-strip', 'slot-grid']) {
       await expect(main.getByTestId(id)).toHaveCount(0);
     }
-    // Links to /book in the body are secondary: never the filled primary button.
-    const bodyBookLinks = main.locator('a[href="/book"]');
-    expect(await bodyBookLinks.count()).toBeGreaterThan(0);
-    for (const link of await bodyBookLinks.all()) {
+    // Any link to /book in the body is secondary: never the filled primary button.
+    for (const link of await main.locator('a[href^="/book"]').all()) {
       await expect(link).not.toHaveClass(/\b(shine|btn-gold)\b/);
     }
+    // The hero points to the programmes, and the close is one contact line.
+    await expect(main.getByRole('link', { name: 'See the programmes' })).toHaveAttribute('href', '/programs');
+    await expect(main.getByTestId('closing-contact')).toHaveText(/^Call or WhatsApp 0798 258 950$/);
   });
 
   test('the home page shows what is on, the programmes, the meeting room and the shop', async ({ page }) => {
@@ -94,6 +95,81 @@ test.describe('the shop bag', () => {
   });
 });
 
+test('nothing unconfirmed is claimed: no Wi-Fi, lockers or changing rooms, no ages for football', async ({ page }) => {
+  for (const path of ['/', '/about', '/book', '/programs/football-academy', '/programs/community-yoga']) {
+    await page.goto(path);
+    const text = await page.locator('main').innerText();
+    expect(text, path).not.toMatch(/wi-?fi|lockers|changing rooms|mats and blocks/i);
+  }
+  await page.goto('/programs/football-academy');
+  await expect(page.locator('main')).not.toContainText(/ages? 6|6 to 16|6–16|boys and girls/i);
+  await expect(page.getByTestId('register-cta')).toHaveAttribute('href', /^https:\/\/wa\.me\/254798258950/);
+});
+
+test.describe('Extra Time on /book', () => {
+  test('during 1–30 November the picker opens on a daytime hour, marks 6am–6pm and asks for Extra Time', async ({ page }) => {
+    await page.clock.setFixedTime(new Date('2026-11-10T05:00:00Z')); // 08:00 in Nairobi
+    await page.route('**/public/slots**', (route) => route.abort());
+    await page.goto('/book');
+    const picker = page.getByTestId('kickoff-picker');
+    await expect(picker.getByRole('button', { name: '09:00' })).toHaveAttribute('aria-pressed', 'true');
+    await expect(picker.locator('[data-extra-time="true"]')).toHaveCount(9); // 09:00 to 17:00
+    await expect(picker.getByRole('button', { name: '18:00' })).not.toHaveAttribute('data-extra-time', 'true');
+    await expect(page.getByTestId('extra-time-legend')).toBeVisible();
+    const href = (await page.getByTestId('kickoff-cta').getAttribute('href')) ?? '';
+    expect(decodeURIComponent(href.split('?text=')[1])).toBe(
+      'Hi MVSA, I would like to book the Arena today at 09:00, with Extra Time. Is it available?'
+    );
+    // An evening hour never asks for Extra Time.
+    await picker.getByRole('button', { name: '20:00' }).click();
+    const evening = (await page.getByTestId('kickoff-cta').getAttribute('href')) ?? '';
+    expect(decodeURIComponent(evening.split('?text=')[1])).toBe('Hi MVSA, I would like to book the Arena today at 20:00. Is it available?');
+  });
+
+  test('from 1 December the picker is back to 20:00 with no marks', async ({ page }) => {
+    await page.clock.setFixedTime(new Date('2026-12-02T05:00:00Z'));
+    await page.route('**/public/slots**', (route) => route.abort());
+    await page.goto('/book');
+    const picker = page.getByTestId('kickoff-picker');
+    await expect(picker.getByRole('button', { name: '20:00' })).toHaveAttribute('aria-pressed', 'true');
+    await expect(picker.locator('[data-extra-time="true"]')).toHaveCount(0);
+    await expect(page.getByTestId('extra-time-legend')).toHaveCount(0);
+  });
+
+  test('the Extra Time note is on /book while it runs, with its hours', async ({ page }) => {
+    const today = new Date(Date.now() + 3 * 3600_000).toISOString().slice(0, 10);
+    test.skip(today < '2026-11-01' || today > '2026-11-30', 'Extra Time is not running today');
+    await page.goto('/book');
+    await expect(page.getByTestId('extra-time-note')).toContainText('+30 MIN FREE');
+    await expect(page.getByTestId('extra-time-note')).toContainText('6am–6pm, 1–30 Nov');
+  });
+
+  test('unavailable hours and the live-times link stay readable (WCAG AA)', async ({ page }) => {
+    await page.clock.setFixedTime(new Date('2026-12-02T12:00:00Z')); // 15:00 in Nairobi: morning hours are past
+    await page.route('**/public/slots**', (route) => route.abort());
+    await page.goto('/book');
+    const ratio = async (selector: string) =>
+      page.locator(selector).first().evaluate((el) => {
+        const rgb = (c: string) => (c.match(/[\d.]+/g) ?? []).slice(0, 3).map(Number);
+        const lum = ([r, g, b]: number[]) => {
+          const f = (v: number) => ((v /= 255) <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4);
+          return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b);
+        };
+        let bgEl: Element | null = el;
+        let bg = 'rgba(0, 0, 0, 0)';
+        while (bgEl && /rgba\(0, 0, 0, 0\)|transparent/.test(bg)) {
+          bg = getComputedStyle(bgEl).backgroundColor;
+          bgEl = bgEl.parentElement;
+        }
+        const a = lum(rgb(getComputedStyle(el).color));
+        const b = lum(rgb(bg));
+        return (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
+      });
+    expect(await ratio('[data-testid="kickoff-picker"] button:disabled')).toBeGreaterThanOrEqual(4.5);
+    expect(await ratio('[data-testid="retry-availability"]')).toBeGreaterThanOrEqual(4.5);
+  });
+});
+
 test.describe("What's on", () => {
   test('has its own page with the current cards', async ({ page }) => {
     await page.clock.setFixedTime(new Date('2026-11-04T09:00:00Z'));
@@ -121,27 +197,37 @@ test.describe("What's on", () => {
 });
 
 test.describe('/book', () => {
-  test('holds both the Arena and the meeting room', async ({ page }) => {
+  test('holds both the Arena and the meeting room, one tap apart', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
     await page.goto('/book');
-    await expect(page.locator('#arena')).toBeAttached();
+    await expect(page.getByTestId('venue-grid').or(page.getByTestId('booking-offline'))).toBeVisible();
+    const roomTab = page.getByTestId('book-tab-room');
+    await expect(roomTab).toBeInViewport();
+    await roomTab.click();
+    await expect(roomTab).toHaveAttribute('aria-pressed', 'true');
     const room = page.getByTestId('meeting-room');
     await expect(room).toBeVisible();
+    await expect(page).toHaveURL(/#meeting-room$/);
     await expect(room.getByRole('img', { name: /meeting room/i })).toBeVisible();
-    // No capacity figure and no room price are published.
-    await expect(room).not.toContainText(/\bK(SH|ES)\b|\bseats? \d|\d+ (people|seats|chairs)/i);
+    // The price from brand.md; no capacity figure, nothing unconfirmed.
+    await expect(room.getByTestId('meeting-room-price')).toHaveText('KSH 1,000 an hour');
+    await expect(room).not.toContainText(/\bseats? \d|\d+ (people|seats|chairs)|wi-?fi/i);
+    await page.getByTestId('book-tab-pitch').click();
+    await expect(room).toBeHidden();
   });
 
   test('the meeting room hands over to WhatsApp with what the visitor picked', async ({ page }) => {
-    await page.goto('/book');
+    await page.goto('/book#meeting-room');
     const room = page.getByTestId('meeting-room');
     const cta = room.getByTestId('meeting-room-cta');
-    await expect(cta).toHaveAttribute('href', `${WA}${encodeURIComponent("Hi MVSA, I'd like to book the meeting room. Is it free?")}`);
+    await expect(cta).toHaveAttribute('href', `${WA}${encodeURIComponent("Hi MVSA, I'd like to book the meeting room. Is it available?")}`);
+    await expect(room).toBeVisible();
     await room.getByRole('button', { name: /^Training/ }).click();
     await room.getByLabel(/which day/i).fill('2026-11-07');
     await room.getByLabel(/how many people/i).fill('20');
     const href = (await cta.getAttribute('href')) ?? '';
     expect(decodeURIComponent(href.split('?text=')[1])).toBe(
-      "Hi MVSA, I'd like to book the meeting room for a training on Saturday 7 November, for about 20 people. Is it free?"
+      "Hi MVSA, I'd like to book the meeting room for a training on Saturday 7 November, for about 20 people. Is it available?"
     );
   });
 
@@ -150,7 +236,8 @@ test.describe('/book', () => {
     await page.goto('/');
     await page.getByRole('navigation', { name: 'Main' }).getByRole('link', { name: 'Meeting room' }).click();
     await expect(page).toHaveURL(/\/book#meeting-room$/);
-    await expect(page.getByTestId('meeting-room')).toBeInViewport();
+    await expect(page.getByTestId('book-tab-room')).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.getByTestId('meeting-room')).toBeVisible();
   });
 });
 
@@ -173,7 +260,8 @@ test.describe('programme pages', () => {
       // Register: WhatsApp to the arena line, message filled in.
       const register = page.getByTestId('register-cta');
       await expect(register).toHaveAttribute('href', `${WA}${encodeURIComponent(story.register.message)}`);
-      if (program.type !== 'arena') {
+      expect(story.register.message).toMatch(/^Hi MVSA, (I'd like|please tell me)/);
+      if (['football-academy', 'holiday-training', 'chess-club', 'community-yoga'].includes(program.slug)) {
         expect(story.register.message).toBe(`Hi MVSA, I'd like to register for ${program.name}`);
       }
 
@@ -221,10 +309,41 @@ test.describe('programme pages', () => {
     await expect(page.locator('main')).toContainText('19 December');
   });
 
-  test('chess leads with "Chess Club" and welcomes first-timers', async ({ page }) => {
+  test('chess leads with "Chess Club", welcomes first-timers and asks people to WhatsApp for details', async ({ page }) => {
     await page.goto('/programs/chess-club');
     await expect(page.getByRole('heading', { level: 1 })).toHaveText(/chess\s*club/i);
     await expect(page.locator('main')).toContainText('First time? Just come at 10am.');
+    await expect(page.getByRole('heading', { name: 'Your first Saturday' })).toBeVisible();
+    await expect(page.getByTestId('register-cta')).toContainText('WhatsApp us for details');
+    for (const heading of await page.locator('main h2').allInnerTexts()) {
+      expect(heading).not.toMatch(/your move|boards are set|take a seat/i);
+    }
+  });
+
+  test('dance is coming soon: no ages, no times, and an "Ask us" instead of Register', async ({ page }) => {
+    await page.goto('/programs/dance');
+    const main = page.locator('main');
+    await expect(main).toContainText(/coming soon/i);
+    await expect(main).not.toContainText(/ages?\s*6|6–16|register/i);
+    await expect(page.getByTestId('register-cta')).toContainText('Ask us');
+  });
+
+  test('boxing says only what is confirmed', async ({ page }) => {
+    await page.goto('/programs/boxing');
+    const main = page.locator('main');
+    await expect(main).toContainText('Sundays');
+    await expect(main).toContainText('WhatsApp us for details');
+    await expect(main).not.toContainText(/adults|pad work|conditioning/i);
+  });
+
+  test('every programme page has a section of its own', async ({ page }) => {
+    const titles = new Set<string>();
+    for (const program of programs.filter((p) => !['boxing', 'dance'].includes(p.slug))) {
+      await page.goto(`/programs/${program.slug}`);
+      const title = await page.getByTestId('program-feature').getByRole('heading', { level: 2 }).innerText();
+      titles.add(title.toLowerCase());
+    }
+    expect(titles.size).toBe(programs.length - 2);
   });
 
   test('every programme photo has a description, and children only ever appear in duotone', async ({ page }) => {

@@ -8,7 +8,7 @@ const pages = [
   { href: '/book', label: 'Book the Arena' },
   { href: '/book#meeting-room', label: 'Meeting room' },
   { href: '/shop', label: 'Shop' },
-  { href: '/programs', label: 'Programs' },
+  { href: '/programs', label: 'Programmes' },
   { href: '/about', label: 'About' },
   { href: '/contact', label: 'Contact' },
 ];
@@ -39,7 +39,7 @@ export default function Footer() {
           </div>
 
           <div className="flex flex-col">
-            <h2 className="label text-base tracking-[0.14em] text-white">Programs</h2>
+            <h2 className="label text-base tracking-[0.14em] text-white">Programmes</h2>
             <ul>
               {programs.map((program) => (
                 <li key={program.id}>

@@ -87,8 +87,9 @@ skipped: it has a price …`. A row is skipped when it:
 
 - has no title or blurb, a date that is not a real date, or `show_from` after `show_until`;
 - uses a picture from another website, or a link that is not `https://` or a site page;
-- shows any price except the Arena's "from KSH 1,500", a Till number or payment
-  instructions (Academy fees are only shared on WhatsApp);
+- shows any price except the Arena's "from KSH 1,500" and the meeting room's
+  "KSH 1,000 an hour", a Till number or payment instructions (Academy fees are
+  only shared on WhatsApp);
 - mentions Extra Time with evening play, or without its 6am–6pm small print;
 - calls yoga free (it is donation-based).
 
@@ -167,10 +168,15 @@ Pitch green and paper, brass accents, after `MVSA/design-system/DESIGN.md`.
   events), set in `src/content/programs.ts`
 - **Children**: no child's face anywhere. A photo that may show children is only
   shown in duotone (forest to cream)
-- **Money**: the only figure on the site is "from KSH 1,500 an hour". No Academy
-  or chess fees, Till numbers or payment instructions
+- **Money**: the only figures on the site are the Arena "from KSH 1,500 an hour"
+  and the meeting room "KSH 1,000 an hour". No Academy or chess fees, Till
+  numbers or payment instructions
 - **Motion**: the marquee, the shop bag's swing and the yoga rings stop for
   anyone who prefers reduced motion
+- **Extra Time** (1–30 Nov 2026, bookings 6am–6pm): while it runs, /book shows
+  the offer, the time picker opens on a daytime hour and marks the hours that
+  qualify, and the WhatsApp message asks for Extra Time. It switches itself off
+  on 1 December (`extraTime` in `src/content/site.ts`)
 - **WhatsApp**: floating button to `wa.me/254798258950` on every page
 
 ---

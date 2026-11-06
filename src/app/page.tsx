@@ -54,8 +54,8 @@ export default async function Home() {
               <Link href="/whats-on" className="btn btn-outline-gold">
                 See what’s on
               </Link>
-              <Link href="/book" className="text-link text-base" data-testid="hero-book-link">
-                Book a pitch
+              <Link href="/programs" className="text-link text-base">
+                See the programmes
               </Link>
             </div>
           </div>
@@ -136,9 +136,9 @@ export default async function Home() {
             </h2>
             <p className="m-0 max-w-[460px] text-base leading-[1.55] text-fog">{home.meetingRoom.body}</p>
             <ul className="m-0 flex list-none flex-wrap gap-2 p-0">
-              {meetingRoom.uses.map((use) => (
-                <li key={use.id} className="label border border-white/20 px-3 py-2 text-[13px] tracking-[0.1em] text-white">
-                  {use.label}s
+              {meetingRoom.audience.map((who) => (
+                <li key={who} className="label border border-white/20 px-3 py-2 text-[13px] tracking-[0.1em] text-white">
+                  {who}
                 </li>
               ))}
             </ul>
@@ -190,12 +190,12 @@ export default async function Home() {
       </section>
 
       <LampClose>
-        <Link href="/book" className="btn btn-ghost">
-          Book a pitch
-        </Link>
-        <a href={contact.bookingsPhoneHref} className="btn btn-ghost">
-          Call {contact.bookingsPhone}
-        </a>
+        <p className="label m-0 text-[clamp(18px,2vw,22px)] tracking-[0.12em] text-fog" data-testid="closing-contact">
+          Call or WhatsApp{' '}
+          <a href={contact.bookingsPhoneHref} className="inline-flex min-h-11 items-center text-gold underline decoration-2 underline-offset-4 hover:text-gold-light">
+            {contact.bookingsPhone}
+          </a>
+        </p>
       </LampClose>
     </main>
   );

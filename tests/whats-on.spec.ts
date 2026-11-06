@@ -137,9 +137,11 @@ test.describe('rows', () => {
     });
   }
 
-  test('the Arena price is the one figure allowed', () => {
-    const { items } = parseWhatsOnCsv([HEADER, row({ title: 'Book a pitch', blurb: 'From KSH 1,500 an hour.' })].join('\n'));
-    expect(items).toHaveLength(1);
+  test('the Arena and meeting-room prices are the only figures allowed', () => {
+    const { items } = parseWhatsOnCsv(
+      [HEADER, row({ title: 'Book a pitch', blurb: 'From KSH 1,500 an hour.' }), row({ title: 'Meeting room', blurb: 'KSH 1,000 an hour.' })].join('\n')
+    );
+    expect(items).toHaveLength(2);
   });
 
   test('Extra Time with its small print is allowed', () => {

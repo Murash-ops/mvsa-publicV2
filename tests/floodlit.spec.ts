@@ -22,7 +22,7 @@ test('the kick-off picker on /book builds a WhatsApp request to book the Arena a
   const href = (await cta.getAttribute('href')) ?? '';
   expect(href.startsWith('https://wa.me/254798258950?text=')).toBe(true);
   const message = decodeURIComponent(href.split('?text=')[1]);
-  expect(message).toBe('Hi MVSA, I would like to book the Arena today at 18:00. Is it free?');
+  expect(message).toBe('Hi MVSA, I would like to book the Arena today at 18:00. Is it available?');
 });
 
 test('reduced motion stops the marquee', async ({ page }) => {
@@ -93,12 +93,12 @@ for (const path of PAGES) {
   });
 }
 
-test('every page shows no price but KSH 1,500', async ({ page }) => {
+test('every page shows no price but the Arena (KSH 1,500) and the meeting room (KSH 1,000)', async ({ page }) => {
   for (const path of PAGES.filter((p) => p !== '/book')) {
     await page.goto(path);
     const text = await page.locator('body').innerText();
     const prices = text.match(/K(?:ES|SH)\s?[\d,]+/gi) ?? [];
-    for (const price of prices) expect(price.replace(/\s/g, ' '), path).toMatch(/KSH 1,500/i);
+    for (const price of prices) expect(price.replace(/\s/g, ' '), path).toMatch(/KSH 1,[05]00/i);
   }
 });
 

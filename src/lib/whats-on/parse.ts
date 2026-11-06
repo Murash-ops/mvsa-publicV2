@@ -213,10 +213,11 @@ export function ruleProblem(item: WhatsOnItem): string | null {
     .filter(Boolean)
     .join(' ');
 
-  // Money: the only figure the site may print is the Arena's "from KSH 1,500".
+  // Money: the only figures the site may print are the Arena's "from KSH 1,500"
+  // and the meeting room's "KSH 1,000 an hour".
   const amounts = text.match(/\b(?:KSH|KES|Ksh|Kshs|Sh)\.?\s?[\d,]+/gi) ?? [];
-  if (amounts.some((a) => a.replace(/\D/g, '') !== '1500')) {
-    return 'it has a price other than "from KSH 1,500" (fees are only shared on WhatsApp)';
+  if (amounts.some((a) => !['1500', '1000'].includes(a.replace(/\D/g, '')))) {
+    return 'it has a price other than the Arena (KSH 1,500) or the meeting room (KSH 1,000); fees are only shared on WhatsApp';
   }
   if (/\btill\s*(?:no\.?|number|#)?\s*:?\s*\d{5,}/i.test(text) || /\b(pay\s?bill|buy goods|m-?pesa)\b/i.test(text)) {
     return 'it has a Till number or payment instructions (those are only shared on WhatsApp)';

@@ -37,7 +37,7 @@ test('booked and past hours cannot be picked, and the live count shows', async (
   await expect(picker.getByRole('button', { name: '21:00' })).toHaveAttribute('aria-pressed', 'true');
   const href = (await page.getByTestId('kickoff-cta').getAttribute('href')) ?? '';
   expect(decodeURIComponent(href.split('?text=')[1])).toBe(
-    'Hi MVSA, I would like to book the Arena today at 21:00. Is it free?'
+    'Hi MVSA, I would like to book the Arena today at 21:00. Is it available?'
   );
 });
 
@@ -53,7 +53,7 @@ test('another day asks for that day by name', async ({ page }) => {
   await expect(page.getByTestId('kickoff-cta')).toHaveText(/Ask for Sun 25 20:00/);
   const href = (await page.getByTestId('kickoff-cta').getAttribute('href')) ?? '';
   expect(decodeURIComponent(href.split('?text=')[1])).toBe(
-    'Hi MVSA, I would like to book the Arena on Sunday 25 October at 20:00. Is it free?'
+    'Hi MVSA, I would like to book the Arena on Sunday 25 October at 20:00. Is it available?'
   );
   expect(asked).toContain('2026-10-25');
 });
@@ -94,7 +94,7 @@ test('more than one hour: tap the next hour to add it, tap an end to drop it', a
     await expect(picker.getByRole('button', { name: time })).toHaveAttribute('aria-pressed', 'true');
   }
   await expect(cta).toHaveText(/Ask for 19:00–22:00/);
-  expect(await message()).toBe('Hi MVSA, I would like to book the Arena today from 19:00 to 22:00 (3 hours). Is it free?');
+  expect(await message()).toBe('Hi MVSA, I would like to book the Arena today from 19:00 to 22:00 (3 hours). Is it available?');
 
   // 22:00 is booked, so the range can't grow into it.
   await expect(picker.getByRole('button', { name: '22:00' })).toBeDisabled();
@@ -117,6 +117,6 @@ test('a range that runs to closing ends at midnight', async ({ page }) => {
   await picker.getByRole('button', { name: '23:00' }).click();
   const href = (await page.getByTestId('kickoff-cta').getAttribute('href')) ?? '';
   expect(decodeURIComponent(href.split('?text=')[1])).toBe(
-    'Hi MVSA, I would like to book the Arena today from 22:00 to midnight (2 hours). Is it free?'
+    'Hi MVSA, I would like to book the Arena today from 22:00 to midnight (2 hours). Is it available?'
   );
 });

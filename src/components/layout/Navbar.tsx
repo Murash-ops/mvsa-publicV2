@@ -25,7 +25,7 @@ export default function Navbar() {
   // shop can never be linked from the navigation by accident.
   const links = [
     { name: "What's on", href: '/whats-on' },
-    { name: 'Programs', href: '/programs' },
+    { name: 'Programmes', href: '/programs' },
     { name: 'Meeting room', href: '/book#meeting-room' },
     ...(shopIsListed ? [{ name: 'Shop', href: '/shop' }] : []),
     { name: 'About', href: '/about' },

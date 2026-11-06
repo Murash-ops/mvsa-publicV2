@@ -127,7 +127,7 @@ test.describe('MVSA Public Site Mobile Responsiveness & Touch Usability', () => 
             await expect(drawerContainer).toBeVisible({ timeout: 5000 });
             
             // Drawer link should be visible
-            const drawerLink = drawerContainer.getByRole('link', { name: 'Programs' });
+            const drawerLink = drawerContainer.getByRole('link', { name: 'Programmes' });
             await expect(drawerLink).toBeVisible();
 
             // Close menu

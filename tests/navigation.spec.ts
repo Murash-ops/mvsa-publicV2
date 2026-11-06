@@ -15,7 +15,7 @@ test.describe('phone menu', () => {
     await expect(menu).toBeVisible();
     const box = await menu.boundingBox();
     expect(box?.height ?? 0).toBeGreaterThan(400);
-    await menu.getByRole('link', { name: 'Programs' }).click();
+    await menu.getByRole('link', { name: 'Programmes' }).click();
     await expect(page).toHaveURL(/\/programs$/);
     await expect(menu).toBeHidden();
   });

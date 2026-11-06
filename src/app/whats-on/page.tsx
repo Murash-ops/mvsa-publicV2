@@ -45,7 +45,7 @@ export default async function WhatsOnPage() {
             or call or WhatsApp {contact.bookingsPhone}.
           </p>
           <Link href="/programs" className="btn btn-outline-gold">
-            All programs
+            All programmes
           </Link>
         </div>
       </section>
