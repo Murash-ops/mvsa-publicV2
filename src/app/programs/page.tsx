@@ -6,7 +6,7 @@ import { contact } from '@/content/site';
 import { whatsappUrl } from '@/lib/whatsapp';
 
 export const metadata: Metadata = {
-  title: 'Programs | Mountain View Sports Arena',
+  title: 'Programmes | Mountain View Sports Arena',
   description:
     'Football Academy, Holiday Training, Chess Club, Community Yoga, Boxing, Dance & Rhythm, individual training and events at the Arena.',
 };
@@ -24,7 +24,7 @@ export default function ProgramsPage() {
   return (
     <main className="theme-light">
       <PageHeader
-        eyebrow="Programs"
+        eyebrow="Programmes"
         titleTop="More than"
         titleBottom="a pitch"
         intro="Football, chess and dance with the Academy; yoga and boxing for adults; your own session or your own event on the Arena. Every programme has its own page to share."

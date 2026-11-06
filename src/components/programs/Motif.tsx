@@ -90,7 +90,9 @@ export default function Motif({ theme, size = 'hero' }: { theme: ProgramTheme; s
       return (
         <div
           aria-hidden="true"
-          className={`${common} flex items-end justify-end gap-[3%] px-[6%] pb-0 ${size === 'hero' ? 'opacity-[0.16] lg:left-auto lg:w-[45%] lg:opacity-40' : 'opacity-50'}`}
+          className={`${common} ${size === 'hero' ? 'hidden lg:flex' : 'flex'} items-end justify-end gap-[3%] px-[6%] pb-0 [mask-image:linear-gradient(to_top,transparent,black_35%)] ${
+            size === 'hero' ? 'lg:left-auto lg:w-[40%] lg:opacity-35' : 'opacity-50'
+          }`}
         >
           {heights.map((h, i) => (
             <span

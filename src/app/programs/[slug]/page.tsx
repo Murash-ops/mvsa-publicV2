@@ -4,7 +4,7 @@ import Link from 'next/link';
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 import { getAcademyProgram, getAcademyPrograms, type AcademyProgram } from '@/lib/academy-programs';
-import { getStory, type ProgramStory, type ProgramTheme } from '@/content/programs';
+import { getStory, type ProgramFeature, type ProgramStory, type ProgramTheme } from '@/content/programs';
 import { contact, siteOrigin } from '@/content/site';
 import { whatsappUrl } from '@/lib/whatsapp';
 import { itemsForProgram, loadWhatsOn } from '@/lib/whats-on';
@@ -32,7 +32,7 @@ function load(slug: string): { program: AcademyProgram; story: ProgramStory } | 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
   const found = load(slug);
-  if (!found) return { title: 'Programs | Mountain View Sports Arena' };
+  if (!found) return { title: 'Programmes | Mountain View Sports Arena' };
   const { program, story } = found;
   const url = `${siteOrigin}/programs/${program.slug}`;
   const title = `${program.name} | Mountain View Sports Arena`;
@@ -137,12 +137,15 @@ function HeroPicture({ story, program }: { story: ProgramStory; program: Academy
     // No photograph of this programme yet: the time does the talking.
     return (
       <div className="relative flex aspect-square w-full max-w-[460px] flex-col justify-end gap-2 justify-self-center overflow-hidden border-2 border-gold p-7 lg:justify-self-end">
-        <Motif theme={story.theme} size="tile" />
+        {/* The drawing keeps to the top half and fades out before the words. */}
+        <div aria-hidden="true" className="absolute inset-x-0 top-0 h-[52%] [mask-image:linear-gradient(to_bottom,black_55%,transparent)]">
+          <Motif theme={story.theme} size="tile" />
+        </div>
         <span className="label relative text-[15px] tracking-[0.14em] text-fog">{story.focalLabel}</span>
         <span className="display relative text-[clamp(72px,10vw,128px)] leading-[0.82] text-gold">{story.focal}</span>
-        <span className="label relative text-[15px] tracking-[0.14em] text-fog">
-          {program.age_group.includes(story.focal) ? program.schedule : program.age_group}
-        </span>
+        {program.age_group ? (
+          <span className="label relative text-[15px] tracking-[0.14em] text-fog">{program.age_group}</span>
+        ) : null}
       </div>
     );
   }
@@ -201,7 +204,7 @@ export default async function ProgramPage({ params }: { params: Promise<{ slug: 
         <div className="wrap relative grid items-center gap-12 pt-[clamp(40px,6vw,72px)] pb-[clamp(56px,7vw,96px)] lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)]">
           <div className="rise flex min-w-0 flex-col gap-6">
             <Link href="/programs" className="text-link self-start text-[14px]">
-              All programs
+              All programmes
             </Link>
             <span className="tag">{story.kicker}</span>
             <Headline story={story} />
@@ -237,7 +240,9 @@ export default async function ProgramPage({ params }: { params: Promise<{ slug: 
             { term: 'When', value: program.schedule },
             { term: 'Who', value: program.age_group },
             { term: 'Where', value: 'The Arena, behind Mountain View Mall, Waiyaki Way' },
-          ].map((row) => (
+          ]
+            .filter((row) => row.value)
+            .map((row) => (
             <div key={row.term} className="flex flex-col gap-1.5 border-l-4 border-gold pl-4">
               <dt className="label text-[13px] tracking-[0.14em] text-mute">{row.term}</dt>
               <dd className="m-0 text-lg font-semibold leading-snug text-white">{row.value}</dd>
@@ -246,23 +251,8 @@ export default async function ProgramPage({ params }: { params: Promise<{ slug: 
         </dl>
       </section>
 
-      {/* The pathway: a real sequence, so it is numbered. */}
-      {story.steps ? (
-        <section className="wrap flex flex-col gap-8 py-[clamp(56px,7vw,88px)]" aria-labelledby="steps-title">
-          <h2 id="steps-title" className="h-section">
-            The <span className="text-gold">pathway</span>
-          </h2>
-          <ol className="m-0 grid list-none gap-0 p-0 md:grid-cols-3">
-            {story.steps.map((step, i) => (
-              <li key={step.title} className="relative flex flex-col gap-3 border-t-4 border-gold pt-6 pr-6 pb-6 md:pb-0">
-                <span className="display text-[64px] leading-none text-gold">{i + 1}</span>
-                <h3 className="display m-0 text-[32px] leading-[0.9]">{step.title}</h3>
-                <p className="m-0 max-w-[340px] text-base leading-[1.55] text-fog">{step.body}</p>
-              </li>
-            ))}
-          </ol>
-        </section>
-      ) : null}
+      {/* The section only this programme has. */}
+      {story.feature ? <Feature feature={story.feature} theme={story.theme} /> : null}
 
       {/* Holiday: the week, day by day, with today marked. */}
       {story.week ? (
@@ -298,18 +288,19 @@ export default async function ProgramPage({ params }: { params: Promise<{ slug: 
         </section>
       ) : null}
 
-      {/* What makes it what it is. */}
-      <section className={`wrap flex flex-col gap-8 ${story.steps || story.week ? 'pb-[clamp(56px,7vw,88px)]' : 'py-[clamp(56px,7vw,88px)]'}`}>
-        <div className="grid gap-8 md:grid-cols-3">
-          {story.points.map((point) => (
-            <div key={point.title} className="flex flex-col gap-3">
-              <PointMark theme={story.theme} />
-              <h3 className="display m-0 text-[30px] leading-[0.9]">{point.title}</h3>
-              <p className="m-0 max-w-[360px] text-base leading-[1.55] text-fog">{point.body}</p>
-            </div>
-          ))}
-        </div>
-      </section>
+      {story.points?.length ? (
+        <section className={`wrap flex flex-col gap-8 ${story.feature || story.week ? 'pb-[clamp(56px,7vw,88px)]' : 'py-[clamp(56px,7vw,88px)]'}`}>
+          <div className="grid gap-8 md:grid-cols-3">
+            {story.points.map((point) => (
+              <div key={point.title} className="flex flex-col gap-3">
+                <PointMark theme={story.theme} />
+                <h3 className="display m-0 text-[30px] leading-[0.9]">{point.title}</h3>
+                <p className="m-0 max-w-[360px] text-base leading-[1.55] text-fog">{point.body}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+      ) : null}
 
       {related.length > 0 ? (
         <section className="wrap flex flex-col gap-6 pb-[clamp(56px,7vw,88px)]" aria-labelledby="related-title">
@@ -338,7 +329,7 @@ export default async function ProgramPage({ params }: { params: Promise<{ slug: 
           </div>
           <div className="flex flex-col gap-5 self-end">
             <a href={registerUrl} target="_blank" rel="noopener noreferrer" className="btn btn-gold min-h-[60px] text-[19px]" data-testid="register-cta-bottom">
-              {story.register.label} on WhatsApp
+              {/whatsapp/i.test(story.register.label) ? story.register.label : `${story.register.label} on WhatsApp`}
             </a>
             <p className="m-0 text-base text-fog">{story.register.note}</p>
             <p className="m-0 text-base text-fog">
@@ -408,5 +399,49 @@ function PointMark({ theme }: { theme: ProgramTheme }) {
     <svg viewBox="0 0 24 24" className="h-7 w-7 text-gold" aria-hidden="true">
       {mark[theme]}
     </svg>
+  );
+}
+
+/** The one section only this programme has, laid out to suit its content. */
+function Feature({ feature, theme }: { feature: ProgramFeature; theme: ProgramTheme }) {
+  return (
+    <section className="wrap flex flex-col gap-8 py-[clamp(56px,7vw,88px)]" aria-labelledby="feature-title" data-testid="program-feature">
+      <h2 id="feature-title" className="h-section">
+        {feature.title}
+      </h2>
+      {feature.kind === 'steps' ? (
+        <ol className="m-0 grid list-none gap-0 p-0 md:grid-cols-3">
+          {feature.items.map((item, i) => (
+            <li key={item.title} className="relative flex flex-col gap-3 border-t-4 border-gold pt-6 pr-6 pb-6 md:pb-0">
+              <span className="display text-[64px] leading-none text-gold">{i + 1}</span>
+              <h3 className="display m-0 text-[32px] leading-[0.9]">{item.title}</h3>
+              <p className="m-0 max-w-[340px] text-base leading-[1.55] text-fog">{item.body}</p>
+            </li>
+          ))}
+        </ol>
+      ) : feature.kind === 'timeline' ? (
+        <ol className="m-0 flex list-none flex-col p-0">
+          {feature.items.map((item) => (
+            <li key={item.title} className="grid gap-x-8 gap-y-1 border-t-2 border-white/15 py-5 sm:grid-cols-[minmax(0,220px)_minmax(0,1fr)]">
+              <span className="display text-[clamp(32px,4vw,48px)] leading-none text-gold">{item.label}</span>
+              <div className="flex flex-col gap-1.5">
+                <h3 className="display m-0 text-[28px] leading-[0.9]">{item.title}</h3>
+                <p className="m-0 max-w-[560px] text-base leading-[1.55] text-fog">{item.body}</p>
+              </div>
+            </li>
+          ))}
+        </ol>
+      ) : (
+        <div className="grid gap-8 md:grid-cols-3">
+          {feature.items.map((item) => (
+            <div key={item.title} className="flex flex-col gap-3">
+              <PointMark theme={theme} />
+              <h3 className="display m-0 text-[30px] leading-[0.9]">{item.title}</h3>
+              <p className="m-0 max-w-[360px] text-base leading-[1.55] text-fog">{item.body}</p>
+            </div>
+          ))}
+        </div>
+      )}
+    </section>
   );
 }

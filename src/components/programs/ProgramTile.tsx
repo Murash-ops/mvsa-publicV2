@@ -20,7 +20,7 @@ export default function ProgramTile({ program }: { program: AcademyProgram }) {
       </div>
       <span className="label relative text-[13px] tracking-[0.08em] text-gold">{program.schedule}</span>
       <h3 className="display relative m-0 text-[clamp(30px,3.4vw,44px)] leading-[0.86]">{program.name}</h3>
-      <span className="relative text-[15px] leading-snug text-fog">{program.age_group}</span>
+      {program.age_group ? <span className="relative text-[15px] leading-snug text-fog">{program.age_group}</span> : null}
     </Link>
   );
 }

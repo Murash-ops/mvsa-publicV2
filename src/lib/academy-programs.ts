@@ -61,9 +61,9 @@ const SEED: AcademyProgram[] = [
     image_url: '/images/programs/boots-and-ball.webp',
     type: 'academy',
     schedule: 'Saturdays, 2–4pm',
-    age_group: 'Ages 6–16',
+    age_group: 'Young players',
     description:
-      'Youth football on the Arena every Saturday afternoon: technique, small-sided games and match play, led by the academy coaches.',
+      'Youth football on the Arena every Saturday afternoon: technique, small-sided games and match play, with the academy coaches.',
     booking_mode: 'enquiry_only',
   },
   {
@@ -107,8 +107,8 @@ const SEED: AcademyProgram[] = [
     name: 'Boxing',
     type: 'fitness',
     schedule: 'Sundays, 3pm',
-    age_group: 'Adults',
-    description: 'Conditioning, pad work and technique, from a first session to regular training.',
+    age_group: '',
+    description: 'Boxing at the Arena, Sundays at 3pm. WhatsApp us for details.',
     booking_mode: 'enquiry_only',
   },
   {
@@ -116,9 +116,9 @@ const SEED: AcademyProgram[] = [
     slug: 'dance',
     name: 'Dance & Rhythm',
     type: 'academy',
-    schedule: 'Ask for class times',
-    age_group: 'Ages 6–16',
-    description: 'Rhythm, movement and choreography classes for children.',
+    schedule: 'Coming soon',
+    age_group: '',
+    description: 'Coming soon. WhatsApp us to hear first.',
     booking_mode: 'enquiry_only',
   },
   {
@@ -139,8 +139,8 @@ const SEED: AcademyProgram[] = [
     image_url: '/images/programs/night-game.webp',
     type: 'arena',
     schedule: 'Any day, 6am to midnight',
-    age_group: 'Teams, companies and families',
-    description: 'Tournaments, company team days and celebrations on a covered, floodlit pitch, with a PA system on request.',
+    age_group: 'Teams and groups',
+    description: 'Events on a covered, floodlit pitch, with a PA system on request.',
     booking_mode: 'enquiry_only',
   },
 ];

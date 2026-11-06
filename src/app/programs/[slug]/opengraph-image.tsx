@@ -47,7 +47,6 @@ export default async function Image({ params }: { params: Promise<{ slug: string
   ]);
   const photo = story.ogPhoto ? `data:image/jpeg;base64,${(await asset('og-photos', story.ogPhoto)).toString('base64')}` : null;
   const c = GROUND[story.theme];
-  const name = story.headline.join(' ');
   const longest = Math.max(...story.headline.map((line) => line.length));
   const nameSize = longest >= 9 ? 120 : 150;
 

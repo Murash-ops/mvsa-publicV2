@@ -32,6 +32,18 @@ export interface ProgramPhoto {
   position?: string;
 }
 
+/**
+ * The one section only this programme's page has: the Academy's pathway,
+ * a first Saturday at Chess Club, a day at holiday training, and so on.
+ * Only facts from brand.md; otherwise it describes the experience.
+ */
+export interface ProgramFeature {
+  title: string;
+  /** steps: a real sequence, numbered. timeline: times down the side. cards: side by side. */
+  kind: 'steps' | 'timeline' | 'cards';
+  items: { label?: string; title: string; body: string }[];
+}
+
 export interface ProgramStory {
   slug: string;
   theme: ProgramTheme;
@@ -44,11 +56,10 @@ export interface ProgramStory {
   focalLabel: string;
   lede: string;
   photo?: ProgramPhoto;
-  /** Only for content that really is a sequence. */
-  steps?: ProgramPoint[];
+  feature?: ProgramFeature;
   /** A week laid out day by day (holiday training). */
   week?: { day: string; who: string }[];
-  points: ProgramPoint[];
+  points?: ProgramPoint[];
   goodToKnow: string[];
   register: {
     heading: string;
@@ -79,35 +90,35 @@ export const stories: ProgramStory[] = [
     focal: 'Sat 2–4pm',
     focalLabel: 'Every Saturday',
     lede:
-      'Young players learn the game properly on the Arena every Saturday afternoon: first touch, then small-sided games, then match play. Ages 6 to 16, led by the academy coaches.',
+      'Young players learn the game properly on the Arena every Saturday afternoon: first touch, then small-sided games, then match play, with the academy coaches.',
     photo: {
       src: '/images/programs/boots-and-ball.webp',
       alt: 'Boots, a ball and training cones on the Arena’s white line',
       treatment: 'duotone',
       position: 'center 40%',
     },
-    steps: [
-      { title: 'First touch', body: 'Ball mastery, passing and moving: the habits every good player is built on.' },
-      { title: 'Small-sided games', body: 'Fewer players per side, so everyone is on the ball and making decisions.' },
-      { title: 'Match play', body: 'Positions, teamwork and real games on a covered, floodlit 5-aside pitch.' },
-    ],
+    feature: {
+      title: 'The pathway',
+      kind: 'steps',
+      items: [
+        { title: 'First touch', body: 'Ball mastery, passing and moving: the habits every good player is built on.' },
+        { title: 'Small-sided games', body: 'Fewer players per side, so everyone is on the ball and making decisions.' },
+        { title: 'Match play', body: 'Positions, teamwork and real games on a covered, floodlit 5-aside pitch.' },
+      ],
+    },
     points: [
-      { title: 'Ages 6 to 16', body: 'Boys and girls, from a first kick to players who already have a team.' },
       { title: 'Green kit', body: 'Registration includes the green kit: jersey, shorts and socks. Bring your own boots.' },
-      { title: 'Under the roof', body: 'The Arena is covered and floodlit, behind Mountain View Mall on Waiyaki Way.' },
+      { title: 'Covered and floodlit', body: 'The Arena is roofed and lit, behind Mountain View Mall on Waiyaki Way.' },
     ],
-    goodToKnow: [
-      'Training is on Saturdays from 2pm to 4pm.',
-      'Message us to register and we will send everything you need on WhatsApp.',
-    ],
+    goodToKnow: ['Training is on Saturdays, 2pm to 4pm.', 'WhatsApp us to register and we will send you the details.'],
     register: {
       heading: 'Start the pathway',
-      label: 'Register now',
+      label: 'WhatsApp us to register',
       message: registerMessage('Football Academy'),
       note: 'Tap to open WhatsApp with your message ready to send. We reply with the details.',
     },
     formUrl: ACADEMY_FORM_URL,
-    shareLine: 'Saturdays 2–4pm on the Arena. Ages 6–16.',
+    shareLine: 'Saturdays, 2–4pm, on the Arena.',
     ogPhoto: 'boots-and-ball.jpg',
   },
   {
@@ -118,12 +129,21 @@ export const stories: ProgramStory[] = [
     focal: '11am–1pm',
     focalLabel: 'Monday to Saturday',
     lede:
-      'Six days a week of proper football while the schools are closed. Coached sessions by age group, green kit included, from Monday 2 November to Saturday 19 December.',
+      'Six days a week of proper football while the schools are closed. Coached sessions by age group, green kit included, until Saturday 19 December.',
     photo: {
       src: '/images/arena/corner-flag-line.webp',
       alt: 'The corner of the Arena at turf level, the white line curving away',
       treatment: 'natural',
       position: 'center 70%',
+    },
+    feature: {
+      title: 'A day at holiday training',
+      kind: 'timeline',
+      items: [
+        { label: '11am', title: 'Kick-off', body: 'Kit on, boots laced. Your group’s coach starts the session.' },
+        { label: '11am–1pm', title: 'Two hours on the pitch', body: 'Each day has its own groups and its own focus: see the week below.' },
+        { label: '1pm', title: 'Home time', body: 'Sessions end at 1pm, Monday to Saturday, until 19 December.' },
+      ],
     },
     week: [
       { day: 'Mon', who: 'Strength & conditioning, all groups' },
@@ -140,11 +160,11 @@ export const stories: ProgramStory[] = [
     ],
     goodToKnow: [
       'Sessions run from 11am to 1pm, Monday to Saturday, until Saturday 19 December 2026.',
-      'Message us to register and we will confirm your child’s group on WhatsApp.',
+      'WhatsApp us to register and we will confirm your child’s group.',
     ],
     register: {
       heading: 'Book their holiday in',
-      label: 'Register now',
+      label: 'WhatsApp us to register',
       message: registerMessage('Holiday Training'),
       note: 'Tap to open WhatsApp with your message ready to send. We reply with the details.',
     },
@@ -159,25 +179,26 @@ export const stories: ProgramStory[] = [
     focal: 'Sat 10am',
     focalLabel: 'Every Saturday',
     lede:
-      'Every Saturday at 10am, children sit down at real boards with our chess coach. They learn how the pieces work together, how to plan ahead, and how to win and lose well.',
+      'Chess Club is for children, every Saturday at 10am, at real boards with our chess coach: how the pieces work together, how to plan ahead, and how to win and lose well.',
     photo: {
       src: '/images/programs/chess-boards.webp',
       alt: 'Chess boards set up on the tables, pieces ready',
       treatment: 'natural',
       position: 'center 70%',
     },
-    points: [
-      { title: 'For children', body: 'The Saturday club is for children, from first moves to their first tournament.' },
-      { title: 'Coached', body: 'Led by our chess coach, one board and one idea at a time.' },
-      { title: 'Walk-ins welcome', body: 'First time? Just come at 10am.' },
-    ],
-    goodToKnow: [
-      'The club meets every Saturday at 10am.',
-      'WhatsApp us for details and we will tell you everything on the chat.',
-    ],
+    feature: {
+      title: 'Your first Saturday',
+      kind: 'timeline',
+      items: [
+        { label: 'Before 10am', title: 'Just come', body: 'First time? Just come at 10am. Walk-ins are welcome.' },
+        { label: '10am', title: 'Chess Club starts', body: 'Children sit down at the boards with our chess coach.' },
+        { label: 'After', title: 'Keep playing', body: 'WhatsApp us for details and we will tell you everything on the chat.' },
+      ],
+    },
+    goodToKnow: ['Chess Club is for children.', 'First time? Just come at 10am.'],
     register: {
-      heading: 'Take a seat at the board',
-      label: 'Register now',
+      heading: 'Chess Club, every Saturday at 10am',
+      label: 'WhatsApp us for details',
       message: registerMessage('Chess Club'),
       note: 'Tap to open WhatsApp with your message ready to send. We reply with the details.',
     },
@@ -199,15 +220,16 @@ export const stories: ProgramStory[] = [
       treatment: 'natural',
       position: 'center 55%',
     },
-    points: [
-      { title: 'Every level', body: 'Beginners and regulars on the same pitch, each at their own pace.' },
-      { title: 'Under the roof', body: 'Mats on the turf, the open sides letting the morning in.' },
-      { title: 'Give what you can', body: 'There is no set price. The class runs on donations.' },
-    ],
-    goodToKnow: [
-      'Bring a mat if you have one. Yoga mats and blocks are also sold at the counter.',
-      'Arrive a few minutes early to find your spot.',
-    ],
+    feature: {
+      title: 'What a session is like',
+      kind: 'cards',
+      items: [
+        { title: 'Mats on the turf', body: 'The class is on the covered pitch, under the roof, with the morning coming in through the open sides.' },
+        { title: 'Your own pace', body: 'Beginners and regulars side by side, each going as far as feels right.' },
+        { title: 'Give what you can', body: 'There is no set price. The class runs on donations.' },
+      ],
+    },
+    goodToKnow: ['Every Friday at 9am.', 'Donation-based: give what you can.'],
     register: {
       heading: 'Join us on Friday',
       label: 'Save me a spot',
@@ -220,48 +242,36 @@ export const stories: ProgramStory[] = [
   {
     slug: 'boxing',
     theme: 'ring',
-    kicker: 'Adults',
+    kicker: 'Sundays',
     headline: ['Boxing'],
     focal: 'Sun 3pm',
     focalLabel: 'Every Sunday',
-    lede:
-      'Gloves on, Sunday afternoons. Conditioning, pad work and technique, whether it is your first session or you train every week.',
-    points: [
-      { title: 'Conditioning', body: 'Rounds that build the fitness the rest of your week will notice.' },
-      { title: 'Pad work', body: 'Combinations on the pads, with a partner holding.' },
-      { title: 'Technique', body: 'Stance, footwork and defence, built up step by step.' },
-    ],
-    goodToKnow: ['Sessions are for adults.', 'Message us before your first session and we will tell you what to bring.'],
+    lede: 'Boxing at the Arena, Sundays at 3pm. WhatsApp us for details.',
+    goodToKnow: ['Sundays at 3pm.', 'WhatsApp us for details.'],
     register: {
-      heading: 'Step in',
-      label: 'Register now',
-      message: registerMessage('Boxing'),
+      heading: 'Sundays, 3pm',
+      label: 'WhatsApp us for details',
+      message: "Hi MVSA, I'd like details about Boxing",
       note: 'Tap to open WhatsApp with your message ready to send.',
     },
-    shareLine: 'Sundays, 3pm. Conditioning, pads and technique.',
+    shareLine: 'Sundays, 3pm. WhatsApp us for details.',
   },
   {
     slug: 'dance',
     theme: 'beat',
-    kicker: 'Mountain View Sports Academy',
+    kicker: 'Coming soon',
     headline: ['Dance &', 'Rhythm'],
-    focal: '6–16',
-    focalLabel: 'Ages',
-    lede:
-      'Rhythm, movement and choreography for children: finding the beat, learning routines and performing them together.',
-    points: [
-      { title: 'Rhythm', body: 'Counting, clapping and moving on the beat.' },
-      { title: 'Movement', body: 'Coordination, balance and the confidence to take up space.' },
-      { title: 'Choreography', body: 'Learning routines and dancing them as a group.' },
-    ],
-    goodToKnow: ['Ask on WhatsApp for the next class time.'],
+    focal: 'Soon',
+    focalLabel: 'Coming',
+    lede: 'Dance & Rhythm is coming to the Arena. WhatsApp us and we will tell you first when classes start.',
+    goodToKnow: ['Classes have not started yet.', 'WhatsApp us and we will let you know first.'],
     register: {
-      heading: 'Find the beat',
-      label: 'Register now',
-      message: registerMessage('Dance & Rhythm'),
-      note: 'Tap to open WhatsApp with your message ready to send. We reply with class times.',
+      heading: 'Hear it first',
+      label: 'Ask us',
+      message: "Hi MVSA, please tell me when Dance & Rhythm starts",
+      note: 'Tap to open WhatsApp with your message ready to send.',
     },
-    shareLine: 'Rhythm, movement and choreography for ages 6–16.',
+    shareLine: 'Coming soon to the Arena. WhatsApp us to hear first.',
   },
   {
     slug: 'individual-training',
@@ -271,19 +281,23 @@ export const stories: ProgramStory[] = [
     focal: '1–5',
     focalLabel: 'Players',
     lede:
-      'Your own time on the Arena to work on what your game needs: finishing, first touch, fitness. Come on your own or bring up to four teammates.',
+      'Your own time on the Arena to work on what your game needs. Come on your own or bring up to four teammates.',
     photo: {
       src: '/images/arena/turf-close.webp',
       alt: 'The Arena turf close up, a white line in the foreground',
       treatment: 'natural',
       position: 'center 75%',
     },
-    points: [
-      { title: 'Your focus', body: 'Shooting, passing, fitness: you decide what the session is for.' },
-      { title: 'Small groups', body: 'One player, or a group of up to five.' },
-      { title: 'Any day', body: 'The Arena is open every day, so pick a time that suits you.' },
-    ],
-    goodToKnow: ['Ask on WhatsApp for free times and the rate for your group.'],
+    feature: {
+      title: 'How a session works',
+      kind: 'steps',
+      items: [
+        { title: 'Tell us', body: 'WhatsApp us the day and how many of you are coming, from one player to five.' },
+        { title: 'We confirm', body: 'Reception finds a free hour on the Arena and confirms on WhatsApp.' },
+        { title: 'Train', body: 'Finishing, first touch, fitness: the session is for whatever your game needs.' },
+      ],
+    },
+    goodToKnow: ['For one to five players.', 'Ask on WhatsApp for free times and the rate for your group.'],
     register: {
       heading: 'Put in the work',
       label: 'Ask for a session',
@@ -300,19 +314,23 @@ export const stories: ProgramStory[] = [
     headline: ['Events'],
     focal: '6am–midnight',
     focalLabel: 'Every day',
-    lede:
-      'Tournaments, company team days and celebrations on a covered, floodlit pitch. Tell us the day and how many people, and we will set up the Arena.',
+    lede: 'Events on a covered, floodlit pitch. Tell us the day and how many people, and we will plan it with you.',
     photo: {
       src: '/images/programs/night-game.webp',
       alt: 'An evening game on the Arena under the floodlights',
       treatment: 'natural',
       position: 'center 55%',
     },
-    points: [
-      { title: 'Covered and floodlit', body: 'Rain or shine, morning or night.' },
-      { title: 'Sound', body: 'A PA system is available on request.' },
-      { title: 'Room to gather', body: 'Use the meeting room for briefings, prize-giving or a meal.' },
-    ],
+    feature: {
+      title: 'What we can host',
+      kind: 'cards',
+      items: [
+        { title: 'Tournaments', body: 'Bring the teams. The pitch is covered and floodlit, morning or night.' },
+        { title: 'Team days', body: 'A game for the office or the group, with the meeting room for the briefing.' },
+        { title: 'Get-togethers', body: 'Mark the occasion around a game on the Arena.' },
+      ],
+    },
+    points: [{ title: 'Sound', body: 'A PA system is available on request.' }],
     goodToKnow: ['Tell us the date, the time and roughly how many people, and we will come back with a plan and a quote.'],
     register: {
       heading: 'Bring everyone',
@@ -320,7 +338,7 @@ export const stories: ProgramStory[] = [
       message: "Hi MVSA, I'd like to plan an event at the Arena",
       note: 'Tap to open WhatsApp with your message ready to send.',
     },
-    shareLine: 'Tournaments, team days and celebrations, open 6am to midnight.',
+    shareLine: 'Events on a covered, floodlit pitch, open 6am to midnight.',
     ogPhoto: 'night-game.jpg',
   },
 ];
