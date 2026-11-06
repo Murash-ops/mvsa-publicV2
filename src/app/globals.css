@@ -20,7 +20,7 @@
   --color-paper: #F5F2EA;        /* light sections */
   --color-line: rgba(255, 255, 255, 0.1);
 
-  --font-display: var(--font-bebas), 'Bebas Neue', Impact, sans-serif;
+  --font-display: var(--font-shoulders), 'Big Shoulders Display', Impact, sans-serif;
   --font-sans: var(--font-barlow), 'Barlow', Arial, sans-serif;
   --font-label: var(--font-barlow-condensed), 'Barlow Condensed', Arial Narrow, sans-serif;
 }
@@ -76,6 +76,9 @@
   --color-gold: #7A5D22;
   --color-gold-light: #5F4718;
   --color-grass: #2D7A3A;
+  --btn-bg: #2D5016;
+  --btn-bg-hover: #23400F;
+  --btn-fg: #FFFFFF;
   background-color: var(--color-ink);
   color: var(--color-white);
 }
@@ -98,6 +101,9 @@
   --color-mute: #9FAE9F;
   --color-gold: #C2A15B;
   --color-gold-light: #D8BF85;
+  --btn-bg: #C2A15B;
+  --btn-bg-hover: #D8BF85;
+  --btn-fg: #0E1C14;
   color: var(--color-white);
 }
 
@@ -117,19 +123,22 @@
 }
 
 .display {
+  /* Big Shoulders at its display size and heaviest weight: the L1 face in
+     MVSA's design system (MVSA/design-system/DESIGN.md), so the site and the
+     social graphics read as one club. */
   font-family: var(--font-display);
-  font-weight: 400;
-  /* Bebas is capitals only. Hinted rendering snaps narrow letters like T to the
-     pixel grid and opens gaps ("RHYT HM"); geometric rendering keeps the spacing. */
+  font-weight: 900;
+  font-variation-settings: 'opsz' 72;
   text-transform: uppercase;
   text-rendering: geometricPrecision;
   line-height: 0.88;
-  letter-spacing: 0.01em;
+  letter-spacing: 0.005em;
 }
 
 .h-section {
   font-family: var(--font-display);
-  font-weight: 400;
+  font-weight: 900;
+  font-variation-settings: 'opsz' 72;
   text-transform: uppercase;
   text-rendering: geometricPrecision;
   font-size: clamp(34px, 4vw, 56px);
@@ -161,29 +170,19 @@
   font-size: 14px;
 }
 
-/* The primary button: brass on dark, pitch green on paper. Flat, no shine. */
+/* The primary button: brass on dark, pitch green on paper. Flat, no shine.
+   The colours are tokens set by .theme-light / .theme-dark, so the nearest
+   theme wins when one sits inside the other. */
 .btn-gold,
 .shine {
-  background: var(--color-gold);
-  color: var(--color-ink);
+  background: var(--btn-bg, var(--color-gold));
+  color: var(--btn-fg, var(--color-ink));
 }
 
 .btn-gold:hover,
 .shine:hover {
-  background: var(--color-gold-light);
-  color: var(--color-ink);
-}
-
-.theme-light .btn-gold,
-.theme-light .shine {
-  background: var(--color-pitch);
-  color: #FFFFFF;
-}
-
-.theme-light .btn-gold:hover,
-.theme-light .shine:hover {
-  background: #23400F;
-  color: #FFFFFF;
+  background: var(--btn-bg-hover, var(--color-gold-light));
+  color: var(--btn-fg, var(--color-ink));
 }
 
 .btn-ghost {
@@ -236,6 +235,7 @@
   background: transparent;
   color: var(--color-white);
   font-family: var(--font-display);
+  font-weight: 800;
   font-size: 22px;
   letter-spacing: 0.04em;
   transition: background-color 0.2s, border-color 0.2s, color 0.2s;
@@ -251,13 +251,33 @@
   color: var(--color-ink);
 }
 
-/* Live hours: booked is struck through, past just fades. Neither can be picked. */
+/* Live hours: booked is struck through, past is dashed. Neither can be picked.
+   The text stays at 65% so it still reads (WCAG AA, 4.5:1 or better on both
+   grounds); the dashed border and the strike-through carry "unavailable". */
 .chip:disabled {
   cursor: not-allowed;
   border-style: dashed;
-  border-color: color-mix(in srgb, var(--color-white) 15%, transparent);
-  color: color-mix(in srgb, var(--color-white) 35%, transparent);
+  border-color: color-mix(in srgb, var(--color-white) 40%, transparent);
+  color: color-mix(in srgb, var(--color-white) 65%, var(--color-surface));
 }
+
+/* Extra Time hours: a brass dot in the corner, explained by the legend. */
+.chip[data-extra-time='true'] { position: relative; border-color: color-mix(in srgb, var(--color-gold) 75%, transparent); }
+.chip[data-extra-time='true']::after,
+.extra-dot {
+  content: '';
+  background: #C2A15B;
+  box-shadow: 0 0 0 2px var(--color-surface);
+}
+.chip[data-extra-time='true']::after {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+}
+.chip[data-extra-time='true'][aria-pressed='true']::after { box-shadow: 0 0 0 2px var(--color-ink); }
 .chip[data-state='booked'] {
   text-decoration: line-through;
   text-decoration-thickness: 2px;
@@ -410,6 +430,143 @@
   .bento > * { grid-column: auto !important; grid-row: auto !important; min-height: 200px; }
 }
 
+/* --------------------------------------------------------------------------
+   Club accents, borrowed from the social graphics (DESIGN.md, direction B):
+   a tilted brass tag, a hard brass shadow under big type, duotone photos.
+   Used sparingly so the pages stay calm around them.
+   -------------------------------------------------------------------------- */
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  align-self: flex-start;
+  padding: 7px 12px 6px;
+  background: var(--color-gold);
+  color: var(--color-ink);
+  font-family: var(--font-label);
+  font-weight: 800;
+  font-size: 14px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  line-height: 1;
+  transform: rotate(-2deg);
+  box-shadow: 3px 3px 0 color-mix(in srgb, var(--color-white) 85%, transparent);
+}
+.theme-light .tag { background: var(--color-pitch); color: #F5F2EA; box-shadow: 3px 3px 0 #C2A15B; }
+.tag-flat { transform: none; }
+
+.hard-shadow { text-shadow: 0.05em 0.05em 0 var(--hard-shadow, #C2A15B); }
+
+/* A tilted photo frame with a solid offset shadow, like a print pinned up. */
+.print {
+  position: relative;
+  border: 8px solid #F5F2EA;
+  box-shadow: 14px 14px 0 var(--print-shadow, #2D5016);
+  background: #F5F2EA;
+}
+.print-tilt-l { transform: rotate(-2deg); }
+.print-tilt-r { transform: rotate(1.6deg); }
+
+/* Duotone: forest shadows, cream highlights. Faces cannot be made out. */
+.duotone { isolation: isolate; overflow: hidden; background: #0d2818; }
+.duotone img { filter: grayscale(1) contrast(1.15) brightness(1.05); mix-blend-mode: luminosity; opacity: 0.9; }
+.duotone::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(243, 238, 226, 0.08), rgba(13, 40, 24, 0.2));
+  mix-blend-mode: multiply;
+  pointer-events: none;
+}
+
+/* Film grain over photos: one tiny noise tile, made in CSS, nothing to licence. */
+.grain::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.12;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* --------------------------------------------------------------------------
+   The shop bag in the navigation: still most of the time, then a small swing
+   every few seconds, like a bag on a hook. Off for reduced motion.
+   -------------------------------------------------------------------------- */
+
+@keyframes bag-swing {
+  0%, 84%, 100% { transform: rotate(0deg) translateY(0); }
+  87% { transform: rotate(-14deg) translateY(-2px); }
+  90% { transform: rotate(10deg) translateY(-1px); }
+  93% { transform: rotate(-6deg); }
+  96% { transform: rotate(3deg); }
+}
+@keyframes bag-spark {
+  0%, 84%, 100% { transform: scale(0); opacity: 0; }
+  88% { transform: scale(1.15); opacity: 1; }
+  96% { transform: scale(1); opacity: 0; }
+}
+.shop-bag { transform-origin: 50% 12%; animation: bag-swing 6s ease-in-out 1.5s infinite; }
+.shop-spark { transform-origin: center; animation: bag-spark 6s ease-out 1.5s infinite; }
+.shop-link:hover .shop-bag, .shop-link:focus-visible .shop-bag { animation-duration: 1.2s; animation-delay: 0s; }
+
+/* --------------------------------------------------------------------------
+   Programme themes. One family: same fonts, same tokens. Each theme changes
+   the ground, the accent and the motif behind the hero.
+   -------------------------------------------------------------------------- */
+
+.prog { --p-ground: var(--color-ink); --p-accent: #C2A15B; }
+.prog-hero { position: relative; overflow: hidden; background: var(--p-ground); }
+
+/* Football Academy: chalk pitch lines. */
+.prog--pathway { --p-ground: #0E1C14; }
+/* Holiday: brass ground, energetic stripes. */
+.prog--holiday { --p-ground: #C2A15B; }
+.prog--holiday .prog-hero { color: #0E1C14; }
+/* Chess: paper, the board. */
+.prog--board { --p-ground: #F5F2EA; }
+/* Yoga: a soft sage, calmer than paper. */
+.prog--breath { --p-ground: #E6ECE2; }
+/* Boxing: night, brass tape. */
+.prog--ring { --p-ground: #0B1610; }
+/* Dance: pitch green. */
+.prog--beat { --p-ground: #2D5016; }
+/* Individual training and events: night ground. */
+.prog--drill { --p-ground: #0E1C14; }
+.prog--event { --p-ground: #0B1610; }
+
+.stripe-band {
+  height: 18px;
+  background: repeating-linear-gradient(-45deg, #0E1C14 0 14px, #C2A15B 14px 28px);
+}
+
+.checker {
+  background-color: #F5F2EA;
+  background-image:
+    conic-gradient(#15241B 25%, transparent 0 50%, #15241B 0 75%, transparent 0);
+  background-size: var(--sq, 48px) var(--sq, 48px);
+}
+
+@keyframes breathe {
+  0%, 100% { transform: scale(0.92); opacity: 0.55; }
+  50% { transform: scale(1.06); opacity: 1; }
+}
+.breath-ring { transform-origin: center; animation: breathe 8s ease-in-out infinite; }
+.breath-ring:nth-child(2) { animation-delay: -2.6s; }
+.breath-ring:nth-child(3) { animation-delay: -5.2s; }
+
+@keyframes beat {
+  0%, 100% { transform: scaleY(0.35); }
+  50% { transform: scaleY(1); }
+}
+.beat-bar { transform-origin: bottom; animation: beat 1.4s ease-in-out infinite; }
+
+.tape {
+  background: repeating-linear-gradient(-55deg, #C2A15B 0 22px, #0B1610 22px 44px);
+}
+
 /* Everything that moves stops for anyone who has asked for less motion. */
 @media (prefers-reduced-motion: reduce) {
   *,
@@ -421,7 +578,25 @@
   }
   .photo:hover img { transform: none; }
   .kit-card:hover, .kit-card:hover .kit-photo { transform: none; }
+  .shop-bag, .shop-spark, .breath-ring, .beat-bar { animation: none !important; }
+  .shop-spark { opacity: 0; }
 }
 
 .scrollbar-hide::-webkit-scrollbar { display: none; }
 .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* Programme cards: their own ground, a small lift when you point at them. */
+.prog-tile { background: var(--p-ground); color: var(--color-white); transition: transform 0.25s cubic-bezier(0.34, 1.4, 0.64, 1), box-shadow 0.25s; }
+.prog-tile:hover, .prog-tile:focus-visible { transform: translateY(-4px); box-shadow: 6px 6px 0 #C2A15B; }
+
+/* Holiday sits on brass, so its accents switch to ink and pitch green. */
+.prog--holiday { --color-gold: #0E1C14; --color-gold-light: #2D5016; --color-fog: #1E2B22; --color-mute: #2E3A31; --color-white: #0E1C14; }
+.prog--holiday .tag { background: #0E1C14; color: #F5F2EA; box-shadow: 3px 3px 0 #F5F2EA; }
+/* Dance sits on pitch green, so its brass is lifted to keep small text readable. */
+.prog--beat { --color-gold: #E2CB8F; --color-gold-light: #F0DFB0; }
+/* Yoga's accent is the calm green, not brass. */
+.prog--breath { --color-gold: #2D6A3A; --color-gold-light: #1F4F2A; }
+
+@media (prefers-reduced-motion: reduce) {
+  .prog-tile:hover, .prog-tile:focus-visible { transform: none; }
+}

@@ -65,7 +65,7 @@ export const catalogue: ShopItem[] = [
   {
     id: 'floodlit-hoodie',
     name: 'Floodlit Hoodie',
-    description: 'Heavyweight black hoodie with the classic emblem in gold across the chest.',
+    description: 'Black hoodie with the classic emblem in gold across the chest.',
     image: { src: '/images/shop/floodlit-hoodie.webp', w: 1200, h: 1200 },
     options: SIZES,
     category: 'hoodies',
@@ -83,7 +83,7 @@ export const catalogue: ShopItem[] = [
   {
     id: 'classic-tee',
     name: 'Classic Tee',
-    description: 'White cotton tee with the classic emblem in black.',
+    description: 'White tee with the classic emblem in black.',
     image: { src: '/images/shop/classic-tee.webp', w: 1200, h: 1200 },
     options: SIZES,
     category: 'tees',
@@ -101,7 +101,7 @@ export const catalogue: ShopItem[] = [
   {
     id: 'captains-armband',
     name: 'Captain’s Armband',
-    description: 'Elastic captain’s band in black with the gold helmets. Lead the squad.',
+    description: 'Captain’s band in black with the gold helmets. Lead the squad.',
     image: { src: '/images/shop/captains-armband.webp', w: 1200, h: 1200 },
     options: ['Junior', 'Senior'],
     category: 'gear',
@@ -110,7 +110,7 @@ export const catalogue: ShopItem[] = [
   {
     id: 'arena-bottle',
     name: 'Arena Bottle',
-    description: 'Insulated steel bottle, matte black with the gold helmets. Cold through a full session.',
+    description: 'Matte black bottle with the gold helmets.',
     image: { src: '/images/shop/arena-bottle.webp', w: 1200, h: 1200 },
     category: 'gear',
     mark: 'helmets',

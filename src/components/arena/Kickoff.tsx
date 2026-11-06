@@ -10,7 +10,7 @@ import {
   useSyncExternalStore,
   type ReactNode,
 } from 'react';
-import { defaultKickoff, kickoffGroups } from '@/content/site';
+import { defaultKickoff, extraTime, isExtraTimeDay, isExtraTimeHours, kickoffGroups } from '@/content/site';
 import { arenaBookingUrl } from '@/lib/whatsapp';
 import { dayLabel, dayPhrase, fetchSlotHours, isPast, nairobiDate, rangeLabel, type SlotHours } from '@/lib/slots';
 
@@ -60,6 +60,21 @@ interface KickoffState {
 
 const KickoffContext = createContext<KickoffState | null>(null);
 
+/**
+ * Where the picker opens before the visitor touches it. Normally 20:00 today
+ * (tomorrow once 20:00 has gone). While Extra Time runs it opens on the next
+ * daytime hour that qualifies, so the offer is what people see first.
+ */
+function openingPick(now: Date | null): { time: string; offset: number } {
+  if (!now) return { time: defaultKickoff, offset: 0 };
+  if (isExtraTimeDay(nairobiDate(0, now))) {
+    const today = ALL_TIMES.find((time) => isExtraTimeHours(time) && !isPast(time, 0, now));
+    if (today) return { time: today, offset: 0 };
+    if (isExtraTimeDay(nairobiDate(1, now))) return { time: extraTime.defaultStart, offset: 1 };
+  }
+  return { time: defaultKickoff, offset: isPast(defaultKickoff, 0, now) ? 1 : 0 };
+}
+
 function buildDays(now: Date): Day[] {
   return Array.from({ length: DAYS_AHEAD }, (_, offset) => {
     const date = nairobiDate(offset, now);
@@ -77,14 +92,16 @@ const getMinute = () => Math.floor(Date.now() / REFRESH_MS);
 const getServerMinute = () => null;
 
 export function KickoffProvider({ children }: { children: ReactNode }) {
-  const [picked, setPickedState] = useState<string>(defaultKickoff);
+  const [chosenTime, setPickedState] = useState<string | null>(null);
   const [span, setSpan] = useState(1);
   const minute = useSyncExternalStore(subscribeMinute, getMinute, getServerMinute);
   const now = useMemo(() => (minute === null ? null : new Date(minute * REFRESH_MS)), [minute]);
-  // Until the visitor picks a day: today, or tomorrow once the default hour
-  // has gone, so the first request isn't for a time in the past.
+  // Until the visitor picks: the opening pick (see openingPick), so the first
+  // request isn't for a time in the past.
+  const opening = useMemo(() => openingPick(now), [now]);
+  const picked = chosenTime ?? opening.time;
   const [chosenOffset, setDayOffset] = useState<number | null>(null);
-  const dayOffset = chosenOffset ?? (now && isPast(defaultKickoff, 0, now) ? 1 : 0);
+  const dayOffset = chosenOffset ?? opening.offset;
   const [live, setLive] = useState<Live>(null);
 
   const days = useMemo(() => (now ? buildDays(now) : []), [now]);
@@ -137,7 +154,7 @@ export function KickoffProvider({ children }: { children: ReactNode }) {
       setDayOffset,
       live: live && live.date === date ? live : null,
       now,
-      href: arenaBookingUrl(picked, day?.phrase, span),
+      href: arenaBookingUrl(picked, day?.phrase, span, isExtraTimeDay(date) && isExtraTimeHours(picked, span)),
     }),
     [picked, span, setPicked, tapHour, days, day, live, date, now]
   );
@@ -213,6 +230,7 @@ export function KickoffChips() {
   }, [stateOf, picked, span, setPicked]);
 
   const freeCount = live ? ALL_TIMES.filter((time) => stateOf(time) === 'free').length : 0;
+  const extraDay = isExtraTimeDay(day?.date);
 
   return (
     <div className="flex flex-col gap-4">
@@ -252,12 +270,15 @@ export function KickoffChips() {
               {group.times.map((time) => {
                 const state = stateOf(time);
                 const unavailable = state === 'booked' || state === 'past';
+                const extra = extraDay && isExtraTimeHours(time) && !unavailable;
                 return (
                   <button
                     key={time}
                     type="button"
                     className="chip"
                     data-state={state}
+                    data-extra-time={extra ? 'true' : undefined}
+                    aria-describedby={extra ? 'extra-time-legend' : undefined}
                     aria-pressed={inRange(time)}
                     disabled={unavailable}
                     title={state === 'booked' ? 'Booked' : undefined}
@@ -271,6 +292,12 @@ export function KickoffChips() {
           </div>
         ))}
       </div>
+      {extraDay ? (
+        <p id="extra-time-legend" className="m-0 flex items-center gap-2 text-sm font-semibold text-white" data-testid="extra-time-legend">
+          <span aria-hidden="true" className="extra-dot inline-block h-2.5 w-2.5 rounded-full" />
+          {extraTime.legend}
+        </p>
+      ) : null}
       <p className="m-0 text-sm text-mute" data-testid="kickoff-hint">
         {span > 1
           ? `${span} hours picked. Tap either end to drop an hour.`
@@ -301,4 +328,10 @@ export function AskForKickoff({ className }: { className?: string }) {
 export function PickedTime() {
   const { label } = useKickoff();
   return <>{label}</>;
+}
+
+/** True when the picked day and hours qualify for Extra Time. */
+export function usePickedExtraTime(): boolean {
+  const { picked, span, day } = useKickoff();
+  return isExtraTimeDay(day?.date) && isExtraTimeHours(picked, span);
 }

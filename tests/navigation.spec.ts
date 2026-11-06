@@ -15,7 +15,7 @@ test.describe('phone menu', () => {
     await expect(menu).toBeVisible();
     const box = await menu.boundingBox();
     expect(box?.height ?? 0).toBeGreaterThan(400);
-    await menu.getByRole('link', { name: 'Programs' }).click();
+    await menu.getByRole('link', { name: 'Programmes' }).click();
     await expect(page).toHaveURL(/\/programs$/);
     await expect(menu).toBeHidden();
   });
@@ -36,10 +36,10 @@ test('the hero names the Arena as the home of football and fitness', async ({ pa
   await expect(page.locator('body')).not.toContainText(/let.s meet/i);
 });
 
-test('the kick-off picker covers the whole day, 06:00 to 23:00', async ({ page }) => {
+test('the kick-off picker on /book covers the whole day, 06:00 to 23:00', async ({ page }) => {
   await page.clock.setFixedTime(new Date('2026-10-23T02:00:00Z')); // 05:00 in Nairobi
   await page.route('**/public/slots**', (route) => route.abort());
-  await page.goto('/');
+  await page.goto('/book');
   const picker = page.getByTestId('kickoff-picker');
   await expect(picker.getByRole('button')).toHaveCount(18);
   await picker.getByRole('button', { name: '06:00' }).click();

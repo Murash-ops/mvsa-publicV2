@@ -1,0 +1,57 @@
+{
+  "_note": "Shown when the What's on sheet is not set up or cannot be reached. Same columns as docs/whats-on-template.csv. Every row passes the same checks as the sheet, and rows outside show_from/show_until are hidden automatically.",
+  "rows": [
+    {
+      "title": "Extra Time",
+      "kicker": "+30 min free",
+      "blurb": "30 minutes free on every booking. Say \"Extra Time\" when you book.",
+      "dates_text": "1–30 November",
+      "show_from": "2026-11-01",
+      "show_until": "2026-11-30",
+      "image": "/images/arena/morning-turf.webp",
+      "link_label": "Book a pitch",
+      "link_url": "/book",
+      "program_id": "",
+      "small_print": "Valid on bookings 6am–6pm, 1–30 Nov 2026."
+    },
+    {
+      "title": "Holiday Training",
+      "kicker": "School's out",
+      "blurb": "Coached sessions by age group, six days a week, with the green kit included.",
+      "dates_text": "Mon–Sat, 11am–1pm, to 19 December",
+      "show_from": "2026-10-26",
+      "show_until": "2026-12-19",
+      "image": "/images/arena/corner-flag-line.webp",
+      "link_label": "Register now",
+      "link_url": "/programs/holiday-training",
+      "program_id": "holiday-training",
+      "small_print": ""
+    },
+    {
+      "title": "Chess Club",
+      "kicker": "For children",
+      "blurb": "Real boards and our chess coach, every Saturday morning. First time? Just come at 10am.",
+      "dates_text": "Every Saturday, 10am",
+      "show_from": "",
+      "show_until": "",
+      "image": "/images/programs/chess-boards.webp",
+      "link_label": "About Chess Club",
+      "link_url": "/programs/chess-club",
+      "program_id": "chess-club",
+      "small_print": ""
+    },
+    {
+      "title": "Community Yoga",
+      "kicker": "Donation-based",
+      "blurb": "A gentle start to Friday on the covered pitch. Every level welcome; give what you can.",
+      "dates_text": "Every Friday, 9am",
+      "show_from": "",
+      "show_until": "",
+      "image": "/images/programs/yoga.webp",
+      "link_label": "About Community Yoga",
+      "link_url": "/programs/community-yoga",
+      "program_id": "community-yoga",
+      "small_print": ""
+    }
+  ]
+}

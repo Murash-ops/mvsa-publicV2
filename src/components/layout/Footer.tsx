@@ -4,8 +4,11 @@ import { contact, social } from '@/content/site';
 import { getAcademyPrograms } from '@/lib/academy-programs';
 
 const pages = [
+  { href: '/whats-on', label: "What's on" },
   { href: '/book', label: 'Book the Arena' },
-  { href: '/programs', label: 'Programs' },
+  { href: '/book#meeting-room', label: 'Meeting room' },
+  { href: '/shop', label: 'Shop' },
+  { href: '/programs', label: 'Programmes' },
   { href: '/about', label: 'About' },
   { href: '/contact', label: 'Contact' },
 ];
@@ -36,11 +39,11 @@ export default function Footer() {
           </div>
 
           <div className="flex flex-col">
-            <h2 className="label text-base tracking-[0.14em] text-white">Programs</h2>
+            <h2 className="label text-base tracking-[0.14em] text-white">Programmes</h2>
             <ul>
               {programs.map((program) => (
                 <li key={program.id}>
-                  <Link href={`/programs/${program.id}`} className={linkClass}>
+                  <Link href={`/programs/${program.slug}`} className={linkClass}>
                     {program.name}
                   </Link>
                 </li>

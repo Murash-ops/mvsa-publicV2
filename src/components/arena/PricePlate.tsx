@@ -1,7 +1,7 @@
 import { home } from '@/content/site';
 
 /**
- * "The Arena from KES 1,500 per hour", with a light travelling round its
+ * "The Arena from KSH 1,500 per hour", with a brass ring round its
  * border. Read from home.pricing so the figure lives in one place.
  */
 export default function PricePlate({ className }: { className?: string }) {

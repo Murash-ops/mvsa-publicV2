@@ -1,57 +1,62 @@
-import Link from 'next/link';
 import type { Metadata } from 'next';
 import PageHeader from '@/components/arena/PageHeader';
+import ProgramTile from '@/components/programs/ProgramTile';
 import { getAcademyPrograms } from '@/lib/academy-programs';
 import { contact } from '@/content/site';
 import { whatsappUrl } from '@/lib/whatsapp';
 
 export const metadata: Metadata = {
-  title: 'Programs | Mountain View Sports Arena',
-  description: 'Football Academy, Chess Club, Boxing, Community Yoga and Dance & Rhythm at the Arena.',
+  title: 'Programmes | Mountain View Sports Arena',
+  description:
+    'Football Academy, Holiday Training, Chess Club, Community Yoga, Boxing, Dance & Rhythm, individual training and events at the Arena.',
 };
 
 /**
  * Programme data comes from src/lib/academy-programs: checked-in seed data,
- * because the backend contract has no programmes endpoint. See that module and
- * docs/backend-migration.md before wiring this page to anything live.
+ * because the backend contract has no programmes endpoint. Each card opens the
+ * programme's own page, which carries its own share card.
  */
 export default function ProgramsPage() {
   const programs = getAcademyPrograms();
+  const academy = programs.filter((p) => p.type === 'academy');
+  const rest = programs.filter((p) => p.type !== 'academy');
 
   return (
     <main className="theme-light">
       <PageHeader
-        eyebrow="Programs"
+        eyebrow="Programmes"
         titleTop="More than"
         titleBottom="a pitch"
-        intro="Football, chess, boxing, yoga and dance at the Arena. Ask the academy line to join any of them."
+        intro="Football, chess and dance with the Academy; yoga and boxing for adults; your own session or your own event on the Arena. Every programme has its own page to share."
       >
         <a
-          href={whatsappUrl(contact.academyWhatsappNumber)}
+          href={whatsappUrl(contact.whatsappNumber, "Hi MVSA, I'd like to know more about your programmes")}
           target="_blank"
           rel="noopener noreferrer"
           className="btn btn-outline-gold self-start"
         >
-          Academy · {contact.academyPhone}
+          Ask us on WhatsApp
         </a>
       </PageHeader>
 
-      <section className="wrap pb-[clamp(56px,7vw,88px)]">
-        <div className="grid gap-3.5 [grid-template-columns:repeat(auto-fit,minmax(220px,1fr))]">
-          {programs.map((program, i) => (
-            <article
-              key={program.id}
-              className="rise flex min-h-[200px] flex-col gap-3 border border-t-4 border-white/10 border-t-grass bg-surface px-6 py-7"
-              style={{ animationDelay: `${(i * 0.07).toFixed(2)}s` }}
-            >
-              <span className="label text-[13px] text-gold">{program.age_group}</span>
-              <h2 className="display m-0 text-[32px] leading-[0.92]">{program.name}</h2>
-              <p className="label m-0 text-base tracking-[0.06em] text-white">{program.schedule}</p>
-              <p className="m-0 grow text-base leading-normal text-fog">{program.description}</p>
-              <Link href={`/programs/${program.id}`} className="text-link text-base" aria-label={`More about ${program.name}`}>
-                More about it
-              </Link>
-            </article>
+      <section className="wrap flex flex-col gap-5 pb-12" aria-labelledby="academy-title">
+        <h2 id="academy-title" className="h-section text-[clamp(28px,3vw,40px)]">
+          Mountain View Sports Academy
+        </h2>
+        <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+          {academy.map((program) => (
+            <ProgramTile key={program.id} program={program} />
+          ))}
+        </div>
+      </section>
+
+      <section className="wrap flex flex-col gap-5 pb-[clamp(56px,7vw,88px)]" aria-labelledby="more-title">
+        <h2 id="more-title" className="h-section text-[clamp(28px,3vw,40px)]">
+          Fitness, training and events
+        </h2>
+        <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+          {rest.map((program) => (
+            <ProgramTile key={program.id} program={program} />
           ))}
         </div>
       </section>

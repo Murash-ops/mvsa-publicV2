@@ -11,10 +11,17 @@
  * hire". The surface may be described once as synthetic turf.
  *
  * Only facts the owner has approved appear here: open every day 06:00 to
- * midnight; the Arena from KES 1,500 an hour, whole hours, one hour minimum;
+ * midnight; the Arena from KSH 1,500 an hour, whole hours, one hour minimum;
  * the two booking lines, the academy line, the email and the handle. No other
  * price band is ever shown.
  */
+
+/**
+ * The public address of the site, used for share links and share cards.
+ * Previews on Vercel still share the live address on purpose: that is the
+ * link people should pass on.
+ */
+export const siteOrigin = 'https://www.mvsa.co.ke';
 
 export interface ContactChannel {
   name: string;
@@ -41,7 +48,7 @@ export const contact = {
   channels: [
     { name: 'Arena bookings', value: '0798 258 950', href: 'tel:+254798258950' },
     { name: 'Arena bookings, second line', value: '0783 209 442', href: 'tel:+254783209442' },
-    { name: 'Academy & programs', value: '0116 619 476', href: 'tel:+254116619476' },
+    { name: 'Academy & programmes', value: '0116 619 476', href: 'tel:+254116619476' },
     {
       name: 'Email',
       value: 'mtviewsportsarena@gmail.com',
@@ -72,72 +79,101 @@ export const kickoffGroups = [
 ] as const;
 export const defaultKickoff = '20:00';
 
+/**
+ * Extra Time (MVSA/social/brand.md, Campaign facts): 30 minutes free on a
+ * booking, advertised 1–30 November 2026 and valid only on bookings from 6am
+ * to 6pm. While it runs, the picker on /book opens on a daytime hour and marks
+ * the hours that qualify. It switches itself off after 30 November.
+ */
+export const extraTime = {
+  from: '2026-11-01',
+  until: '2026-11-30',
+  /** Start hours that end by 6pm. */
+  firstStart: 6,
+  lastEnd: 18,
+  /** What the daytime default is when the picker opens on another day. */
+  defaultStart: '10:00',
+  headline: '+30 MIN FREE',
+  note: 'on bookings 6am–6pm, 1–30 Nov. Say “Extra Time” when you book.',
+  legend: 'Extra Time: +30 min free on these hours',
+} as const;
+
+/** True on a day (YYYY-MM-DD, Nairobi) when Extra Time applies. */
+export function isExtraTimeDay(date: string | null | undefined): boolean {
+  return Boolean(date && date >= extraTime.from && date <= extraTime.until);
+}
+
+/** True when a booking from this hour, for this many hours, ends by 6pm. */
+export function isExtraTimeHours(start: string, hours = 1): boolean {
+  const h = Number(start.slice(0, 2));
+  return h >= extraTime.firstStart && h + hours <= extraTime.lastEnd;
+}
+
 export const home = {
   hero: {
     titleTop: 'Your home of',
     titleBottom: 'football and fitness',
     body:
-      'Floodlit 5-aside on synthetic turf, behind Mountain View Mall on Waiyaki Way. Book an hour, bring your squad, play until midnight.',
-    imageAlt: 'The synthetic pitch at Mountain View Sports Arena, lines running toward the goal',
+      'A covered, floodlit 5-aside pitch behind Mountain View Mall on Waiyaki Way, with the Academy, Chess Club, yoga, a meeting room and our own kit. Open every day.',
+    imageAlt: 'The covered pitch at Mountain View Sports Arena from a corner: the roof, the goals and the centre circle',
   },
   /**
    * The headline Arena price, set by the owner as marketing copy. The home
-   * page leads with KES 1,500 and never lists any other band.
+   * page leads with KSH 1,500 and never lists any other band.
    */
   pricing: {
     eyebrow: 'Arena hire',
     name: 'The Arena',
-    headline: 'From KES 1,500',
+    headline: 'From KSH 1,500',
     unit: 'per hour',
     terms: 'whole hours',
     note: 'Full-day hire, meeting room and events: call or WhatsApp reception.',
   },
-  marquee: ['Play', 'Compete', 'Connect', 'Floodlit 5-aside', 'Open until midnight', 'Waiyaki Way'],
-  kickoff: {
-    titleTop: 'Pick your',
-    titleBottom: 'kick-off',
-    body: 'Choose a time and we’ll open WhatsApp with your request ready to send. Reception confirms the slot.',
-    markerCaption: 'Your squad’s time',
-  },
-  bento: {
-    titleTop: 'Built for',
-    titleBottom: 'match night',
-    tiles: [
-      {
-        tag: 'Under the lights',
-        title: 'Floodlit to midnight',
-        body: 'Shadow-free light across the whole pitch, so the late kick-off plays like the first.',
-        cols: 2,
-        rows: 2,
-        size: 'lg',
-        img: '/images/gallery/shot-01.webp',
-      },
-      { tag: 'Kit', title: 'Changing rooms & lockers', body: 'Change on site and lock your gear away.', cols: 2, rows: 1, size: 'md' },
-      { tag: 'Between games', title: 'Free Wi-Fi & water', body: 'Stay connected and refill whenever you need.', cols: 1, rows: 1, size: 'sm' },
-      { tag: 'Flexible', title: '1 hour minimum', body: 'Whole hours, 06:00 to midnight.', cols: 1, rows: 1, size: 'sm' },
-      { tag: 'Teams & events', title: 'Meeting room', body: 'Team talks, training sessions and small events. Ask reception.', cols: 2, rows: 1, size: 'md' },
-      { tag: 'Arena shop', title: 'Kit & balls', body: 'Tees, jerseys, trainers, yoga kit and balls. Ask what’s in today.', cols: 2, rows: 1, size: 'md' },
-    ],
-  },
-  week: {
-    titleTop: 'This week',
-    titleBottom: 'at the Arena',
-    body: 'The Arena is open every day. Regular sessions run on Saturdays.',
-    fixtures: [
-      { day: 'Daily', time: '06:00 – 00:00', what: 'The Arena is open for bookings', cta: 'Book', line: 'bookings' },
-      { day: 'Sat', time: '10:00', what: 'Chess Club', cta: 'Join', line: 'academy' },
-      { day: 'Sat', time: '14:00 – 16:00', what: 'Football Academy', cta: 'Join', line: 'academy' },
-      { day: 'Any day', time: 'On request', what: 'Full-day hire & events', cta: 'Ask', line: 'bookings' },
-    ],
+  marquee: ['Play', 'Compete', 'Connect', 'Covered & floodlit', 'Open every day', 'Waiyaki Way'],
+  whatsOn: {
+    title: 'What’s on',
+    body: 'Offers, the holiday programme and the regular sessions at the Arena right now.',
+    empty: 'Nothing special this week: the Arena is open every day for bookings, and the regular sessions carry on.',
   },
   programs: {
     titleTop: 'More than',
     titleBottom: 'a pitch',
+    body: 'Football, chess, yoga, boxing and dance, for children and adults. Every programme has its own page you can share.',
+  },
+  bento: {
+    titleTop: 'Built for',
+    titleBottom: 'match day',
+    tiles: [
+      {
+        tag: 'Under the roof',
+        title: 'Covered and floodlit',
+        body: 'Rain or sun, morning or late: the pitch plays the same under the roof and the lights.',
+        cols: 2,
+        rows: 2,
+        size: 'lg',
+        img: '/images/arena/pitch-corner.webp',
+      },
+      { tag: 'Every day', title: 'Open 6am to midnight', body: 'Early kick-off before work or the last game of the night.', cols: 2, rows: 1, size: 'md' },
+      { tag: 'Flexible', title: '1 hour minimum', body: 'Book in whole hours.', cols: 1, rows: 1, size: 'sm' },
+      { tag: 'Plan ahead', title: 'Up to a month ahead', body: 'Or book the same day.', cols: 1, rows: 1, size: 'sm' },
+    ],
+  },
+  meetingRoom: {
+    titleTop: 'Your meeting.',
+    titleBottom: 'Our room.',
+    body: 'A quiet, bright room for small businesses, NGOs, church groups, tutors, interviews and trainings. KSH 1,000 an hour.',
+    cta: 'Book the meeting room',
+  },
+  shop: {
+    titleTop: 'Wear',
+    titleBottom: 'the Arena',
+    body: 'Hoodies, tees, captain’s armbands and bottles with the Arena’s marks. Pick your size and order on WhatsApp.',
+    cta: 'Visit the shop',
   },
   photos: [
-    { src: '/images/gallery/shot-01.webp', alt: 'The full pitch under the arena roof' },
+    { src: '/images/arena/morning-turf.webp', alt: 'Morning light across the turf to the stand' },
     { src: '/images/gallery/shot-18.webp', alt: 'Corner line on the synthetic turf' },
-    { src: '/images/gallery/shot-08.webp', alt: 'Low view across the pitch' },
+    { src: '/images/arena/touchline.webp', alt: 'The touchline running the length of the covered pitch' },
     { src: '/images/gallery/shot-02.webp', alt: 'Floodlights and seating beside the pitch' },
   ],
   closing: {
@@ -155,14 +191,14 @@ export const about = {
   intro:
     'Mountain View Sports Arena is a floodlit 5-aside pitch behind Mountain View Mall on Waiyaki Way, open every day from 06:00 to midnight.',
   story: [
-    'We built the Arena so the neighbourhood has a proper place to play: a synthetic pitch under floodlights, somewhere to change, and a reception team to sort out your booking.',
+    'We built the Arena so the neighbourhood has a proper place to play: a covered synthetic pitch under floodlights, and a reception team to sort out your booking.',
     'Book an hour for your five-a-side, bring the children to the academy on a Saturday, or use the meeting room for a team talk. Whatever brings you, the lights stay on until midnight.',
   ],
   amenities: [
     { title: 'Floodlit to midnight', body: 'Play late, every day of the week.' },
-    { title: 'Changing rooms & lockers', body: 'Change on site and lock your gear away.' },
-    { title: 'Free Wi-Fi & water', body: 'Stay connected and refill whenever you need.' },
-    { title: 'Meeting room', body: 'Team talks, training sessions and small events. Ask reception.' },
+    { title: 'Covered pitch', body: 'The roof keeps the game on in sun or rain.' },
+    { title: 'Up to a month ahead', body: 'Book whole hours, or the same day.' },
+    { title: 'Meeting room', body: 'Meetings, interviews and trainings. KSH 1,000 an hour.' },
   ],
   photos: [
     { src: '/images/gallery/shot-03.webp', alt: 'The pitch end to end, goals in frame' },
@@ -178,15 +214,42 @@ export const about = {
 } as const;
 
 export const booking = {
-  eyebrow: 'Book the Arena',
-  titleTop: 'Book',
-  titleBottom: 'the Arena',
-  intro: 'The Arena from KES 1,500 an hour. Whole hours, one hour minimum, every day 06:00 to midnight.',
+  eyebrow: 'Bookings',
+  titleTop: 'Book the Arena',
+  titleBottom: 'or the room',
+  intro: 'The pitch from KSH 1,500 an hour, or the meeting room at KSH 1,000 an hour. Open every day, 06:00 to midnight.',
   /** The one calm block shown while online booking is not available. */
   offline: {
     title: 'Book on WhatsApp or by phone',
     body: 'Pick a kick-off and we’ll open WhatsApp with your request ready to send. Reception checks the diary and confirms your slot.',
     coming: 'Online booking is coming. Until then, reception books every slot by hand.',
     retry: 'Check for live times',
+    /** Under the picked hour on the 3D pitch. */
+    markerCaption: 'Your squad’s time',
   },
+} as const;
+
+/**
+ * The meeting room. No capacity figure and no price are published: the room
+ * is set up for the group, and reception quotes on WhatsApp.
+ */
+export const meetingRoom = {
+  eyebrow: 'Meeting room',
+  titleTop: 'Your meeting.',
+  titleBottom: 'Our room.',
+  price: 'KSH 1,000 an hour',
+  lede:
+    'A quiet, bright room at the Arena, away from the office and the noise: rows of chairs, a table up front, a whiteboard and a long wall of windows.',
+  /** Who it is for, in their words. */
+  audience: ['Small businesses', 'NGOs', 'Church groups', 'Tutors', 'Interviews', 'Trainings'],
+  photoAlt: 'The meeting room: rows of green chairs facing a table and a whiteboard, windows along one wall',
+  uses: [
+    { id: 'meeting', label: 'Meeting', body: 'Planning days, board meetings, team talks.' },
+    { id: 'interview', label: 'Interview', body: 'A private, quiet room to meet candidates.' },
+    { id: 'training', label: 'Training', body: 'Chairs in rows, a whiteboard, a table up front.' },
+    { id: 'class', label: 'Class', body: 'Tutoring, workshops and group study.' },
+  ],
+  features: ['Whiteboard', 'Daylight from a wall of windows', 'Table at the front', 'Rows of chairs'],
+  combo: 'Make a day of it: meet in the room, then play on the pitch.',
+  note: 'Tell us the day, the time and how many people. Reception confirms on WhatsApp.',
 } as const;

@@ -40,7 +40,7 @@ export const venues: VenuePresentation[] = [
     activityId: 'turf_hire',
     badge: 'Floodlit 5-aside',
     imageUrl: '/images/gallery/shot-03.webp',
-    blurb: 'Floodlit 5-aside, open until midnight. From KES 1,500 an hour.',
+    blurb: 'Covered, floodlit 5-aside, open every day. From KSH 1,500 an hour.',
   },
   {
     resourceId: 'res_meeting_room',
@@ -49,8 +49,8 @@ export const venues: VenuePresentation[] = [
     kind: 'meeting_room',
     activityId: 'meeting_room',
     badge: 'Teams & events',
-    imageUrl: '/images/gallery/shot-14.webp',
-    blurb: 'A quiet room for team talks, training sessions and small events.',
+    imageUrl: '/images/arena/meeting-room.webp',
+    blurb: 'A quiet, bright room for meetings, interviews, trainings and workshops.',
   },
 ];
 

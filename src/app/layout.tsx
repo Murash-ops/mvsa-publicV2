@@ -1,15 +1,19 @@
 import type { Metadata, Viewport } from 'next';
-import { Bebas_Neue, Barlow, Barlow_Condensed } from 'next/font/google';
+import { Big_Shoulders, Barlow, Barlow_Condensed } from 'next/font/google';
 import './globals.css';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import WhatsAppButton from '@/components/layout/WhatsAppButton';
 
-const bebas = Bebas_Neue({
-  variable: '--font-bebas',
+// The display face of MVSA's design system (Big Shoulders, heaviest weight,
+// display optical size). Variable, so one file covers every heading.
+const shoulders = Big_Shoulders({
+  variable: '--font-shoulders',
   subsets: ['latin'],
-  weight: '400',
+  axes: ['opsz'],
   display: 'swap',
+  // next/font has no metrics for this family, so it cannot size a fallback.
+  adjustFontFallback: false,
 });
 
 const barlow = Barlow({
@@ -38,7 +42,7 @@ export const metadata: Metadata = {
   metadataBase: siteUrl(),
   title: 'Mountain View Sports Arena | Your home of football and fitness',
   description:
-    'Floodlit 5-aside at the Arena, behind Mountain View Mall on Waiyaki Way. Open every day, 06:00 to midnight. Book on WhatsApp.',
+    'A covered, floodlit 5-aside pitch behind Mountain View Mall on Waiyaki Way, with the Academy, Chess Club, yoga, a meeting room and the Arena shop. Open every day, 6am to midnight.',
   openGraph: {
     title: 'Your home of football and fitness',
     description:
@@ -62,7 +66,7 @@ export default function RootLayout({
 }>) {
   return (
     // The font variables sit on <html> so the theme tokens on :root can see them.
-    <html lang="en" className={`${bebas.variable} ${barlow.variable} ${barlowCondensed.variable}`}>
+    <html lang="en" className={`${shoulders.variable} ${barlow.variable} ${barlowCondensed.variable}`}>
       <body className="min-h-screen flex flex-col">
         <Navbar />
         <div className="flex-1">{children}</div>

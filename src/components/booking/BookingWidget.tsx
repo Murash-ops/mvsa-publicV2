@@ -28,6 +28,7 @@ import { format, addDays, isSameDay } from 'date-fns';
 import Image from 'next/image';
 import Link from 'next/link';
 import { AskForKickoff, KickoffChips, KickoffProvider } from '@/components/arena/Kickoff';
+import Pitch3D from '@/components/arena/Pitch3D';
 import { booking as bookingCopy } from '@/content/site';
 import type { VenuePresentation } from '@/content/venues';
 import type {
@@ -389,29 +390,38 @@ export default function BookingWidget({
   if (showOffline && !hold && !booking) {
     return (
       <KickoffProvider>
+        {/* Phone: heading, the pitch, then the picker. Desktop: the picker on
+            the left, the pitch beside it showing the picked hour. */}
         <section
-          className="flex flex-col gap-6 border border-t-4 border-white/10 border-t-gold bg-surface p-[clamp(20px,4vw,44px)]"
+          className="grid gap-6 border border-t-4 border-white/10 border-t-gold bg-surface p-[clamp(20px,4vw,44px)] lg:grid-cols-[minmax(0,6fr)_minmax(0,5fr)] lg:gap-x-10"
           data-testid="booking-offline"
           aria-labelledby="booking-offline-title"
         >
-          <h2 id="booking-offline-title" className="display m-0 text-[clamp(32px,3.6vw,44px)] leading-[0.9]">
-            {bookingCopy.offline.title}
-          </h2>
-          <p className="m-0 max-w-[620px] text-base leading-[1.55] text-fog">{bookingCopy.offline.body}</p>
-          <KickoffChips />
-          <div className="flex flex-wrap gap-3">
-            <AskForKickoff />
-            <a href={bookingsPhoneHref} className="btn btn-ghost" data-testid="phone-route">
-              Call {bookingsPhone}
-            </a>
+          <div className="flex min-w-0 flex-col gap-4">
+            <h2 id="booking-offline-title" className="display m-0 text-[clamp(32px,3.6vw,44px)] leading-[0.9]">
+              {bookingCopy.offline.title}
+            </h2>
+            <p className="m-0 max-w-[620px] text-base leading-[1.55] text-fog">{bookingCopy.offline.body}</p>
           </div>
-          <div className="flex flex-wrap items-center justify-between gap-3 border-t border-white/10 pt-5">
+          <div className="min-w-0 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:self-center">
+            <Pitch3D caption={bookingCopy.offline.markerCaption} />
+          </div>
+          <div className="flex min-w-0 flex-col gap-6">
+            <KickoffChips />
+            <div className="flex flex-wrap gap-3">
+              <AskForKickoff />
+              <a href={bookingsPhoneHref} className="btn btn-ghost" data-testid="phone-route">
+                Call {bookingsPhone}
+              </a>
+            </div>
+          </div>
+          <div className="flex flex-wrap items-center justify-between gap-3 border-t border-white/10 pt-5 lg:col-span-2">
             <p className="m-0 text-base text-mute">{bookingCopy.offline.coming}</p>
             <button
               type="button"
               onClick={() => void loadSlots()}
               disabled={isLoadingSlots}
-              className="text-link text-[13px] disabled:opacity-60"
+              className="text-link text-[15px]"
               data-testid="retry-availability"
             >
               {isLoadingSlots ? 'Checking…' : bookingCopy.offline.retry}

@@ -1,9 +1,9 @@
 import { test, expect } from '@playwright/test';
 
-test('the home page leads with the KES 1,500 turf price', async ({ page }) => {
+test('the home page leads with the KSH 1,500 Arena price', async ({ page }) => {
   await page.goto('/');
   const price = page.getByTestId('pricing-headline');
-  await expect(price).toContainText('From KES 1,500');
+  await expect(price).toContainText('From KSH 1,500');
   await expect(price).toContainText('per hour');
 });
 

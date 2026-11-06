@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, type MouseEvent } from 'react';
-import { PickedTime } from './Kickoff';
+import { PickedTime, usePickedExtraTime } from './Kickoff';
+import { extraTime } from '@/content/site';
 
 const REST = { rx: 52, rz: -16 };
 
@@ -9,9 +10,15 @@ function prefersReducedMotion(): boolean {
   return typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 }
 
-/** The pitch drawn in 3D, tilting with the mouse, the picked hour floating over it. */
+/**
+ * The pitch drawn in 3D, tilting with the mouse, the picked hour floating
+ * over it. During Extra Time a daytime pick also shows "+30 MIN FREE". It
+ * keeps still for anyone who prefers reduced motion (the tilt is skipped and
+ * the float stops in globals.css).
+ */
 export default function Pitch3D({ caption }: { caption: string }) {
   const [tilt, setTilt] = useState(REST);
+  const extra = usePickedExtraTime();
 
   const onMove = (event: MouseEvent<HTMLDivElement>) => {
     if (prefersReducedMotion()) return;
@@ -27,10 +34,11 @@ export default function Pitch3D({ caption }: { caption: string }) {
     <div
       onMouseMove={onMove}
       onMouseLeave={() => setTilt(REST)}
-      className="flex h-[clamp(260px,46vw,380px)] min-w-0 flex-[1_1_520px] items-center justify-center [perspective:1100px] bg-[radial-gradient(ellipse_60%_55%_at_50%_55%,rgba(63,163,77,0.22),transparent_70%)]"
+      className="flex h-[200px] w-full min-w-0 items-center justify-center [perspective:1100px] bg-[radial-gradient(ellipse_60%_55%_at_50%_55%,rgba(63,163,77,0.22),transparent_70%)] sm:h-[clamp(260px,40vw,380px)]"
+      data-testid="pitch-3d"
     >
       <div
-        className="relative aspect-[520/340] w-[76%] sm:w-[86%] max-w-[540px] [transform-style:preserve-3d] transition-transform duration-[350ms] ease-out"
+        className="relative aspect-[520/340] w-[70%] sm:w-[86%] max-w-[540px] [transform-style:preserve-3d] transition-transform duration-[350ms] ease-out"
         style={{ transform: `rotateX(${tilt.rx}deg) rotateZ(${tilt.rz}deg)` }}
       >
         <div
@@ -53,10 +61,19 @@ export default function Pitch3D({ caption }: { caption: string }) {
         <div aria-hidden="true" className={`${lamp} -top-2 -right-2`} />
         <div aria-hidden="true" className={`${lamp} -bottom-2 -left-2`} />
         <div aria-hidden="true" className={`${lamp} -bottom-2 -right-2`} />
-        <div className="pitch-marker absolute top-1/2 left-1/2 -mt-[34px] -ml-[92px] flex w-[184px] flex-col items-center gap-0.5 border-2 border-gold bg-ink px-3.5 py-2.5 shadow-[0_16px_30px_rgba(0,0,0,0.5)]">
-          <span className="display text-[28px] leading-none text-gold">
+        <div
+          className="pitch-marker absolute top-1/2 left-1/2 -mt-[34px] -ml-[92px] flex w-[184px] flex-col items-center gap-0.5 border-2 border-gold bg-ink px-3.5 py-2.5 shadow-[0_16px_30px_rgba(0,0,0,0.5)]"
+          data-testid="pitch-marker"
+          aria-live="polite"
+        >
+          <span className="display text-[28px] leading-none text-gold" data-testid="pitch-marker-time">
             <PickedTime />
           </span>
+          {extra ? (
+            <span className="display text-[20px] leading-none text-white" data-testid="pitch-marker-extra">
+              {extraTime.headline}
+            </span>
+          ) : null}
           <span className="label text-sm tracking-[0.14em]">{caption}</span>
         </div>
       </div>

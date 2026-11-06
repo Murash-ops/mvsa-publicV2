@@ -25,11 +25,17 @@
  * See docs/backend-migration.md, gaps 2 and 3.
  */
 
-export type AcademyProgramType = 'academy' | 'fitness';
+export type AcademyProgramType = 'academy' | 'fitness' | 'arena';
 
 export interface AcademyProgram {
   /** Mirrors the backend activity_id in GET /v1/activities, for a later swap. */
   id: string;
+  /**
+   * The shareable address: /programs/<slug>. Lowercase words and hyphens, so
+   * a link pasted into WhatsApp reads like what it is. Old /programs/<id>
+   * links redirect here (see next.config.ts).
+   */
+  slug: string;
   name: string;
   type: AcademyProgramType;
   /** Human schedule line, as published by the venue. */
@@ -42,55 +48,99 @@ export interface AcademyProgram {
   booking_mode: 'enquiry_only';
 }
 
+/*
+ * Facts below come from MVSA/social/brand.md (Programmes, and Campaign facts
+ * for November to December 2026). Where brand.md says CONFIRM, the schedule
+ * says "ask" rather than guessing a day or a time.
+ */
 const SEED: AcademyProgram[] = [
   {
     id: 'football_academy',
+    slug: 'football-academy',
     name: 'Football Academy',
-    // The academy trains on the Arena, so this photograph is of the real
-    // place, with nobody in it. The other four programmes have no photograph
-    // on purpose: a caption the picture does not support is worse than none.
-    image_url: '/images/gallery/shot-04.webp',
+    image_url: '/images/programs/boots-and-ball.webp',
     type: 'academy',
     schedule: 'Saturdays, 2–4pm',
-    age_group: 'Ages 6–16',
+    age_group: 'Young players',
     description:
-      'Youth football on the Arena every Saturday afternoon: technique, small-sided games and match play, led by the academy coaches.',
+      'Youth football on the Arena every Saturday afternoon: technique, small-sided games and match play, with the academy coaches.',
+    booking_mode: 'enquiry_only',
+  },
+  {
+    id: 'holiday_training',
+    slug: 'holiday-training',
+    name: 'Holiday Training',
+    image_url: '/images/arena/corner-flag-line.webp',
+    type: 'academy',
+    schedule: 'Mon–Sat, 11am–1pm, to 19 December',
+    age_group: 'Under 11 to Under 15, and goalkeepers',
+    description:
+      'School’s out, so the Academy trains six days a week: coached sessions by age group, green kit included, through to Saturday 19 December.',
     booking_mode: 'enquiry_only',
   },
   {
     id: 'chess',
+    slug: 'chess-club',
     name: 'Chess Club',
+    image_url: '/images/programs/chess-boards.webp',
     type: 'academy',
     schedule: 'Saturdays, 10am',
-    age_group: 'All ages',
-    description: 'Chess on Saturday mornings, for beginners and for players who want a proper game.',
-    booking_mode: 'enquiry_only',
-  },
-  {
-    id: 'boxing',
-    name: 'Boxing',
-    type: 'fitness',
-    schedule: 'Ask reception for class times',
-    age_group: 'Adults',
-    description: 'Conditioning, pad work and technique, from a first session to regular training.',
+    age_group: 'For children',
+    description:
+      'Chess for children every Saturday at 10am, with our chess coach. First time? Just come at 10am.',
     booking_mode: 'enquiry_only',
   },
   {
     id: 'community_yoga',
+    slug: 'community-yoga',
     name: 'Community Yoga',
+    image_url: '/images/programs/yoga.webp',
     type: 'fitness',
-    schedule: 'Ask reception for class times',
+    schedule: 'Fridays, 9am',
     age_group: 'All levels',
-    description: 'A yoga class open to everyone, whatever your level.',
+    description: 'A donation-based yoga class on the covered pitch every Friday morning. Give what you can.',
+    booking_mode: 'enquiry_only',
+  },
+  {
+    id: 'boxing',
+    slug: 'boxing',
+    name: 'Boxing',
+    type: 'fitness',
+    schedule: 'Sundays, 3pm',
+    age_group: '',
+    description: 'Boxing at the Arena, Sundays at 3pm. WhatsApp us for details.',
     booking_mode: 'enquiry_only',
   },
   {
     id: 'dance',
+    slug: 'dance',
     name: 'Dance & Rhythm',
     type: 'academy',
-    schedule: 'Ask reception for class times',
-    age_group: 'Ages 6–16',
-    description: 'Rhythm, movement and choreography classes for children.',
+    schedule: 'Coming soon',
+    age_group: '',
+    description: 'Coming soon. WhatsApp us to hear first.',
+    booking_mode: 'enquiry_only',
+  },
+  {
+    id: 'individual_training',
+    slug: 'individual-training',
+    name: 'Individual Training',
+    image_url: '/images/arena/turf-close.webp',
+    type: 'arena',
+    schedule: 'Any day, by arrangement',
+    age_group: 'One to five players',
+    description: 'Your own session on the Arena, for one player or a small group of up to five.',
+    booking_mode: 'enquiry_only',
+  },
+  {
+    id: 'events',
+    slug: 'events',
+    name: 'Events',
+    image_url: '/images/programs/night-game.webp',
+    type: 'arena',
+    schedule: 'Any day, 6am to midnight',
+    age_group: 'Teams and groups',
+    description: 'Events on a covered, floodlit pitch, with a PA system on request.',
     booking_mode: 'enquiry_only',
   },
 ];
@@ -100,6 +150,7 @@ export function getAcademyPrograms(): AcademyProgram[] {
   return SEED;
 }
 
-export function getAcademyProgram(id: string): AcademyProgram | undefined {
-  return SEED.find((program) => program.id === id);
+/** Finds a programme by its slug, or by its backend id for old links. */
+export function getAcademyProgram(slugOrId: string): AcademyProgram | undefined {
+  return SEED.find((program) => program.slug === slugOrId || program.id === slugOrId);
 }

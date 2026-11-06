@@ -11,7 +11,7 @@ interface PageHeaderProps {
   children?: ReactNode;
 }
 
-/** The top of every inner page: gold label, big Bebas title, a line of copy. */
+/** The top of every inner page: gold label, big display title, a line of copy. */
 export default function PageHeader({ eyebrow, titleTop, titleBottom, intro, image, children }: PageHeaderProps) {
   return (
     <section className={`relative overflow-hidden ${image ? 'flex min-h-[360px] items-end' : ''}`}>
