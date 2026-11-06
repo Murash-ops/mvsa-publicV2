@@ -87,10 +87,10 @@ export const stories: ProgramStory[] = [
     theme: 'pathway',
     kicker: 'Mountain View Sports Academy',
     headline: ['Football', 'Academy'],
-    focal: 'Sat 2–4pm',
-    focalLabel: 'Every Saturday',
+    focal: 'Sat & Sun',
+    focalLabel: 'Every weekend',
     lede:
-      'Young players learn the game properly on the Arena every Saturday afternoon: first touch, then small-sided games, then match play, with the academy coaches.',
+      'Players aged 6 to 17 learn the game properly on the Arena every Saturday and Sunday: first touch, then small-sided games, then match play, with the academy coaches.',
     photo: {
       src: '/images/programs/boots-and-ball.webp',
       alt: 'Boots, a ball and training cones on the Arena’s white line',
@@ -110,7 +110,7 @@ export const stories: ProgramStory[] = [
       { title: 'Green kit', body: 'Registration includes the green kit: jersey, shorts and socks. Bring your own boots.' },
       { title: 'Covered and floodlit', body: 'The Arena is roofed and lit, behind Mountain View Mall on Waiyaki Way.' },
     ],
-    goodToKnow: ['Training is on Saturdays, 2pm to 4pm.', 'WhatsApp us to register and we will send you the details.'],
+    goodToKnow: ['For ages 6 to 17. Training is on Saturdays and Sundays; WhatsApp us for session times.', 'WhatsApp us to register and we will send you the details.'],
     register: {
       heading: 'Start the pathway',
       label: 'WhatsApp us to register',
@@ -118,7 +118,7 @@ export const stories: ProgramStory[] = [
       note: 'Tap to open WhatsApp with your message ready to send. We reply with the details.',
     },
     formUrl: ACADEMY_FORM_URL,
-    shareLine: 'Saturdays, 2–4pm, on the Arena.',
+    shareLine: 'Ages 6–17. Saturdays and Sundays on the Arena.',
     ogPhoto: 'boots-and-ball.jpg',
   },
   {

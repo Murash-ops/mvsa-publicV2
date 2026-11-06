@@ -60,10 +60,10 @@ const SEED: AcademyProgram[] = [
     name: 'Football Academy',
     image_url: '/images/programs/boots-and-ball.webp',
     type: 'academy',
-    schedule: 'Saturdays, 2–4pm',
-    age_group: 'Young players',
+    schedule: 'Saturdays & Sundays',
+    age_group: 'Ages 6–17',
     description:
-      'Youth football on the Arena every Saturday afternoon: technique, small-sided games and match play, with the academy coaches.',
+      'Youth football on the Arena every Saturday and Sunday, for ages 6 to 17: technique, small-sided games and match play, with the academy coaches.',
     booking_mode: 'enquiry_only',
   },
   {

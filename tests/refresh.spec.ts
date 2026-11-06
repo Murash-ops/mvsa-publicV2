@@ -102,7 +102,10 @@ test('nothing unconfirmed is claimed: no Wi-Fi, lockers or changing rooms, no ag
     expect(text, path).not.toMatch(/wi-?fi|lockers|changing rooms|mats and blocks/i);
   }
   await page.goto('/programs/football-academy');
-  await expect(page.locator('main')).not.toContainText(/ages? 6|6 to 16|6–16|boys and girls/i);
+  // Confirmed by Murash, 6 Nov 2026: ages 6–17, Saturdays and Sundays.
+  await expect(page.locator('main')).toContainText('Ages 6–17');
+  await expect(page.locator('main')).toContainText('Saturdays & Sundays');
+  await expect(page.locator('main')).not.toContainText(/6 to 16|6–16|boys and girls|2–4pm/i);
   await expect(page.getByTestId('register-cta')).toHaveAttribute('href', /^https:\/\/wa\.me\/254798258950/);
 });
 
@@ -379,7 +382,9 @@ test.describe('programme pages', () => {
     await page.goto('/programs/dance');
     const main = page.locator('main');
     await expect(main).toContainText(/coming soon/i);
-    await expect(main).not.toContainText(/ages?\s*6|6–16|register/i);
+    // Dance's own content only: the "Also at the Arena" cards show other programmes' ages.
+    const own = main.locator('section').filter({ hasNot: page.getByTestId('program-tile') });
+    for (const text of await own.allInnerTexts()) expect(text).not.toMatch(/ages?\s*6|6–1[67]|register/i);
     await expect(page.getByTestId('register-cta')).toContainText('Ask us');
   });
 

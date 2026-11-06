@@ -192,7 +192,7 @@ export const about = {
     'Mountain View Sports Arena is a floodlit 5-aside pitch behind Mountain View Mall on Waiyaki Way, open every day from 06:00 to midnight.',
   story: [
     'We built the Arena so the neighbourhood has a proper place to play: a covered synthetic pitch under floodlights, and a reception team to sort out your booking.',
-    'Book an hour for your five-a-side, bring the children to the academy on a Saturday, or use the meeting room for a team talk. Whatever brings you, the lights stay on until midnight.',
+    'Book an hour for your five-a-side, bring the children to the academy at the weekend, or use the meeting room for a team talk. Whatever brings you, the lights stay on until midnight.',
   ],
   amenities: [
     { title: 'Floodlit to midnight', body: 'Play late, every day of the week.' },
