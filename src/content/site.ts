@@ -224,6 +224,8 @@ export const booking = {
     body: 'Pick a kick-off and we’ll open WhatsApp with your request ready to send. Reception checks the diary and confirms your slot.',
     coming: 'Online booking is coming. Until then, reception books every slot by hand.',
     retry: 'Check for live times',
+    /** Under the picked hour on the 3D pitch. */
+    markerCaption: 'Your squad’s time',
   },
 } as const;
 

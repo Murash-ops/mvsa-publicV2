@@ -170,6 +170,61 @@ test.describe('Extra Time on /book', () => {
   });
 });
 
+test.describe('the 3D pitch on /book', () => {
+  test('sits beside the picker on a desktop and its marker follows the picked hour', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.clock.setFixedTime(new Date('2026-12-02T05:00:00Z')); // 08:00 in Nairobi, after Extra Time
+    await page.route('**/public/slots**', (route) => route.abort());
+    await page.goto('/book');
+    const pitch = page.getByTestId('pitch-3d');
+    await expect(pitch).toBeVisible();
+    const marker = page.getByTestId('pitch-marker-time');
+    await expect(marker).toHaveText('20:00');
+    const picker = page.getByTestId('kickoff-picker');
+    await picker.getByRole('button', { name: '18:00' }).click();
+    await expect(marker).toHaveText('18:00');
+    await picker.getByRole('button', { name: '19:00' }).click();
+    await expect(marker).toHaveText('18:00–20:00');
+    await expect(page.getByTestId('pitch-marker-extra')).toHaveCount(0);
+    // Beside the picker: to its right, overlapping it vertically.
+    const p = (await pitch.boundingBox())!;
+    const k = (await picker.boundingBox())!;
+    expect(p.x).toBeGreaterThan(k.x + k.width - 1);
+  });
+
+  test('on a phone it sits above the picker, compact', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.route('**/public/slots**', (route) => route.abort());
+    await page.goto('/book');
+    const p = (await page.getByTestId('pitch-3d').boundingBox())!;
+    const k = (await page.getByTestId('kickoff-picker').boundingBox())!;
+    expect(p.y + p.height).toBeLessThanOrEqual(k.y);
+    expect(p.height).toBeLessThanOrEqual(220);
+  });
+
+  test('during Extra Time a daytime pick shows +30 MIN FREE on the marker, an evening pick does not', async ({ page }) => {
+    await page.clock.setFixedTime(new Date('2026-11-10T05:00:00Z')); // 08:00 in Nairobi
+    await page.route('**/public/slots**', (route) => route.abort());
+    await page.goto('/book');
+    await expect(page.getByTestId('pitch-marker-time')).toHaveText('09:00');
+    await expect(page.getByTestId('pitch-marker-extra')).toHaveText('+30 MIN FREE');
+    await page.getByTestId('kickoff-picker').getByRole('button', { name: '20:00' }).click();
+    await expect(page.getByTestId('pitch-marker-extra')).toHaveCount(0);
+  });
+
+  test('keeps still for reduced motion', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto('/book');
+    const marker = page.getByTestId('pitch-marker');
+    expect(await marker.evaluate((el) => getComputedStyle(el).animationName)).toBe('none');
+    const board = page.getByTestId('pitch-3d').locator('> div').first();
+    const before = await board.evaluate((el) => el.getAttribute('style'));
+    await page.getByTestId('pitch-3d').hover({ position: { x: 20, y: 20 } });
+    expect(await board.evaluate((el) => el.getAttribute('style'))).toBe(before);
+  });
+});
+
 test.describe("What's on", () => {
   test('has its own page with the current cards', async ({ page }) => {
     await page.clock.setFixedTime(new Date('2026-11-04T09:00:00Z'));

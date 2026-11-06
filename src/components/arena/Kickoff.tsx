@@ -329,3 +329,9 @@ export function PickedTime() {
   const { label } = useKickoff();
   return <>{label}</>;
 }
+
+/** True when the picked day and hours qualify for Extra Time. */
+export function usePickedExtraTime(): boolean {
+  const { picked, span, day } = useKickoff();
+  return isExtraTimeDay(day?.date) && isExtraTimeHours(picked, span);
+}
