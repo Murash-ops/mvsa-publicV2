@@ -61,7 +61,7 @@ function phones(program: AcademyProgram) {
       ]
     : [
         { label: contact.bookingsPhone, href: contact.bookingsPhoneHref },
-        { label: contact.secondPhone, href: contact.secondPhoneHref },
+        program.second_phone ?? { label: contact.secondPhone, href: contact.secondPhoneHref },
       ];
 }
 
@@ -345,7 +345,7 @@ export default async function ProgramPage({ params }: { params: Promise<{ slug: 
               {phones(program).map((phone, i) => (
                 <span key={phone.href}>
                   {i > 0 ? ' / ' : null}
-                  <a href={phone.href} className="inline-flex min-h-11 items-center font-semibold text-white underline decoration-gold underline-offset-4 hover:text-gold-light">
+                  <a href={phone.href} data-testid="program-phone" className="inline-flex min-h-11 items-center font-semibold text-white underline decoration-gold underline-offset-4 hover:text-gold-light">
                     {phone.label}
                   </a>
                 </span>

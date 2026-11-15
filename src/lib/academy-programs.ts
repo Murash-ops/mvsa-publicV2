@@ -51,6 +51,11 @@ export interface AcademyProgram {
    * has cleared (Yoga & Mobility). Never for the Academy or Chess Club.
    */
   price?: string;
+  /**
+   * A second line to call for this class, shown beside the bookings line in
+   * place of reception's second number. The WhatsApp button is not affected.
+   */
+  second_phone?: { label: string; href: string };
   /** Every programme is enquiry-only: enrolment happens over WhatsApp. */
   booking_mode: 'enquiry_only';
 }
@@ -120,6 +125,8 @@ const SEED: AcademyProgram[] = [
     description:
       'An hour of movement and breathing on the covered pitch every Tuesday morning. Booking is essential.',
     price: 'Ksh 500 a class',
+    // The class's own line (owner, 15 Nov 2026). No name is printed with it.
+    second_phone: { label: '0797 531 742', href: 'tel:+254797531742' },
     booking_mode: 'enquiry_only',
   },
   {

@@ -339,6 +339,10 @@ test.describe('programme pages', () => {
       'href',
       `${WA}${encodeURIComponent("Hi MVSA, I'd like to book Yoga & Mobility on Tuesday")}`
     );
+    // Its second number is the class's own line; the button still goes to the bookings line.
+    const phones = page.getByTestId('program-phone');
+    await expect(phones).toHaveText(['0798 258 950', '0797 531 742']);
+    await expect(phones.nth(1)).toHaveAttribute('href', 'tel:+254797531742');
     // This class has a price; it is never called free or donation-based itself.
     // (The cards for the other programmes, below "Also at the Arena", are left out.)
     const text = (await main.innerText()).split(/also at\s+the arena/i)[0];
@@ -349,7 +353,11 @@ test.describe('programme pages', () => {
     await page.goto('/programs/community-yoga');
     await expect(page.getByTestId('program-also')).toHaveAttribute('href', '/programs/yoga-and-mobility');
     await expect(page.getByTestId('program-focal')).toHaveText('Fri 9am');
+    // Every other programme keeps its own numbers.
+    await expect(page.getByTestId('program-phone')).toHaveText(['0798 258 950', '0783 209 442']);
     await expect(page.locator('main')).toContainText(/donation-based/i);
+    await page.goto('/programs/chess-club');
+    await expect(page.getByTestId('program-phone')).toHaveText(['0798 258 950', '0116 619 476']);
   });
 
   test('only Yoga & Mobility shows a price on its programme page, and only Ksh 500', async ({ page }) => {
