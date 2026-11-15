@@ -111,6 +111,8 @@ const SEED: AcademyProgram[] = [
     schedule: 'Fridays, 9am',
     age_group: 'All levels',
     description: 'A donation-based yoga class on the covered pitch every Friday morning. Give what you can.',
+    // The yoga classes' own line (owner, 16 Nov 2026). No name is printed with it.
+    second_phone: { label: '0797 531 742', href: 'tel:+254797531742' },
     booking_mode: 'enquiry_only',
   },
   {

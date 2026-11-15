@@ -353,11 +353,15 @@ test.describe('programme pages', () => {
     await page.goto('/programs/community-yoga');
     await expect(page.getByTestId('program-also')).toHaveAttribute('href', '/programs/yoga-and-mobility');
     await expect(page.getByTestId('program-focal')).toHaveText('Fri 9am');
-    // Every other programme keeps its own numbers.
-    await expect(page.getByTestId('program-phone')).toHaveText(['0798 258 950', '0783 209 442']);
+    // The Friday class shows the same yoga line; its button still goes to the bookings line.
+    await expect(page.getByTestId('program-phone')).toHaveText(['0798 258 950', '0797 531 742']);
+    await expect(page.getByTestId('register-cta')).toHaveAttribute('href', new RegExp(`^${WA.replace(/[.?]/g, '\\$&')}`));
     await expect(page.locator('main')).toContainText(/donation-based/i);
+    // Every non-yoga programme keeps its own numbers.
     await page.goto('/programs/chess-club');
     await expect(page.getByTestId('program-phone')).toHaveText(['0798 258 950', '0116 619 476']);
+    await page.goto('/programs/boxing');
+    await expect(page.getByTestId('program-phone')).toHaveText(['0798 258 950', '0783 209 442']);
   });
 
   test('only Yoga & Mobility shows a price on its programme page, and only Ksh 500', async ({ page }) => {
