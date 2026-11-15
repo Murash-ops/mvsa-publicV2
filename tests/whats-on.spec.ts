@@ -200,7 +200,7 @@ test.describe('the checked-in fallback', () => {
     const warnings: string[] = [];
     const items = fallbackItems({ warn: (m: string) => warnings.push(m) });
     expect(warnings).toEqual([]);
-    expect(items.map((i) => i.title)).toEqual(['Extra Time', 'Holiday Training', 'Chess Club', 'Community Yoga']);
+    expect(items.map((i) => i.title)).toEqual(['Extra Time', 'Holiday Training', 'Chess Club', 'Community Yoga', 'Yoga & Mobility']);
   });
 
   test('Extra Time carries its small print and never mentions the evening', () => {
@@ -217,7 +217,7 @@ test.describe('the checked-in fallback', () => {
     expect(await titles('2026-12-01T09:00:00Z')).not.toContain('Extra Time');
     expect(await titles('2026-12-19T09:00:00Z')).toContain('Holiday Training');
     expect(await titles('2026-12-20T09:00:00Z')).not.toContain('Holiday Training');
-    expect(await titles('2026-12-20T09:00:00Z')).toEqual(['Chess Club', 'Community Yoga']);
+    expect(await titles('2026-12-20T09:00:00Z')).toEqual(['Chess Club', 'Community Yoga', 'Yoga & Mobility']);
   });
 });
 

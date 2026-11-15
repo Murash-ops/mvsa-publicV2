@@ -105,7 +105,7 @@ test('every page shows no price but the Arena (KSH 1,500) and the meeting room (
 test('the footer lists every programme', async ({ page }) => {
   await page.goto('/');
   const footer = page.locator('footer');
-  for (const name of ['Football Academy', 'Holiday Training', 'Chess Club', 'Community Yoga', 'Boxing', 'Dance & Rhythm', 'Individual Training', 'Events']) {
+  for (const name of ['Football Academy', 'Holiday Training', 'Chess Club', 'Community Yoga', 'Yoga & Mobility', 'Boxing', 'Dance & Rhythm', 'Individual Training', 'Events']) {
     await expect(footer.getByRole('link', { name, exact: true })).toBeVisible();
   }
 });

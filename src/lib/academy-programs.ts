@@ -16,7 +16,9 @@
  * The seed below is kept consistent with the activity catalogue the backend
  * does serve (GET /v1/activities, booking_mode "enquiry_only" for all of
  * these), so nothing here contradicts the venue's approved facts. Prices are
- * deliberately omitted: programme pricing is not published on the site.
+ * deliberately omitted: Academy pricing is never published on the site. The one
+ * exception is Yoga & Mobility, an adult class whose price the owner approved
+ * for the site (15 Nov 2026).
  *
  * WHEN A BACKEND ENDPOINT ARRIVES: replace the two functions at the bottom with
  * calls through src/lib/mvsa-api, keep this module's return shape, and delete
@@ -44,6 +46,11 @@ export interface AcademyProgram {
   description: string;
   image_url?: string;
   instructor?: { name: string };
+  /**
+   * A price approved for the site. Only ever set for an adult class the owner
+   * has cleared (Yoga & Mobility). Never for the Academy or Chess Club.
+   */
+  price?: string;
   /** Every programme is enquiry-only: enrolment happens over WhatsApp. */
   booking_mode: 'enquiry_only';
 }
@@ -99,6 +106,20 @@ const SEED: AcademyProgram[] = [
     schedule: 'Fridays, 9am',
     age_group: 'All levels',
     description: 'A donation-based yoga class on the covered pitch every Friday morning. Give what you can.',
+    booking_mode: 'enquiry_only',
+  },
+  {
+    // Confirmed by Murash, 15 Nov 2026. First class Tuesday 17 November 2026.
+    id: 'yoga_and_mobility',
+    slug: 'yoga-and-mobility',
+    name: 'Yoga & Mobility',
+    image_url: '/images/programs/yoga.webp',
+    type: 'fitness',
+    schedule: 'Tuesdays, 7:30–8:30am',
+    age_group: '',
+    description:
+      'An hour of movement and breathing on the covered pitch every Tuesday morning. Booking is essential.',
+    price: 'Ksh 500 a class',
     booking_mode: 'enquiry_only',
   },
   {

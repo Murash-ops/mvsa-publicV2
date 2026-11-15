@@ -227,6 +227,11 @@ export default async function ProgramPage({ params }: { params: Promise<{ slug: 
                 </a>
               ) : null}
             </div>
+            {story.also ? (
+              <Link href={story.also.href} className="text-link self-start text-base" data-testid="program-also">
+                {story.also.label}
+              </Link>
+            ) : null}
             <ShareBar url={url} text={shareText} />
           </div>
           <HeroPicture story={story} program={program} />
@@ -239,13 +244,16 @@ export default async function ProgramPage({ params }: { params: Promise<{ slug: 
           {[
             { term: 'When', value: program.schedule },
             { term: 'Who', value: program.age_group },
+            { term: 'Price', value: program.price },
             { term: 'Where', value: 'The Arena, behind Mountain View Mall, Waiyaki Way' },
           ]
             .filter((row) => row.value)
             .map((row) => (
             <div key={row.term} className="flex flex-col gap-1.5 border-l-4 border-gold pl-4">
               <dt className="label text-[13px] tracking-[0.14em] text-mute">{row.term}</dt>
-              <dd className="m-0 text-lg font-semibold leading-snug text-white">{row.value}</dd>
+              <dd className="m-0 text-lg font-semibold leading-snug text-white" data-testid={`glance-${row.term.toLowerCase()}`}>
+                {row.value}
+              </dd>
             </div>
           ))}
         </dl>
