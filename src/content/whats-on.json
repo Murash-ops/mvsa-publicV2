@@ -52,6 +52,19 @@
       "link_url": "/programs/community-yoga",
       "program_id": "community-yoga",
       "small_print": ""
+    },
+    {
+      "title": "Yoga & Mobility",
+      "kicker": "Booking essential",
+      "blurb": "An hour of movement and breathing on the covered pitch. Bring a mat if you have one; if not, mats are provided.",
+      "dates_text": "Every Tuesday, 7:30–8:30am",
+      "show_from": "",
+      "show_until": "",
+      "image": "/images/programs/yoga.webp",
+      "link_label": "About Yoga & Mobility",
+      "link_url": "/programs/yoga-and-mobility",
+      "program_id": "yoga-and-mobility",
+      "small_print": ""
     }
   ]
 }

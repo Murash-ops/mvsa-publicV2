@@ -9,7 +9,9 @@
  * House rules that apply to every word below (MVSA/social/brand.md):
  * - No Academy or chess prices, fees, Till numbers or payment instructions.
  *   Those are shared on WhatsApp only.
- * - Yoga is donation-based. Never "free".
+ * - Community Yoga (Fridays) is donation-based. Never "free".
+ * - Yoga & Mobility (Tuesdays) is an adult class: its price, Ksh 500, may be
+ *   shown (owner, 15 Nov 2026). The teacher is not named.
  * - "Chess Club" leads the chess headline. No wordplay headlines.
  * - No child's face in any photograph.
  */
@@ -71,6 +73,8 @@ export interface ProgramStory {
   };
   /** An approved online form, shown as a second way in. */
   formUrl?: string;
+  /** A pointer to a sister class (the two yoga classes point at each other). */
+  also?: { label: string; href: string };
   /** One line for the share preview card. */
   shareLine: string;
   /** A duotone photo in assets/og-photos for the share card. */
@@ -236,7 +240,50 @@ export const stories: ProgramStory[] = [
       message: registerMessage('Community Yoga'),
       note: 'Tap to open WhatsApp with your message ready to send.',
     },
+    also: { label: 'Also: Yoga & Mobility, Tuesdays at 7:30am', href: '/programs/yoga-and-mobility' },
     shareLine: 'Every Friday, 9am, on the covered pitch. Donation-based.',
+    ogPhoto: 'yoga.jpg',
+  },
+  {
+    // Facts confirmed by Murash, 15 Nov 2026; the description is the teacher's
+    // own, tidied. Nothing added: no level, no health claim, no teacher's name.
+    slug: 'yoga-and-mobility',
+    theme: 'breath',
+    kicker: 'Booking essential',
+    headline: ['Yoga &', 'Mobility'],
+    focal: 'Tue 7:30am',
+    focalLabel: 'Every Tuesday',
+    lede:
+      'Start your Tuesday on the covered pitch. An hour that blends soulful movement with conscious breathing, to leave you calm and clear in the mind, light and energetic in the body, and ready for the day. First class: Tuesday 17 November.',
+    photo: {
+      src: '/images/programs/yoga.webp',
+      alt: 'A yoga class on mats on the covered pitch',
+      treatment: 'natural',
+      position: 'center 55%',
+    },
+    feature: {
+      title: 'What to know',
+      kind: 'cards',
+      items: [
+        { title: 'Movement and breath', body: 'Soulful movement blended with conscious breathing, for one hour: 7:30am to 8:30am.' },
+        { title: 'Book your spot', body: 'Booking is essential. It holds your spot and tells the teacher how many are coming.' },
+        { title: 'Mats', body: 'Bring a mat if you have one. If not, mats are provided.' },
+      ],
+    },
+    goodToKnow: [
+      'Every Tuesday, 7:30am to 8:30am, from Tuesday 17 November 2026.',
+      'Ksh 500 a class.',
+      'Booking is essential, to hold your spot.',
+      'Bring a mat if you have one. If not, mats are provided.',
+    ],
+    register: {
+      heading: 'Book your Tuesday',
+      label: 'Book my spot',
+      message: "Hi MVSA, I'd like to book Yoga & Mobility on Tuesday",
+      note: 'Tap to open WhatsApp with your message ready to send.',
+    },
+    also: { label: 'Also: Community Yoga, Fridays at 9am, donation-based', href: '/programs/community-yoga' },
+    shareLine: 'Every Tuesday, 7:30–8:30am, on the covered pitch. Ksh 500 a class. Booking essential.',
     ogPhoto: 'yoga.jpg',
   },
   {

@@ -8,7 +8,7 @@ import { whatsappUrl } from '@/lib/whatsapp';
 export const metadata: Metadata = {
   title: 'Programmes | Mountain View Sports Arena',
   description:
-    'Football Academy, Holiday Training, Chess Club, Community Yoga, Boxing, Dance & Rhythm, individual training and events at the Arena.',
+    'Football Academy, Holiday Training, Chess Club, Community Yoga, Yoga & Mobility, Boxing, Dance & Rhythm, individual training and events at the Arena.',
 };
 
 /**

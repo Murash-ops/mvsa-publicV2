@@ -327,6 +327,57 @@ test.describe('programme pages', () => {
     });
   }
 
+  test('Yoga & Mobility: Tuesdays 7:30am, Ksh 500, booking essential, and a link to the Friday class', async ({ page }) => {
+    await page.goto('/programs/yoga-and-mobility');
+    const main = page.locator('main');
+    await expect(page.getByTestId('program-focal')).toHaveText('Tue 7:30am');
+    await expect(page.getByTestId('glance-when')).toHaveText('Tuesdays, 7:30–8:30am');
+    await expect(page.getByTestId('glance-price')).toHaveText('Ksh 500 a class');
+    await expect(main).toContainText('Booking is essential');
+    await expect(main).toContainText('Bring a mat if you have one. If not, mats are provided.');
+    await expect(page.getByTestId('register-cta')).toHaveAttribute(
+      'href',
+      `${WA}${encodeURIComponent("Hi MVSA, I'd like to book Yoga & Mobility on Tuesday")}`
+    );
+    // Its second number is the class's own line; the button still goes to the bookings line.
+    const phones = page.getByTestId('program-phone');
+    await expect(phones).toHaveText(['0798 258 950', '0797 531 742']);
+    await expect(phones.nth(1)).toHaveAttribute('href', 'tel:+254797531742');
+    // This class has a price; it is never called free or donation-based itself.
+    // (The cards for the other programmes, below "Also at the Arena", are left out.)
+    const text = (await main.innerText()).split(/also at\s+the arena/i)[0];
+    expect(text).not.toMatch(/\bfree\b/i);
+    expect(text).not.toMatch(/all levels|every level/i);
+    // The two yoga pages point at each other.
+    await expect(page.getByTestId('program-also')).toHaveAttribute('href', '/programs/community-yoga');
+    await page.goto('/programs/community-yoga');
+    await expect(page.getByTestId('program-also')).toHaveAttribute('href', '/programs/yoga-and-mobility');
+    await expect(page.getByTestId('program-focal')).toHaveText('Fri 9am');
+    // The Friday class shows the same yoga line; its button still goes to the bookings line.
+    await expect(page.getByTestId('program-phone')).toHaveText(['0798 258 950', '0797 531 742']);
+    await expect(page.getByTestId('register-cta')).toHaveAttribute('href', new RegExp(`^${WA.replace(/[.?]/g, '\\$&')}`));
+    await expect(page.locator('main')).toContainText(/donation-based/i);
+    // Every non-yoga programme keeps its own numbers.
+    await page.goto('/programs/chess-club');
+    await expect(page.getByTestId('program-phone')).toHaveText(['0798 258 950', '0116 619 476']);
+    await page.goto('/programs/boxing');
+    await expect(page.getByTestId('program-phone')).toHaveText(['0798 258 950', '0783 209 442']);
+  });
+
+  test('only Yoga & Mobility shows a price on its programme page, and only Ksh 500', async ({ page }) => {
+    for (const program of programs) {
+      await page.goto(`/programs/${program.slug}`);
+      const text = await page.locator('main').innerText();
+      const prices = (text.match(/K(?:ES|SH)S?\.?\s?[\d,]+/gi) ?? []).map((p) => p.replace(/\s+/g, ' ').toLowerCase());
+      if (program.slug === 'yoga-and-mobility') {
+        expect(prices.length).toBeGreaterThan(0);
+        for (const price of prices) expect(price).toBe('ksh 500');
+      } else {
+        expect(prices, program.slug).toEqual([]);
+      }
+    }
+  });
+
   test('copy link puts the page address on the clipboard and says so', async ({ page, context }) => {
     await context.grantPermissions(['clipboard-read', 'clipboard-write']);
     await page.goto('/programs/chess-club');
