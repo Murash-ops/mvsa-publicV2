@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import Logo from '@/components/brand/Logo';
-import { contact, social } from '@/content/site';
+import { contact, social, watchGames, youtube } from '@/content/site';
 import { getAcademyPrograms } from '@/lib/academy-programs';
 
 const pages = [
@@ -61,6 +61,15 @@ export default function Footer() {
               className={linkClass}
             >
               @{social.instagram}
+            </a>
+            <a
+              href={youtube.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={linkClass}
+              data-testid="footer-youtube"
+            >
+              {watchGames.short}
             </a>
             <h2 className="label mt-4 text-base tracking-[0.14em] text-white">Pages</h2>
             <ul>

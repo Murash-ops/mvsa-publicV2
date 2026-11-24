@@ -65,6 +65,29 @@ export const social = {
   facebook: 'mtviewsportsarena',
 } as const;
 
+/**
+ * The Arena's YouTube channel, MVSA TV (@MountainViewSportsArena, channel
+ * UC8iROTCPpmjCwbv0Zj2Cbpg). Not to be confused with the unrelated "MVSA TV"
+ * at @MVSATV. The site links to the channel only: customers' booking matches
+ * are never embedded one by one, because each needs the captain's consent.
+ */
+export const youtube = {
+  name: 'MVSA TV',
+  handle: '@MountainViewSportsArena',
+  url: 'https://www.youtube.com/@MountainViewSportsArena',
+} as const;
+
+/** "Watch our games": the home page section and the line on What's on. */
+export const watchGames = {
+  tag: 'MVSA TV',
+  titleTop: 'Watch our',
+  titleBottom: 'games',
+  body: 'Games from the Arena, on our YouTube channel MVSA TV. Watch them back and subscribe for the next one.',
+  cta: 'Watch on YouTube',
+  /** The short line on What's on and in the footer. */
+  short: 'Watch our games on YouTube',
+} as const;
+
 /** The owner's own words, used to close pages. */
 export const signature = 'Bring your squad.';
 

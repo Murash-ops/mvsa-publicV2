@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import PageHeader from '@/components/arena/PageHeader';
-import { contact as venueContact, social } from '@/content/site';
+import { contact as venueContact, social, youtube } from '@/content/site';
 import { isValidKenyanPhone } from '@/lib/booking/phone';
 import { whatsappUrl } from '@/lib/whatsapp';
 
@@ -21,6 +21,7 @@ export default function ContactPage() {
     { name: 'Instagram', handle: `@${social.instagram}`, href: `https://instagram.com/${social.instagram}` },
     { name: 'TikTok', handle: `@${social.tiktok}`, href: `https://www.tiktok.com/@${social.tiktok}` },
     { name: 'Facebook', handle: social.facebook, href: `https://facebook.com/${social.facebook}` },
+    { name: 'YouTube', handle: youtube.name, href: youtube.url },
   ];
 
   const handleSubmit = (e: React.FormEvent) => {
