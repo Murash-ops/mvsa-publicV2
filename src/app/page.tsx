@@ -11,6 +11,7 @@ import Bento from '@/components/arena/Bento';
 import LampClose from '@/components/arena/LampClose';
 import WhatsOnPosters from '@/components/whats-on/WhatsOnPosters';
 import ProgramTile from '@/components/programs/ProgramTile';
+import WatchGames from '@/components/arena/WatchGames';
 
 /** What's on is read from the sheet at most once an hour. */
 export const revalidate = 3600;
@@ -84,6 +85,9 @@ export default async function Home() {
           </Link>
         </section>
       </div>
+
+      {/* Watch our games: the YouTube channel, MVSA TV. */}
+      <WatchGames />
 
       {/* Programmes: each card in its own theme. */}
       <section id="programs" className="wrap flex flex-col gap-8 py-[clamp(56px,7vw,88px)]" aria-labelledby="programs-title">
