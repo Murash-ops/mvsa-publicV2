@@ -373,6 +373,7 @@ test.describe('posters', () => {
   test('the Weekend Academy card is Saturday only, with no fee', () => {
     const academy = fallbackItems(quiet).find((i) => i.title === 'Weekend Academy')!;
     expect(academy.datesText).toBe('Saturdays, 2–4pm');
+    expect(academy.blurb).toBe('Football for ages 6–17. WhatsApp us to register.');
     expect(academy.linkUrl).toBe('/programs/football-academy');
     expect(JSON.stringify(academy)).not.toMatch(/sunday|ksh|kes|\bsh\b|fee|till|m-?pesa/i);
   });
