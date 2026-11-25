@@ -69,7 +69,7 @@
       "link_url": "/programs/community-yoga",
       "program_id": "community-yoga",
       "small_print": "",
-      "poster": ""
+      "poster": "/posters/community-yoga.jpg"
     },
     {
       "title": "Yoga & Mobility",
@@ -83,7 +83,7 @@
       "link_url": "/programs/yoga-and-mobility",
       "program_id": "yoga-and-mobility",
       "small_print": "",
-      "poster": ""
+      "poster": "/posters/yoga-and-mobility.jpg"
     }
   ]
 }

@@ -367,6 +367,8 @@ test.describe('posters', () => {
     expect(warnings).toEqual([]);
     expect(items.filter((i) => i.poster).map((i) => [i.title, i.poster, i.posterFilename])).toEqual([
       ['Weekend Academy', '/posters/weekend-academy.jpg', 'mvsa-weekend-academy.jpg'],
+      ['Community Yoga', '/posters/community-yoga.jpg', 'mvsa-community-yoga.jpg'],
+      ['Yoga & Mobility', '/posters/yoga-and-mobility.jpg', 'mvsa-yoga-and-mobility.jpg'],
     ]);
   });
 
