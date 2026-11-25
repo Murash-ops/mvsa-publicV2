@@ -12,12 +12,15 @@
  * The browser never calls the sheet: the fetch happens on the server.
  */
 
+import { readFileSync } from 'node:fs';
 import fallbackFile from '../../content/whats-on.json';
+import { posterFiles } from '../../content/posters';
 import {
   WhatsOnFormatError,
   checkRecord,
   isShowing,
   parseWhatsOnCsv,
+  type CheckOptions,
   type Column,
   type RowProblem,
   type WhatsOnItem,
@@ -45,17 +48,44 @@ function report(log: Logger, where: string, problems: RowProblem[]) {
   }
 }
 
-/** The checked-in rows, through the same checks as the sheet. */
-export function fallbackItems(log: Logger = console): WhatsOnItem[] {
+function reportNotes(log: Logger, where: string, notes: RowProblem[]) {
+  for (const n of notes) {
+    log.warn(`[whats-on] ${where} row ${n.row}${n.title ? ` ("${n.title}")` : ''}: ${n.reason}`);
+  }
+}
+
+/** The posters really on the site (see src/content/posters.ts). */
+export const knownPosters: ReadonlySet<string> = new Set(posterFiles);
+
+/**
+ * Test-only: with WHATS_ON_FIXTURE set to a JSON file ({ rows, posters }), a
+ * dev server shows those rows instead of the sheet. Ignored in production
+ * builds, so the live site can never show fixture data.
+ */
+function fixture(): { rows: Partial<Record<Column, string>>[]; posters: string[] } | null {
+  const path = process.env.WHATS_ON_FIXTURE;
+  if (!path || process.env.NODE_ENV === 'production') return null;
+  return JSON.parse(readFileSync(path, 'utf8'));
+}
+
+function checkRows(rows: Partial<Record<Column, string>>[], where: string, options: CheckOptions, log: Logger): WhatsOnItem[] {
   const items: WhatsOnItem[] = [];
   const problems: RowProblem[] = [];
-  (fallbackFile.rows as Partial<Record<Column, string>>[]).forEach((row, i) => {
-    const { item, reason } = checkRecord(row);
+  const notes: RowProblem[] = [];
+  rows.forEach((row, i) => {
+    const { item, reason, note } = checkRecord(row, options);
     if (item) items.push(item);
     else problems.push({ row: i + 1, title: row.title ?? '', reason: reason ?? 'invalid' });
+    if (note) notes.push({ row: i + 1, title: row.title ?? '', reason: note });
   });
-  report(log, 'fallback file', problems);
+  report(log, where, problems);
+  reportNotes(log, where, notes);
   return items;
+}
+
+/** The checked-in rows, through the same checks as the sheet. */
+export function fallbackItems(log: Logger = console, posters: ReadonlySet<string> = knownPosters): WhatsOnItem[] {
+  return checkRows(fallbackFile.rows as Partial<Record<Column, string>>[], 'fallback file', { posterFiles: posters }, log);
 }
 
 export async function loadWhatsOn({
@@ -63,15 +93,23 @@ export async function loadWhatsOn({
   fetchImpl = fetch as FetchLike,
   now = new Date(),
   log = console,
+  posters = knownPosters,
 }: {
   url?: string;
   fetchImpl?: FetchLike;
   now?: Date;
   log?: Logger;
+  posters?: ReadonlySet<string>;
 } = {}): Promise<WhatsOnResult> {
+  const test = fixture();
+  if (test) {
+    const items = checkRows(test.rows, 'fixture', { posterFiles: new Set(test.posters) }, log);
+    return { items: items.filter((item) => isShowing(item, now)), source: 'fallback', reason: 'test fixture' };
+  }
+
   const fallback = (reason: string): WhatsOnResult => {
     if (url) log.warn(`[whats-on] using the checked-in list: ${reason}`);
-    return { items: fallbackItems(log).filter((item) => isShowing(item, now)), source: 'fallback', reason };
+    return { items: fallbackItems(log, posters).filter((item) => isShowing(item, now)), source: 'fallback', reason };
   };
 
   if (!url) return fallback(`${WHATS_ON_ENV} is not set`);
@@ -91,13 +129,19 @@ export async function loadWhatsOn({
   }
 
   try {
-    const { items, problems } = parseWhatsOnCsv(text);
+    const { items, problems, notes } = parseWhatsOnCsv(text, { posterFiles: posters });
     report(log, 'sheet', problems);
+    reportNotes(log, 'sheet', notes);
     return { items: items.filter((item) => isShowing(item, now)), source: 'sheet' };
   } catch (error) {
     if (error instanceof WhatsOnFormatError) return fallback(`the sheet is not in the expected shape: ${error.message}`);
     throw error;
   }
+}
+
+/** Items showing now that carry a poster, for /posters. */
+export function itemsWithPosters(items: WhatsOnItem[]): WhatsOnItem[] {
+  return items.filter((item) => item.poster);
 }
 
 /** Items that belong to one programme, matched by its slug or backend id. */

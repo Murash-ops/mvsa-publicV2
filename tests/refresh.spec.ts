@@ -463,3 +463,13 @@ test.describe('programme pages', () => {
     await expect(page.locator('.prog-hero .duotone img')).toHaveCount(1);
   });
 });
+
+test.describe('posters, before any are approved', () => {
+  test('no card has a download link and /posters says there are none yet', async ({ page }) => {
+    await page.goto('/whats-on');
+    await expect(page.getByTestId('poster-download')).toHaveCount(0);
+    await expect(page.getByTestId('all-posters-link')).toHaveCount(0);
+    await page.goto('/posters');
+    await expect(page.getByTestId('posters-empty')).toBeVisible();
+  });
+});

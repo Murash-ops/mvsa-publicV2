@@ -299,3 +299,70 @@ test.describe('loading', () => {
     expect(items).toHaveLength(4);
   });
 });
+
+test.describe('posters', () => {
+  const NOW = new Date('2026-11-04T09:00:00Z');
+  const onSite = new Set(['community-yoga.jpg']);
+  const yoga = { title: 'Community Yoga', blurb: 'Fridays, give what you can.' };
+
+  test('a sheet made before the poster column still works', () => {
+    const { items } = parseWhatsOnCsv([HEADER, row(yoga)].join('\n'));
+    expect(items.map((i) => i.title)).toEqual(['Community Yoga']);
+    expect(items[0].poster).toBeUndefined();
+  });
+
+  test('a poster on the site gets a download name after the card', () => {
+    const csv = [`${HEADER},poster`, `${row(yoga)},/posters/community-yoga.jpg`].join('\n');
+    const { items, problems, notes } = parseWhatsOnCsv(csv, { posterFiles: onSite });
+    expect(problems).toEqual([]);
+    expect(notes).toEqual([]);
+    expect(items[0]).toMatchObject({ poster: '/posters/community-yoga.jpg', posterFilename: 'mvsa-community-yoga.jpg' });
+  });
+
+  const bad: [string, RegExp][] = [
+    ['/posters/missing.jpg', /not on the site yet/],
+    ['/images/arena/morning-turf.webp', /must be a file on the site/],
+    ['https://example.com/poster.jpg', /must be a file on the site/],
+    ['/posters/../secrets.jpg', /must be a file on the site/],
+    ['/posters/poster.exe', /must be a file on the site/],
+  ];
+  for (const [path, why] of bad) {
+    test(`poster "${path}" is left off and reported, and the card still shows`, () => {
+      const csv = [`${HEADER},poster`, `${row(yoga)},${path}`].join('\n');
+      const { items, problems, notes } = parseWhatsOnCsv(csv, { posterFiles: onSite });
+      expect(problems).toEqual([]);
+      expect(items[0].title).toBe('Community Yoga');
+      expect(items[0].poster).toBeUndefined();
+      expect(notes[0]).toMatchObject({ row: 2, title: 'Community Yoga' });
+      expect(notes[0].reason).toMatch(why);
+    });
+  }
+
+  test('a bad poster in the sheet is logged with its row number', async () => {
+    const warnings: string[] = [];
+    const result = await loadWhatsOn({
+      url: 'https://docs.google.com/x.csv',
+      now: NOW,
+      log: { warn: (m: string) => warnings.push(m) },
+      posters: onSite,
+      fetchImpl: async () => new Response([`${HEADER},poster`, `${row(yoga)},/posters/typo.jpg`].join('\n')),
+    });
+    expect(result.items[0].poster).toBeUndefined();
+    expect(warnings.join('\n')).toMatch(/sheet row 2 \("Community Yoga"\): poster .*not on the site yet.*shows without it/);
+  });
+
+  test('the list of posters matches the files in public/posters', async () => {
+    const { readdirSync } = await import('node:fs');
+    const { join } = await import('node:path');
+    const { posterFiles } = await import('../src/content/posters');
+    const files = readdirSync(join(__dirname, '..', 'public', 'posters'))
+      .filter((f) => !f.startsWith('.') && !f.startsWith('test-'))
+      .sort();
+    expect([...posterFiles].sort()).toEqual(files);
+  });
+
+  test('no poster is on the live site until one is approved', async () => {
+    const items = fallbackItems(quiet);
+    expect(items.filter((i) => i.poster)).toEqual([]);
+  });
+});

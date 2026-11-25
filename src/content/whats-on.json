@@ -12,7 +12,8 @@
       "link_label": "Book a pitch",
       "link_url": "/book",
       "program_id": "",
-      "small_print": "Valid on bookings 6am–6pm, 1–30 Nov 2026."
+      "small_print": "Valid on bookings 6am–6pm, 1–30 Nov 2026.",
+      "poster": ""
     },
     {
       "title": "Holiday Training",
@@ -25,7 +26,8 @@
       "link_label": "Register now",
       "link_url": "/programs/holiday-training",
       "program_id": "holiday-training",
-      "small_print": ""
+      "small_print": "",
+      "poster": ""
     },
     {
       "title": "Chess Club",
@@ -38,7 +40,8 @@
       "link_label": "About Chess Club",
       "link_url": "/programs/chess-club",
       "program_id": "chess-club",
-      "small_print": ""
+      "small_print": "",
+      "poster": ""
     },
     {
       "title": "Community Yoga",
@@ -51,7 +54,8 @@
       "link_label": "About Community Yoga",
       "link_url": "/programs/community-yoga",
       "program_id": "community-yoga",
-      "small_print": ""
+      "small_print": "",
+      "poster": ""
     },
     {
       "title": "Yoga & Mobility",
@@ -64,7 +68,8 @@
       "link_label": "About Yoga & Mobility",
       "link_url": "/programs/yoga-and-mobility",
       "program_id": "yoga-and-mobility",
-      "small_print": ""
+      "small_print": "",
+      "poster": ""
     }
   ]
 }

@@ -24,7 +24,15 @@ export const COLUMNS = [
   'small_print',
 ] as const;
 
-export type Column = (typeof COLUMNS)[number];
+/**
+ * Columns a sheet may leave out. A sheet made before the column existed keeps
+ * working; the new template has them.
+ */
+export const OPTIONAL_COLUMNS = ['poster'] as const;
+
+export type Column = (typeof COLUMNS)[number] | (typeof OPTIONAL_COLUMNS)[number];
+
+const ALL_COLUMNS: readonly string[] = [...COLUMNS, ...OPTIONAL_COLUMNS];
 
 export interface WhatsOnItem {
   /** Stable key for React and for tests: the title in lowercase words. */
@@ -46,6 +54,10 @@ export interface WhatsOnItem {
   /** A programme slug (e.g. chess-club) or backend id (e.g. chess). */
   programId?: string;
   smallPrint?: string;
+  /** A downloadable poster in /public/posters, e.g. /posters/community-yoga.jpg. */
+  poster?: string;
+  /** The name the poster downloads as, e.g. mvsa-community-yoga.jpg. */
+  posterFilename?: string;
 }
 
 export interface RowProblem {
@@ -58,6 +70,17 @@ export interface RowProblem {
 export interface ParseResult {
   items: WhatsOnItem[];
   problems: RowProblem[];
+  /** Rows that still show, but with a part left out (a bad poster). */
+  notes: RowProblem[];
+}
+
+export interface CheckOptions {
+  /**
+   * The poster files that are really on the site (names in /public/posters).
+   * A poster not in this list is left off the card, so a card never links to
+   * a missing file. Omitted: only the shape of the path is checked.
+   */
+  posterFiles?: ReadonlySet<string>;
 }
 
 /** The whole sheet is unusable (wrong columns, not CSV). */
@@ -282,8 +305,30 @@ function checkImage(path: string): string | null {
   return null;
 }
 
-/** Validates one record (from the sheet or the fallback file). */
-export function checkRecord(record: Partial<Record<Column, string>>): { item?: WhatsOnItem; reason?: string } {
+const POSTER_PATH = /^\/posters\/([a-z0-9][a-z0-9-_]*\.(jpg|jpeg|png|webp|pdf))$/i;
+
+/**
+ * A poster is a file in /public/posters (a picture or a PDF). Returns the
+ * file name, or why the poster cannot be used.
+ */
+export function checkPoster(path: string, posterFiles?: ReadonlySet<string>): { file?: string; reason?: string } {
+  const m = POSTER_PATH.exec(path);
+  if (!m) return { reason: `poster "${path}" must be a file on the site, like /posters/community-yoga.jpg` };
+  if (posterFiles && !posterFiles.has(m[1])) {
+    return { reason: `poster "${path}" is not on the site yet (add it to public/posters and src/content/posters.ts)` };
+  }
+  return { file: m[1] };
+}
+
+/**
+ * Validates one record (from the sheet or the fallback file). A wrong poster
+ * does not hide the card: the card shows without its download link and the
+ * reason comes back in `note`.
+ */
+export function checkRecord(
+  record: Partial<Record<Column, string>>,
+  options: CheckOptions = {},
+): { item?: WhatsOnItem; reason?: string; note?: string } {
   const get = (c: Column) => (record[c] ?? '').trim();
 
   const title = get('title');
@@ -341,6 +386,14 @@ export function checkRecord(record: Partial<Record<Column, string>>): { item?: W
 
   const broken = ruleProblem(item);
   if (broken) return { reason: broken };
+
+  const poster = get('poster');
+  if (poster) {
+    const { file, reason } = checkPoster(poster, options.posterFiles);
+    if (!file) return { item, note: `${reason}; the card shows without it` };
+    item.poster = `/posters/${file}`;
+    item.posterFilename = `mvsa-${item.id}${file.slice(file.lastIndexOf('.')).toLowerCase()}`;
+  }
   return { item };
 }
 
@@ -349,7 +402,7 @@ export function checkRecord(record: Partial<Record<Column, string>>): { item?: W
  * whole cannot be trusted (missing or unknown columns); otherwise returns the
  * good rows and a list of the rows that were skipped and why.
  */
-export function parseWhatsOnCsv(text: string): ParseResult {
+export function parseWhatsOnCsv(text: string, options: CheckOptions = {}): ParseResult {
   if (/^\s*<(!doctype|html)/i.test(text)) {
     throw new WhatsOnFormatError('Got a web page, not CSV. Publish the sheet as CSV, not as a web page.');
   }
@@ -359,13 +412,14 @@ export function parseWhatsOnCsv(text: string): ParseResult {
   const header = rows[0].map((h) => h.trim().toLowerCase());
   const missing = COLUMNS.filter((c) => !header.includes(c));
   if (missing.length) throw new WhatsOnFormatError(`Missing columns: ${missing.join(', ')}.`);
-  const unknown = header.filter((h) => h !== '' && !(COLUMNS as readonly string[]).includes(h));
+  const unknown = header.filter((h) => h !== '' && !ALL_COLUMNS.includes(h));
   if (unknown.length) throw new WhatsOnFormatError(`Unknown columns: ${unknown.join(', ')}.`);
   const dupes = header.filter((h, i) => h !== '' && header.indexOf(h) !== i);
   if (dupes.length) throw new WhatsOnFormatError(`Columns appear twice: ${dupes.join(', ')}.`);
 
   const items: WhatsOnItem[] = [];
   const problems: RowProblem[] = [];
+  const notes: RowProblem[] = [];
   const seen = new Set<string>();
 
   rows.slice(1).forEach((cells, index) => {
@@ -381,7 +435,7 @@ export function parseWhatsOnCsv(text: string): ParseResult {
       problems.push({ row: rowNumber, title, reason: 'it has more cells than the header has columns' });
       return;
     }
-    const { item, reason } = checkRecord(record);
+    const { item, reason, note } = checkRecord(record, options);
     if (!item) {
       problems.push({ row: rowNumber, title, reason: reason ?? 'invalid' });
       return;
@@ -391,8 +445,9 @@ export function parseWhatsOnCsv(text: string): ParseResult {
       return;
     }
     seen.add(item.id);
+    if (note) notes.push({ row: rowNumber, title, reason: note });
     items.push(item);
   });
 
-  return { items, problems };
+  return { items, problems, notes };
 }

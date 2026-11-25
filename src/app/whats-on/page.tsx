@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 import PageHeader from '@/components/arena/PageHeader';
 import WhatsOnPosters from '@/components/whats-on/WhatsOnPosters';
 import WatchGames from '@/components/arena/WatchGames';
-import { loadWhatsOn } from '@/lib/whats-on';
+import { itemsWithPosters, loadWhatsOn } from '@/lib/whats-on';
 import { contact, home, social } from '@/content/site';
 
 /** Read from the sheet at most once an hour. */
@@ -32,6 +32,11 @@ export default async function WhatsOnPage() {
             {home.whatsOn.empty}
           </p>
         )}
+        {itemsWithPosters(items).length > 0 ? (
+          <Link href="/posters" className="text-link self-start text-base" data-testid="all-posters-link">
+            All posters, to download and share
+          </Link>
+        ) : null}
         <WatchGames variant="band" />
         <div className="flex flex-wrap items-center justify-between gap-6 border-t border-white/10 pt-8">
           <p className="m-0 max-w-[560px] text-base leading-[1.55] text-fog">
