@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
+import { Download } from 'lucide-react';
 import type { WhatsOnItem } from '@/lib/whats-on';
 
 /**
@@ -14,6 +15,30 @@ const KIDS_PHOTOS = new Set(['/images/programs/boots-and-ball.webp']);
 
 function isExternal(url: string) {
   return /^https?:\/\//.test(url);
+}
+
+/**
+ * "Download poster". `download` saves the file with a clear name on Android
+ * and desktop. Where it is ignored (iPhone Safari at times, and the in-app
+ * browsers of WhatsApp and Instagram), `target="_blank"` opens the full-size
+ * file instead, where it can be pressed and saved.
+ */
+export function PosterDownload({ item, className = '' }: { item: WhatsOnItem; className?: string }) {
+  if (!item.poster) return null;
+  return (
+    <a
+      href={item.poster}
+      download={item.posterFilename}
+      target="_blank"
+      rel="noopener"
+      className={`inline-flex min-h-11 items-center gap-2 ${className}`}
+      data-testid="poster-download"
+    >
+      <Download aria-hidden="true" className="h-[18px] w-[18px]" />
+      Download poster
+      <span className="sr-only"> ({item.title})</span>
+    </a>
+  );
 }
 
 export function WhatsOnPoster({ item, priority = false }: { item: WhatsOnItem; priority?: boolean }) {
@@ -67,6 +92,10 @@ export function WhatsOnPoster({ item, priority = false }: { item: WhatsOnItem; p
             </Link>
           )
         ) : null}
+        <PosterDownload
+          item={item}
+          className="label self-start text-[15px] tracking-[0.08em] text-white underline decoration-gold decoration-2 underline-offset-4 hover:text-gold-light"
+        />
       </div>
     </article>
   );

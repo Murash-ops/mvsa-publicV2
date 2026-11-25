@@ -463,3 +463,18 @@ test.describe('programme pages', () => {
     await expect(page.locator('.prog-hero .duotone img')).toHaveCount(1);
   });
 });
+
+test.describe('posters', () => {
+  test('the approved posters download from their cards and are listed on /posters', async ({ page }) => {
+    await page.goto('/whats-on');
+    await expect(page.getByTestId('poster-download')).toHaveCount(1);
+    const academy = page.getByTestId('whats-on-item').filter({ hasText: 'Weekend Academy' });
+    await expect(academy.getByTestId('poster-download')).toHaveAttribute('download', 'mvsa-weekend-academy.jpg');
+    await page.getByTestId('all-posters-link').click();
+    await expect(page).toHaveURL(/\/posters$/);
+    await expect(page.getByTestId('poster')).toHaveCount(1);
+    const response = await page.request.get('/posters/weekend-academy.jpg');
+    expect(response.status()).toBe(200);
+    expect(response.headers()['content-type']).toContain('image/jpeg');
+  });
+});

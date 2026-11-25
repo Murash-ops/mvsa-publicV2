@@ -200,7 +200,7 @@ test.describe('the checked-in fallback', () => {
     const warnings: string[] = [];
     const items = fallbackItems({ warn: (m: string) => warnings.push(m) });
     expect(warnings).toEqual([]);
-    expect(items.map((i) => i.title)).toEqual(['Extra Time', 'Holiday Training', 'Chess Club', 'Community Yoga', 'Yoga & Mobility']);
+    expect(items.map((i) => i.title)).toEqual(['Extra Time', 'Holiday Training', 'Weekend Academy', 'Chess Club', 'Community Yoga', 'Yoga & Mobility']);
   });
 
   test('Extra Time carries its small print and never mentions the evening', () => {
@@ -217,7 +217,7 @@ test.describe('the checked-in fallback', () => {
     expect(await titles('2026-12-01T09:00:00Z')).not.toContain('Extra Time');
     expect(await titles('2026-12-19T09:00:00Z')).toContain('Holiday Training');
     expect(await titles('2026-12-20T09:00:00Z')).not.toContain('Holiday Training');
-    expect(await titles('2026-12-20T09:00:00Z')).toEqual(['Chess Club', 'Community Yoga', 'Yoga & Mobility']);
+    expect(await titles('2026-12-20T09:00:00Z')).toEqual(['Weekend Academy', 'Chess Club', 'Community Yoga', 'Yoga & Mobility']);
   });
 });
 
@@ -296,6 +296,99 @@ test.describe('loading', () => {
     const csv = readFileSync(join(__dirname, '..', 'docs', 'whats-on-template.csv'), 'utf8');
     const { items, problems } = parseWhatsOnCsv(csv);
     expect(problems).toEqual([]);
-    expect(items).toHaveLength(4);
+    expect(items).toHaveLength(6);
+  });
+});
+
+test.describe('posters', () => {
+  const NOW = new Date('2026-11-04T09:00:00Z');
+  const onSite = new Set(['community-yoga.jpg']);
+  const yoga = { title: 'Community Yoga', blurb: 'Fridays, give what you can.' };
+
+  test('a sheet made before the poster column still works', () => {
+    const { items } = parseWhatsOnCsv([HEADER, row(yoga)].join('\n'));
+    expect(items.map((i) => i.title)).toEqual(['Community Yoga']);
+    expect(items[0].poster).toBeUndefined();
+  });
+
+  test('a poster on the site downloads under its own name', () => {
+    const csv = [`${HEADER},poster`, `${row(yoga)},/posters/community-yoga.jpg`].join('\n');
+    const { items, problems, notes } = parseWhatsOnCsv(csv, { posterFiles: onSite });
+    expect(problems).toEqual([]);
+    expect(notes).toEqual([]);
+    expect(items[0]).toMatchObject({ poster: '/posters/community-yoga.jpg', posterFilename: 'mvsa-community-yoga.jpg' });
+  });
+
+  const bad: [string, RegExp][] = [
+    ['/posters/missing.jpg', /not on the site yet/],
+    ['/images/arena/morning-turf.webp', /must be a file on the site/],
+    ['https://example.com/poster.jpg', /must be a file on the site/],
+    ['/posters/../secrets.jpg', /must be a file on the site/],
+    ['/posters/poster.exe', /must be a file on the site/],
+  ];
+  for (const [path, why] of bad) {
+    test(`poster "${path}" is left off and reported, and the card still shows`, () => {
+      const csv = [`${HEADER},poster`, `${row(yoga)},${path}`].join('\n');
+      const { items, problems, notes } = parseWhatsOnCsv(csv, { posterFiles: onSite });
+      expect(problems).toEqual([]);
+      expect(items[0].title).toBe('Community Yoga');
+      expect(items[0].poster).toBeUndefined();
+      expect(notes[0]).toMatchObject({ row: 2, title: 'Community Yoga' });
+      expect(notes[0].reason).toMatch(why);
+    });
+  }
+
+  test('a bad poster in the sheet is logged with its row number', async () => {
+    const warnings: string[] = [];
+    const result = await loadWhatsOn({
+      url: 'https://docs.google.com/x.csv',
+      now: NOW,
+      log: { warn: (m: string) => warnings.push(m) },
+      posters: onSite,
+      fetchImpl: async () => new Response([`${HEADER},poster`, `${row(yoga)},/posters/typo.jpg`].join('\n')),
+    });
+    expect(result.items[0].poster).toBeUndefined();
+    expect(warnings.join('\n')).toMatch(/sheet row 2 \("Community Yoga"\): poster .*not on the site yet.*shows without it/);
+  });
+
+  test('the list of posters matches the files in public/posters', async () => {
+    const { readdirSync } = await import('node:fs');
+    const { join } = await import('node:path');
+    const { posterFiles } = await import('../src/content/posters');
+    const files = readdirSync(join(__dirname, '..', 'public', 'posters'))
+      .filter((f) => !f.startsWith('.') && !f.startsWith('test-'))
+      .sort();
+    expect([...posterFiles].sort()).toEqual(files);
+  });
+
+  test('the approved posters are on their cards, with clear download names', () => {
+    const warnings: string[] = [];
+    const items = fallbackItems({ warn: (m: string) => warnings.push(m) });
+    expect(warnings).toEqual([]);
+    expect(items.filter((i) => i.poster).map((i) => [i.title, i.poster, i.posterFilename])).toEqual([
+      ['Weekend Academy', '/posters/weekend-academy.jpg', 'mvsa-weekend-academy.jpg'],
+    ]);
+  });
+
+  test('the Weekend Academy card is Saturday only, with no fee', () => {
+    const academy = fallbackItems(quiet).find((i) => i.title === 'Weekend Academy')!;
+    expect(academy.datesText).toBe('Saturdays, 2–4pm');
+    expect(academy.blurb).toBe('Football for ages 6–17. WhatsApp us to register.');
+    expect(academy.linkUrl).toBe('/programs/football-academy');
+    expect(JSON.stringify(academy)).not.toMatch(/sunday|ksh|kes|\bsh\b|fee|till|m-?pesa/i);
+  });
+
+  test('every poster file is a web-sized JPG with no camera or GPS data', async () => {
+    const { readFileSync, statSync } = await import('node:fs');
+    const { join } = await import('node:path');
+    const { posterFiles } = await import('../src/content/posters');
+    for (const name of posterFiles) {
+      const path = join(__dirname, '..', 'public', 'posters', name);
+      expect(statSync(path).size).toBeLessThan(400_000);
+      const bytes = readFileSync(path);
+      expect(bytes.subarray(0, 2).toString('hex')).toBe('ffd8');
+      // No EXIF block (APP1 "Exif"), so no GPS or camera details.
+      expect(bytes.includes(Buffer.from('Exif\0\0', 'binary'))).toBe(false);
+    }
   });
 });

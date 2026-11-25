@@ -52,3 +52,6 @@ testsprite_tests\tmp\config.json
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+
+# What's on poster fixtures written by tests, never deployed
+/public/posters/test-*

@@ -1,0 +1,34 @@
+{
+  "_note": "Test-only What's on rows for tests/posters.spec.ts, read by the :3002 dev server through WHATS_ON_FIXTURE. Never used in production. The poster file itself is served by the test (page.route), not from public/.",
+  "posters": ["test-community-yoga.png"],
+  "rows": [
+    {
+      "title": "Community Yoga",
+      "kicker": "Donation-based",
+      "blurb": "A gentle start to Friday on the covered pitch. Every level welcome; give what you can.",
+      "dates_text": "Every Friday, 9am",
+      "image": "/images/programs/yoga.webp",
+      "link_label": "About Community Yoga",
+      "link_url": "/programs/community-yoga",
+      "program_id": "community-yoga",
+      "poster": "/posters/test-community-yoga.png"
+    },
+    {
+      "title": "Chess Club",
+      "kicker": "For children",
+      "blurb": "Real boards and our chess coach, every Saturday morning.",
+      "dates_text": "Every Saturday, 10am",
+      "image": "/images/programs/chess-boards.webp",
+      "link_label": "About Chess Club",
+      "link_url": "/programs/chess-club",
+      "program_id": "chess-club",
+      "poster": "/posters/not-uploaded.jpg"
+    },
+    {
+      "title": "Old Event",
+      "blurb": "Finished, so its poster is not listed.",
+      "show_until": "2026-01-31",
+      "poster": "/posters/test-community-yoga.png"
+    }
+  ]
+}

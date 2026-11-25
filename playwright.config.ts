@@ -62,18 +62,34 @@ export default defineConfig({
         MVSA_API_TIMEOUT_MS: '1000',
       },
     },
+    {
+      // Posters: What's on from test-only rows (ignored in production builds).
+      command: 'npx next dev -p 3002',
+      url: 'http://localhost:3002',
+      reuseExistingServer: true,
+      timeout: 180_000,
+      env: {
+        NEXT_DIST_DIR: '.next_public_posters',
+        WHATS_ON_FIXTURE: 'tests/fixtures/whats-on-posters.json',
+      },
+    },
   ],
 
   projects: [
     {
       name: 'chromium',
       use: { ...devices['Desktop Chrome'], baseURL: 'http://localhost:3000' },
-      testIgnore: /booking-writes\.spec\.ts/,
+      testIgnore: /(booking-writes|posters)\.spec\.ts/,
     },
     {
       name: 'booking-writes',
       use: { ...devices['Desktop Chrome'], baseURL: 'http://localhost:3001' },
       testMatch: /booking-writes\.spec\.ts/,
+    },
+    {
+      name: 'posters',
+      use: { ...devices['Desktop Chrome'], baseURL: 'http://localhost:3002', acceptDownloads: true },
+      testMatch: /posters\.spec\.ts/,
     },
   ],
 });

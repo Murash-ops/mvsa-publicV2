@@ -22,6 +22,7 @@ Next.js (App Router) application. No sign-in.
 | `/book` | The one booking page: the Arena (the 6-step WhatsApp widget) and the meeting room. Reached from the single **Book** button in the navigation. |
 | `/programs` and `/programs/<name>` | One themed page per programme with its own share card, share buttons and a **Register now** button that opens WhatsApp with the message filled in. |
 | `/shop` | Arena Kit, ordered on WhatsApp. The navigation shows it with a small animated bag. |
+| `/posters` | The posters for what is on now, to download and share. Says there are none when no card has a poster. |
 
 Programme addresses are plain words, made for sharing: `/programs/football-academy`,
 `/programs/holiday-training`, `/programs/chess-club`, `/programs/community-yoga`,
@@ -78,6 +79,23 @@ instead.
 | `link_url` | A page on this site (`/programs/chess-club`, `/book`) or a full `https://` address. |
 | `program_id` | Shows the card on that programme's page too: `chess-club`, `holiday-training`, … |
 | `small_print` | Conditions. Extra Time must carry "Valid on bookings 6am–6pm, 1–30 Nov." |
+| `poster` | Optional. A poster people can download: `/posters/community-yoga.jpg`. The card gets a **Download poster** link (saved as `mvsa-community-yoga.jpg`) and the poster is listed on `/posters`. A sheet without this column still works. |
+
+### Posters
+
+Only approved posters go up, in two steps:
+
+1. Put the file in `public/posters/` (jpg, png, webp or pdf; lowercase name
+   with dashes, e.g. `community-yoga.jpg`), add its name to
+   `src/content/posters.ts`, and deploy. A test fails if the list and the
+   folder differ.
+2. Put `/posters/community-yoga.jpg` in that card's `poster` column.
+
+A poster that is not a file in that list, or not a `/posters/…` path, is left
+off the card and written to the Vercel logs; the card itself still shows. On a
+phone the link downloads the file, or (iPhone Safari, WhatsApp and Instagram's
+own browsers) opens it full size to press and save; `/posters` shows each
+poster whole for the same reason.
 
 ### Rows that are skipped
 
@@ -193,6 +211,11 @@ npx playwright test --ui             # Interactive mode
 `tests/booking.spec.ts` and `tests/booking-writes.spec.ts` drive the booking
 path against a mocked `/api/*` layer, including the unreachable-backend and 409
 cases, so they need no backend and no token.
+
+`tests/posters.spec.ts` runs on a third dev server (:3002) that reads the
+test-only rows in `tests/fixtures/whats-on-posters.json` (`WHATS_ON_FIXTURE`,
+ignored in production builds); the poster file is served by the test itself,
+so no fake poster is ever in `public/`.
 
 `tests/whats-on.spec.ts` checks the sheet reader with no network: CSV quoting,
 bad rows, date windows in Nairobi time, and the fallback. `tests/refresh.spec.ts`
