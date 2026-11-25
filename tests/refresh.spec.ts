@@ -467,12 +467,14 @@ test.describe('programme pages', () => {
 test.describe('posters', () => {
   test('the approved posters download from their cards and are listed on /posters', async ({ page }) => {
     await page.goto('/whats-on');
-    await expect(page.getByTestId('poster-download')).toHaveCount(1);
+    await expect(page.getByTestId('poster-download')).toHaveCount(3);
     const academy = page.getByTestId('whats-on-item').filter({ hasText: 'Weekend Academy' });
     await expect(academy.getByTestId('poster-download')).toHaveAttribute('download', 'mvsa-weekend-academy.jpg');
+    const yoga = page.getByTestId('whats-on-item').filter({ hasText: 'Yoga & Mobility' });
+    await expect(yoga.getByTestId('poster-download')).toHaveAttribute('download', 'mvsa-yoga-and-mobility.jpg');
     await page.getByTestId('all-posters-link').click();
     await expect(page).toHaveURL(/\/posters$/);
-    await expect(page.getByTestId('poster')).toHaveCount(1);
+    await expect(page.getByTestId('poster')).toHaveCount(3);
     const response = await page.request.get('/posters/weekend-academy.jpg');
     expect(response.status()).toBe(200);
     expect(response.headers()['content-type']).toContain('image/jpeg');

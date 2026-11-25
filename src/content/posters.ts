@@ -12,6 +12,8 @@
  * step.
  */
 export const posterFiles: readonly string[] = [
-  // Approved by Murash, 25 Nov 2026 (week of 30 Nov feed poster).
+  // Approved by Murash, 25 Nov 2026 (week of 30 Nov feed posters).
+  'community-yoga.jpg',
   'weekend-academy.jpg',
+  'yoga-and-mobility.jpg',
 ];
