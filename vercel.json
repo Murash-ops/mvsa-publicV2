@@ -29,6 +29,15 @@
           "value": "max-age=31536000; includeSubDomains; preload"
         }
       ]
+    },
+    {
+      "source": "/posters/:file",
+      "headers": [
+        {
+          "key": "Content-Disposition",
+          "value": "inline; filename=\"mvsa-:file\""
+        }
+      ]
     }
   ]
 }
