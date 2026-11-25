@@ -464,12 +464,17 @@ test.describe('programme pages', () => {
   });
 });
 
-test.describe('posters, before any are approved', () => {
-  test('no card has a download link and /posters says there are none yet', async ({ page }) => {
+test.describe('posters', () => {
+  test('the approved posters download from their cards and are listed on /posters', async ({ page }) => {
     await page.goto('/whats-on');
-    await expect(page.getByTestId('poster-download')).toHaveCount(0);
-    await expect(page.getByTestId('all-posters-link')).toHaveCount(0);
-    await page.goto('/posters');
-    await expect(page.getByTestId('posters-empty')).toBeVisible();
+    await expect(page.getByTestId('poster-download')).toHaveCount(1);
+    const academy = page.getByTestId('whats-on-item').filter({ hasText: 'Weekend Academy' });
+    await expect(academy.getByTestId('poster-download')).toHaveAttribute('download', 'mvsa-weekend-academy.jpg');
+    await page.getByTestId('all-posters-link').click();
+    await expect(page).toHaveURL(/\/posters$/);
+    await expect(page.getByTestId('poster')).toHaveCount(1);
+    const response = await page.request.get('/posters/weekend-academy.jpg');
+    expect(response.status()).toBe(200);
+    expect(response.headers()['content-type']).toContain('image/jpeg');
   });
 });

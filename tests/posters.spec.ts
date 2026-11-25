@@ -45,7 +45,7 @@ function png(width = 40, height = 60): Buffer {
 }
 
 async function servePoster(page: Page) {
-  await page.route('**/posters/test-fixture-yoga.png', (route) =>
+  await page.route('**/posters/test-community-yoga.png', (route) =>
     route.fulfill({ status: 200, contentType: 'image/png', body: png() }),
   );
 }
@@ -57,13 +57,13 @@ test('a card with a poster has a Download poster link that saves a clearly named
   const yoga = page.getByTestId('whats-on-item').filter({ hasText: 'Community Yoga' });
   const link = yoga.getByTestId('poster-download');
   await expect(link).toHaveText(/Download poster/);
-  await expect(link).toHaveAttribute('href', '/posters/test-fixture-yoga.png');
-  await expect(link).toHaveAttribute('download', 'mvsa-community-yoga.png');
-  // Where download is ignored (iPhone, in-app browsers), it opens the file instead.
+  await expect(link).toHaveAttribute('href', '/posters/test-community-yoga.png');
+  await expect(link).toHaveAttribute('download', 'mvsa-test-community-yoga.png');
+  // Saved under the poster's own file name. Where download is ignored (iPhone, in-app browsers), it opens the file instead.
   await expect(link).toHaveAttribute('target', '_blank');
 
   const [download] = await Promise.all([page.waitForEvent('download'), link.click()]);
-  expect(download.suggestedFilename()).toBe('mvsa-community-yoga.png');
+  expect(download.suggestedFilename()).toBe('mvsa-test-community-yoga.png');
 });
 
 test('a poster that is not on the site is left off; the card still shows', async ({ page }) => {
@@ -85,8 +85,8 @@ test('/posters lists only the posters showing now, full size and easy to save', 
   await expect(posters).toHaveCount(1); // not Chess (no file) and not Old Event (ended)
   await expect(posters.first()).toContainText('Community Yoga');
   const img = posters.first().locator('img');
-  await expect(img).toHaveAttribute('src', '/posters/test-fixture-yoga.png'); // the real file, not a resized copy
+  await expect(img).toHaveAttribute('src', '/posters/test-community-yoga.png'); // the real file, not a resized copy
   await expect.poll(() => img.evaluate((el: HTMLImageElement) => el.naturalWidth)).toBe(40);
-  await expect(posters.first().getByTestId('poster-open')).toHaveAttribute('href', '/posters/test-fixture-yoga.png');
-  await expect(posters.first().getByTestId('poster-download')).toHaveAttribute('download', 'mvsa-community-yoga.png');
+  await expect(posters.first().getByTestId('poster-open')).toHaveAttribute('href', '/posters/test-community-yoga.png');
+  await expect(posters.first().getByTestId('poster-download')).toHaveAttribute('download', 'mvsa-test-community-yoga.png');
 });

@@ -392,7 +392,8 @@ export function checkRecord(
     const { file, reason } = checkPoster(poster, options.posterFiles);
     if (!file) return { item, note: `${reason}; the card shows without it` };
     item.poster = `/posters/${file}`;
-    item.posterFilename = `mvsa-${item.id}${file.slice(file.lastIndexOf('.')).toLowerCase()}`;
+    // Saved under the poster's own name, e.g. mvsa-yoga-and-mobility.jpg.
+    item.posterFilename = `mvsa-${file.toLowerCase()}`;
   }
   return { item };
 }

@@ -1,6 +1,6 @@
 {
   "_note": "Test-only What's on rows for tests/posters.spec.ts, read by the :3002 dev server through WHATS_ON_FIXTURE. Never used in production. The poster file itself is served by the test (page.route), not from public/.",
-  "posters": ["test-fixture-yoga.png"],
+  "posters": ["test-community-yoga.png"],
   "rows": [
     {
       "title": "Community Yoga",
@@ -11,7 +11,7 @@
       "link_label": "About Community Yoga",
       "link_url": "/programs/community-yoga",
       "program_id": "community-yoga",
-      "poster": "/posters/test-fixture-yoga.png"
+      "poster": "/posters/test-community-yoga.png"
     },
     {
       "title": "Chess Club",
@@ -28,7 +28,7 @@
       "title": "Old Event",
       "blurb": "Finished, so its poster is not listed.",
       "show_until": "2026-01-31",
-      "poster": "/posters/test-fixture-yoga.png"
+      "poster": "/posters/test-community-yoga.png"
     }
   ]
 }

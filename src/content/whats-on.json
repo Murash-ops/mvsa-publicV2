@@ -30,6 +30,20 @@
       "poster": ""
     },
     {
+      "title": "Weekend Academy",
+      "kicker": "Weekend training",
+      "blurb": "Football for ages 6–17 with the academy coaches: first touch, small-sided games, then match play. WhatsApp us to register.",
+      "dates_text": "Saturdays, 2–4pm",
+      "show_from": "",
+      "show_until": "",
+      "image": "/images/programs/boots-and-ball.webp",
+      "link_label": "About the Academy",
+      "link_url": "/programs/football-academy",
+      "program_id": "football-academy",
+      "small_print": "",
+      "poster": "/posters/weekend-academy.jpg"
+    },
+    {
       "title": "Chess Club",
       "kicker": "For children",
       "blurb": "Real boards and our chess coach, every Saturday morning. First time? Just come at 10am.",

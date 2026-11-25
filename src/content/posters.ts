@@ -11,4 +11,7 @@
  * card never links to a missing file. A test keeps this list and the folder in
  * step.
  */
-export const posterFiles: readonly string[] = [];
+export const posterFiles: readonly string[] = [
+  // Approved by Murash, 25 Nov 2026 (week of 30 Nov feed poster).
+  'weekend-academy.jpg',
+];
